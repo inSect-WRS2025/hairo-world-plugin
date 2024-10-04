@@ -41,14 +41,8 @@ links:
             rotation: [ 1, 0, 0, 90 ]
             geometry: { type: Cylinder, radius: 0.03, height: 0.02 }
             appearance: { material: { diffuseColor: [ 0.2, 0.2, 0.8 ], transparency: 0.5 } }
-      -
-        type: RateGyroSensor
-        name: GyroSensor
-        maxAngularVelocity: 1000.0
-      -
-        type: AccelerationSensor
-        name: AccSensor
-        maxAcceleration: [ 1000.0, 1000.0, 1000.0 ]
+      - { type: RateGyroSensor, name: GyroSensor, maxAngularVelocity: 1000.0 }
+      - { type: AccelerationSensor, name: AccSensor, maxAcceleration: [ 1000.0, 1000.0, 1000.0 ] }
       -
         type: PassiveMarker
         name: GreenMarker
@@ -86,25 +80,22 @@ links:
         type: Shape
         geometry: { type: Box, size: [ 0.05, 0.05, 0.03 ] }
         appearance: &green { material: { diffuseColor: [ 0, 1, 0 ] } }
-      - &rotor_device
-        type: Rotor
-        name: Rotor_RF
-        symbol: false
+      - &rotor_device { type: Rotor, name: Rotor_RF, symbol: false }
   - <<: *rotor_link
     name: ROTOR_LF
     translation: [ 0.075, 0.075, 0.035 ]
     elements:
       - { <<: *rotor_shape, appearance: *green }
-      - { name: Rotor_LF, <<: *rotor_device }
+      - { <<: *rotor_device, name: Rotor_LF }
   - <<: *rotor_link
     name: ROTOR_LR
     translation: [ -0.075, 0.075, 0.035 ]
     elements:
       - { <<: *rotor_shape, appearance: &red { material: { diffuseColor: [ 1, 0, 0 ] } } }
-      - { name: Rotor_LR, <<: *rotor_device }
+      - { <<: *rotor_device, name: Rotor_LR }
   - <<: *rotor_link
     name: ROTOR_RR
     translation: [ -0.075, -0.075, 0.035 ]
     elements:
       - { <<: *rotor_shape, appearance: *red }
-      - { name: Rotor_RR, <<: *rotor_device }
+      - { <<: *rotor_device, name: Rotor_RR }
