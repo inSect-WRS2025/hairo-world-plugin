@@ -221,6 +221,7 @@ void VFXVisionSimulatorItem::Impl::onPostDynamics()
                 }
             }
             camera->setImage(image);
+            camera->notifyStateChange();
         }
     }
 }
@@ -280,6 +281,7 @@ void VFXVisionSimulatorItem::Impl::onPostDynamics2()
                 converter.random_mosaic(image.get(), mosaic_chance, kernel);
             }
             camera->setImage(image);
+            camera->notifyStateChange();
         }
     }
 }
@@ -413,6 +415,7 @@ void VFXVisionSimulatorItem::Impl::onPostDynamics3()
                 converter.random_mosaic(image.get(), mosaic_chance, kernel);
             }
             camera->setImage(image);
+            camera->notifyStateChange();
         }
     }
 }
