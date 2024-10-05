@@ -32,6 +32,7 @@ public:
     Impl(VFXVisionSimulatorItem* self, const Impl& org);
 
     bool initializeSimulation(SimulatorItem* simulatorItem);
+    void finalizeSimulation();
     void onPostDynamics();
     void onPostDynamics2();
     void onPostDynamics3();
@@ -162,6 +163,19 @@ bool VFXVisionSimulatorItem::Impl::initializeSimulation(SimulatorItem* simulator
     }
 
     return true;
+}
+
+
+void VFXVisionSimulatorItem::finalizeSimulation()
+{
+    GLVisionSimulatorItem::finalizeSimulation();
+    impl->finalizeSimulation();
+}
+
+
+void VFXVisionSimulatorItem::Impl::finalizeSimulation()
+{
+
 }
 
 
