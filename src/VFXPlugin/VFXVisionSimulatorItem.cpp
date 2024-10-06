@@ -6,7 +6,6 @@
 #include <cnoid/Body>
 #include <cnoid/ItemManager>
 #include <cnoid/WorldItem>
-#include <cnoid/Selection>
 #include <cnoid/Archive>
 #include <cnoid/PutPropertyFunction>
 #include <cnoid/DeviceList>
@@ -32,17 +31,10 @@ public:
     Impl(VFXVisionSimulatorItem* self, const Impl& org);
 
     bool initializeSimulation(SimulatorItem* simulatorItem);
-    void finalizeSimulation();
     void onPostDynamics();
-    void onPostDynamics2();
-    void onPostDynamics3();
-    bool setDynamicsType(int dynamicsId);
-    double dynamicsType() const;
 
     DeviceList<Camera> cameras;
     ItemList<MultiColliderItem> colliders;
-    enum DynamicsId { RANDOM_SALT_ONLY, RANDOM_MOSAIC_ONLY, ALL_PROCESS };
-    Selection dynamicsSelection;
     SimulatorItem* simulatorItem;
     std::mutex convertMutex;
     VFXConverter converter;
@@ -74,10 +66,6 @@ VFXVisionSimulatorItem::Impl::Impl(VFXVisionSimulatorItem* self)
 {
     cameras.clear();
     colliders.clear();
-    dynamicsSelection.setSymbol(RANDOM_SALT_ONLY, N_("Random salt only"));
-    dynamicsSelection.setSymbol(RANDOM_MOSAIC_ONLY, N_("Random mosaic only"));
-    dynamicsSelection.setSymbol(ALL_PROCESS, N_("All process"));
-    dynamicsSelection.select(RANDOM_SALT_ONLY);
     simulatorItem = nullptr;
     events.clear();
 }
@@ -96,7 +84,6 @@ VFXVisionSimulatorItem::Impl::Impl(VFXVisionSimulatorItem* self, const Impl& org
 {
     cameras.clear();
     colliders.clear();
-    dynamicsSelection = org.dynamicsSelection;
     vfx_event_file_path = org.vfx_event_file_path;
 }
 
@@ -147,19 +134,7 @@ bool VFXVisionSimulatorItem::Impl::initializeSimulation(SimulatorItem* simulator
     }
 
     if(cameras.size() > 0) {
-        switch(dynamicsSelection.which()) {
-        case RANDOM_SALT_ONLY:
-                simulatorItem->addPostDynamicsFunction([&](){ onPostDynamics(); });
-            break;
-        case RANDOM_MOSAIC_ONLY:
-                simulatorItem->addPostDynamicsFunction([&](){ onPostDynamics2(); });
-            break;
-        case ALL_PROCESS:
-                simulatorItem->addPostDynamicsFunction([&](){ onPostDynamics3(); });
-            break;
-        default:
-            break;
-        }
+        simulatorItem->addPostDynamicsFunction([&](){ onPostDynamics(); });
     }
 
     return true;
@@ -169,139 +144,10 @@ bool VFXVisionSimulatorItem::Impl::initializeSimulation(SimulatorItem* simulator
 void VFXVisionSimulatorItem::finalizeSimulation()
 {
     GLVisionSimulatorItem::finalizeSimulation();
-    impl->finalizeSimulation();
-}
-
-
-void VFXVisionSimulatorItem::Impl::finalizeSimulation()
-{
-
 }
 
 
 void VFXVisionSimulatorItem::Impl::onPostDynamics()
-{
-    double current_time = simulatorItem->currentTime();
-
-    for(auto& camera : cameras) {
-        Link* link = camera->link();
-        double salt_amount = 0.0;
-        double salt_chance = 0.0;
-
-        NoisyCamera* noisyCamera = dynamic_cast<NoisyCamera*>(camera.get());
-        if(noisyCamera) {
-            salt_amount = noisyCamera->saltAmount();
-            salt_chance = noisyCamera->saltChance();
-        }
-
-        for(auto& collider : colliders) {
-            if(collision(collider, link->T().translation())) {
-                salt_amount = collider->saltAmount();
-                salt_chance = collider->saltChance();
-            }
-
-            for(auto& event : events) {
-                for(auto& target_collider : event.targetColliders()) {
-                    if(target_collider == collider->name()) {
-                        double begin_time = event.beginTime();
-                        double end_time = std::max({ event.endTime(), event.beginTime() + event.duration() });
-                        bool is_event_enabled = current_time >= begin_time ? true: false;
-                        is_event_enabled = current_time >= end_time ? false : is_event_enabled;
-                        Vector2 cycle = event.cycle();
-                        if(cycle[0] > 0.0 && cycle[1] > 0.0) {
-                            if(!is_event_enabled && event.isEnabled()) {
-                                event.setBeginTime(end_time + cycle[1]);
-                                event.setEndTime(end_time + cycle[0] + cycle[1]);
-                            }
-                        }
-                        event.setEnabled(is_event_enabled);
-
-                        if(is_event_enabled) {
-                            salt_amount = event.saltAmount() > 0.0 ? event.saltAmount() : salt_amount;
-                            salt_chance = event.saltChance() > 0.0 ? event.saltChance() : salt_chance;
-                        }
-                    }
-                }
-            }
-        }
-
-        {
-            std::lock_guard<std::mutex> lock(convertMutex);
-            std::shared_ptr<Image> image = std::make_shared<Image>(*camera->sharedImage());
-            converter.initialize(image->width(), image->height());
-            if(salt_chance > 0.0) {
-                if(salt_amount > 0.0) {
-                    converter.random_salt(image.get(), salt_amount, salt_chance);
-                }
-            }
-            camera->setImage(image);
-            camera->notifyStateChange();
-        }
-    }
-}
-
-
-void VFXVisionSimulatorItem::Impl::onPostDynamics2()
-{
-    double current_time = simulatorItem->currentTime();
-
-    for(auto& camera : cameras) {
-        Link* link = camera->link();
-        double mosaic_chance = 0.0;
-        int kernel = 16;
-
-        NoisyCamera* noisyCamera = dynamic_cast<NoisyCamera*>(camera.get());
-        if(noisyCamera) {
-            mosaic_chance = noisyCamera->mosaicChance();
-            kernel = noisyCamera->kernel();
-        }
-
-        for(auto& collider : colliders) {
-            if(collision(collider, link->T().translation())) {
-                mosaic_chance = collider->mosaicChance();
-                kernel = collider->kernel();
-            }
-
-            for(auto& event : events) {
-                for(auto& target_collider : event.targetColliders()) {
-                    if(target_collider == collider->name()) {
-                        double begin_time = event.beginTime();
-                        double end_time = std::max({ event.endTime(), event.beginTime() + event.duration() });
-                        bool is_event_enabled = current_time >= begin_time ? true: false;
-                        is_event_enabled = current_time >= end_time ? false : is_event_enabled;
-                        Vector2 cycle = event.cycle();
-                        if(cycle[0] > 0.0 && cycle[1] > 0.0) {
-                            if(!is_event_enabled && event.isEnabled()) {
-                                event.setBeginTime(end_time + cycle[1]);
-                                event.setEndTime(end_time + cycle[0] + cycle[1]);
-                            }
-                        }
-                        event.setEnabled(is_event_enabled);
-
-                        if(is_event_enabled) {
-                            mosaic_chance = event.mosaicChance() > 0.0 ? event.mosaicChance() : mosaic_chance;
-                            kernel = event.kernel() != 16 ? event.kernel() : kernel;
-                        }
-                    }
-                }
-            }
-        }
-
-        {
-            std::lock_guard<std::mutex> lock(convertMutex);
-            std::shared_ptr<Image> image = std::make_shared<Image>(*camera->sharedImage());
-            converter.initialize(image->width(), image->height());
-            if(mosaic_chance > 0.0) {
-                converter.random_mosaic(image.get(), mosaic_chance, kernel);
-            }
-            camera->setImage(image);
-            camera->notifyStateChange();
-        }
-    }
-}
-
-
-void VFXVisionSimulatorItem::Impl::onPostDynamics3()
 {
     double current_time = simulatorItem->currentTime();
 
@@ -435,22 +281,6 @@ void VFXVisionSimulatorItem::Impl::onPostDynamics3()
 }
 
 
-bool VFXVisionSimulatorItem::Impl::setDynamicsType(int dynamicsId)
-{
-    if(!dynamicsSelection.select(dynamicsId)) {
-        return false;
-    }
-    self->notifyUpdate();
-    return true;
-}
-
-
-double VFXVisionSimulatorItem::Impl::dynamicsType() const
-{
-    return dynamicsSelection.which();
-}
-
-
 Item* VFXVisionSimulatorItem::doCloneItem(CloneMap* cloneMap) const
 {
     return new VFXVisionSimulatorItem(*this);
@@ -460,8 +290,6 @@ Item* VFXVisionSimulatorItem::doCloneItem(CloneMap* cloneMap) const
 void VFXVisionSimulatorItem::doPutProperties(PutPropertyFunction& putProperty)
 {
     GLVisionSimulatorItem::doPutProperties(putProperty);
-    putProperty(_("Dynamics type"), impl->dynamicsSelection,
-                [this](int which){ return impl->setDynamicsType(which); });
     putProperty(_("VFX event file"), FilePathProperty(impl->vfx_event_file_path),
                 [this](const std::string& value){
                     impl->vfx_event_file_path = value;
@@ -475,7 +303,6 @@ bool VFXVisionSimulatorItem::store(Archive& archive)
     if(!GLVisionSimulatorItem::store(archive)) {
         return false;
     }
-    archive.write("dynamics_type", impl->dynamicsSelection.selectedSymbol());
     archive.writeRelocatablePath("vfx_event_file_path", impl->vfx_event_file_path);
     return true;
 }
@@ -487,9 +314,6 @@ bool VFXVisionSimulatorItem::restore(const Archive& archive)
         return false;
     }
     string symbol;
-    if(archive.read("dynamics_type", symbol)) {
-        impl->dynamicsSelection.select(symbol);
-    }
     if(archive.read("vfx_event_file_path", symbol)) {
         symbol = archive.resolveRelocatablePath(symbol);
         if(!symbol.empty()) {

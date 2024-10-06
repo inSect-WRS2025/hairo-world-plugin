@@ -78,12 +78,14 @@ public:
     string project_dir;
     string registration_file;
     vector<ProjectInfo> projectInfo;
+    double format_version;
     bool is_initialized;
 
     void onUtilOptionsParsed();
     void onInputFileOptionsParsed(vector<string>& inputFiles);
 
     bool load(const string& filename, ostream& os = nullout());
+    void initialize();
     void update();
     void onOpenButtonClicked();
     void onUpdateButtonClicked();
@@ -127,6 +129,7 @@ WRSUtilBar::Impl::Impl(WRSUtilBar* self)
     : self(self),
       project_dir(""),
       registration_file(""),
+      format_version(0.0),
       is_initialized(false)
 {
     self->setVisibleByDefault(false);
@@ -149,6 +152,9 @@ WRSUtilBar::Impl::Impl(WRSUtilBar* self)
     auto openButton = self->addButton(":/GoogleMaterialSymbols/icon/open_in_new_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
     openButton->setToolTip(_("Open the selected project"));
     openButton->sigClicked().connect([&](){ onOpenButtonClicked(); });
+
+    initialize();
+    update();
 }
 
 
@@ -167,6 +173,15 @@ void WRSUtilBar::setProjectDirectory(const string& directory)
 void WRSUtilBar::setRegistrationFile(const string& filename)
 {
     impl->registration_file = filename;
+}
+
+
+void WRSUtilBar::Impl::initialize()
+{
+    const string wrs_dirs[] = { "WRS2024PRE", "WRS2025" };
+    int index = format_version >= 2.0 ? 1 : 0;
+    project_dir = shareDir() + "/" + wrs_dirs[index] + "/project";
+    registration_file = shareDir() + "/" + wrs_dirs[index] + "/share/default/registration.yaml";
 }
 
 
@@ -224,6 +239,9 @@ bool WRSUtilBar::Impl::load(const string& filename, ostream& os)
         YAMLReader reader;
         auto archive = reader.loadDocument(filename)->toMapping();
         if(archive) {
+            format_version = archive->get("format_version", 1.0);
+            initialize();
+
             auto& registrationList = *archive->findListing("registrations");
             if(registrationList.isValid()) {
                 for(int i = 0; i < registrationList.size(); ++i) {
