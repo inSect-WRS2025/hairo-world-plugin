@@ -363,13 +363,13 @@ void WRSUtilBar::Impl::onOpenButtonClicked()
         selectedInfo = alignmentInfo[2];
     } else if(alignment == "Y-") {
         selectedInfo = alignmentInfo[3];
-    } else if(alignment == "X+Z+") {
+    } else if(alignment == "ZX+") {
         selectedInfo = alignmentInfo[4];
-    } else if(alignment == "X-Z+") {
+    } else if(alignment == "ZX-") {
         selectedInfo = alignmentInfo[5];
-    } else if(alignment == "Y+Z+") {
+    } else if(alignment == "ZY+") {
         selectedInfo = alignmentInfo[6];
-    } else if(alignment == "Y-Z+") {
+    } else if(alignment == "ZY-") {
         selectedInfo = alignmentInfo[7];
     }
 

@@ -14,4 +14,3 @@ if [[ -z ${1} ]]; then
 fi
 
 echo -e '[Desktop Entry]\nName='${1}'\nType=Application\nIcon=org.gnome.Nautilus\nExec=gio open '$DIR >> $FILE
-sudo cp $FILE /usr/share/applications
