@@ -181,7 +181,9 @@ void WRSUtilBar::Impl::initialize()
     const string wrs_dirs[] = { "WRS2024PRE", "WRS2025" };
     int index = format_version >= 2.0 ? 1 : 0;
     project_dir = shareDir() + "/" + wrs_dirs[index] + "/project";
-    registration_file = shareDir() + "/" + wrs_dirs[index] + "/share/default/registration.yaml";
+    if(registration_file.empty()) {
+        registration_file = shareDir() + "/" + wrs_dirs[index] + "/share/default/registration.yaml";
+    }
 }
 
 
