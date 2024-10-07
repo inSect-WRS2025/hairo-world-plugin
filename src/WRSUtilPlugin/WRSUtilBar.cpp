@@ -22,12 +22,14 @@
 #include <cnoid/UTF8>
 #include <cnoid/WorldItem>
 #include <cnoid/YAMLReader>
+#include <cnoid/stdx/filesystem>
 #include <src/BodyPlugin/WorldLogFileItem.h>
 #include <vector>
 #include "gettext.h"
 
 using namespace std;
 using namespace cnoid;
+namespace filesystem = cnoid::stdx::filesystem;
 
 namespace {
 
@@ -79,6 +81,7 @@ public:
     string registration_file;
     string material_table_file;
     vector<ProjectInfo> projectInfo;
+    vector<WRSUtilBar::FormatInfo> formats;
     double format_version;
     bool is_initialized;
 
@@ -155,6 +158,7 @@ WRSUtilBar::Impl::Impl(WRSUtilBar* self)
     openButton->setToolTip(_("Open the selected project"));
     openButton->sigClicked().connect([&](){ onOpenButtonClicked(); });
 
+    formats.clear();
     initialize();
     update();
 }
@@ -163,6 +167,12 @@ WRSUtilBar::Impl::Impl(WRSUtilBar* self)
 WRSUtilBar::~WRSUtilBar()
 {
     delete impl;
+}
+
+
+void WRSUtilBar::addFormat(FormatInfo info)
+{
+    impl->formats.push_back(info);
 }
 
 
@@ -180,10 +190,15 @@ void WRSUtilBar::setRegistrationFile(const string& filename)
 
 void WRSUtilBar::Impl::initialize()
 {
-    const string wrs_dirs[] = { "WRS2024PRE", "WRS2025" };
-    int index = format_version >= 2.0 ? 1 : 0;
-    project_dir = shareDir() + "/" + wrs_dirs[index] + "/project";
-    material_table_file = shareDir() + "/" + wrs_dirs[index] + "/share/default/materials.yaml";
+    string wrs_dir;
+    for(auto& format : formats) {
+        int major_version = (int)format.format_version;
+        if( (int)format_version == major_version) {
+            wrs_dir = format.directory;
+            project_dir = shareDir() + "/" + wrs_dir + "/project";
+            material_table_file = shareDir() + "/" + wrs_dir + "/share/default/materials.yaml";
+        }
+    }
 }
 
 
@@ -241,7 +256,7 @@ bool WRSUtilBar::Impl::load(const string& filename, ostream& os)
         YAMLReader reader;
         auto archive = reader.loadDocument(filename)->toMapping();
         if(archive) {
-            format_version = archive->get("format_version", 1.0);
+            format_version = archive->get("format_version", 0.0);
             initialize();
 
             auto& registrationList = *archive->findListing("registrations");

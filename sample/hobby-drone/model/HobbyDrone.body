@@ -6,7 +6,7 @@ name: HobbyDrone
 links:
   -
     name: CHASSIS
-    translation: [ 0, 0, 0 ]
+    translation: [ 0, 0, 0.3 ]
     jointType: free
     centerOfMass: [ 0, 0, 0 ]
     mass: 1.0
