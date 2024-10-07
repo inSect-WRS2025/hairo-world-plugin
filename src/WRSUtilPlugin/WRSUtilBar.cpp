@@ -77,6 +77,7 @@ public:
 
     string project_dir;
     string registration_file;
+    string material_table_file;
     vector<ProjectInfo> projectInfo;
     double format_version;
     bool is_initialized;
@@ -129,6 +130,7 @@ WRSUtilBar::Impl::Impl(WRSUtilBar* self)
     : self(self),
       project_dir(""),
       registration_file(""),
+      material_table_file(""),
       format_version(0.0),
       is_initialized(false)
 {
@@ -181,9 +183,7 @@ void WRSUtilBar::Impl::initialize()
     const string wrs_dirs[] = { "WRS2024PRE", "WRS2025" };
     int index = format_version >= 2.0 ? 1 : 0;
     project_dir = shareDir() + "/" + wrs_dirs[index] + "/project";
-    if(registration_file.empty()) {
-        registration_file = shareDir() + "/" + wrs_dirs[index] + "/share/default/registration.yaml";
-    }
+    material_table_file = shareDir() + "/" + wrs_dirs[index] + "/share/default/materials.yaml";
 }
 
 
@@ -333,6 +333,7 @@ void WRSUtilBar::Impl::onOpenButtonClicked()
 
     auto worldItem = new WorldItem;
     worldItem->setName("World");
+    worldItem->setDefaultMaterialTableFile(material_table_file);
     rootItem->addChildItem(worldItem);
 
     for(auto& project : info.task_projects) {
