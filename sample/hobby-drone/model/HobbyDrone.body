@@ -41,16 +41,6 @@ links:
             rotation: [ 1, 0, 0, 90 ]
             geometry: { type: Cylinder, radius: 0.03, height: 0.02 }
             appearance: { material: { diffuseColor: [ 0.2, 0.2, 0.8 ], transparency: 0.5 } }
-      - { type: RateGyroSensor, name: GyroSensor, maxAngularVelocity: 1000.0 }
-      - { type: AccelerationSensor, name: AccSensor, maxAcceleration: [ 1000.0, 1000.0, 1000.0 ] }
-      -
-        type: PassiveMarker
-        name: GreenMarker
-        translation: [ 0, 0, 0 ]
-        radius: 0.03
-        color: [ 0.0, 1.0, 0.0 ]
-        transparency: 0.3
-        symbol: false
       -
         type: SpotLight
         name: Light
@@ -67,6 +57,16 @@ links:
             translation: [ -0.02, 0, 0 ]
             geometry: { type: Cone, height: 0.04, radius: 0.025 }
             appearance: { material: { diffuseColor: [ 1.0, 1.0, 0.4 ] } }
+      - { type: RateGyroSensor, name: GyroSensor, maxAngularVelocity: 1000.0 }
+      - { type: AccelerationSensor, name: AccSensor, maxAcceleration: [ 1000.0, 1000.0, 1000.0 ] }
+      -
+        type: PassiveMarker
+        name: GreenMarker
+        translation: [ 0, 0, 0 ]
+        radius: 0.03
+        color: [ 0.0, 1.0, 0.0 ]
+        transparency: 0.3
+        symbol: false
   - &rotor_link
     name: ROTOR_RF
     parent: CHASSIS
