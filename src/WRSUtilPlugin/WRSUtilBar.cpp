@@ -5,6 +5,7 @@
 #include "WRSUtilBar.h"
 #include <cnoid/AISTSimulatorItem>
 #include <cnoid/BodyItem>
+#include <cnoid/BodySyncCameraItem>
 #include <cnoid/ComboBox>
 #include <cnoid/EigenArchive>
 #include <cnoid/ExecutablePath>
@@ -43,6 +44,7 @@ struct ProjectInfo {
     vector<string> simulator_projects;
     vector<string> robot_projects;
     bool is_recording_enabled;
+    bool is_tracking_enabled;
     bool is_ros_enabled;
     Vector3 start_position;
 };
@@ -304,6 +306,9 @@ bool WRSUtilBar::Impl::load(const string& filename, ostream& os)
                     bool is_recording_enabled = node->get("enable_recording", false);
                     info.is_recording_enabled = is_recording_enabled;
 
+                    bool is_tracking_enabled = node->get("enable_tracking", false);
+                    info.is_tracking_enabled = is_tracking_enabled;
+
                     bool is_ros_enabled = node->get("enable_ros", false);
                     info.is_ros_enabled = is_ros_enabled;
 
@@ -409,6 +414,12 @@ void WRSUtilBar::Impl::onOpenButtonClicked()
             robotItem->storeInitialState();
             // offset[1] += 1.5;
             offset[selectedInfo.offset_id] += selectedInfo.offset_value;
+
+            if(info.is_tracking_enabled) {
+                auto cameraItem = new BodySyncCameraItem;
+                robotItem->addChildItem(cameraItem);
+                cameraItem->setChecked(true);
+            }
 
             if(info.is_ros_enabled) {
                 auto controllerItem = new SimpleControllerItem;
