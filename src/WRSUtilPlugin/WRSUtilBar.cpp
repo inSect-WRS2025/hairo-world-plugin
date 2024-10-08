@@ -429,7 +429,7 @@ void WRSUtilBar::Impl::onOpenButtonClicked()
                 mainControllerItem->addChildItem(controllerItem);
 
                 controllerItem->setController("JoyTopicSubscriberController");
-                if(robot_id != 0) {
+                if(robot_id > 0) {
                     string options = "topic joy" + to_string(robot_id + 1);
                     controllerItem->setOptions(options);
                 }
