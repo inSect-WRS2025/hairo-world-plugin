@@ -301,7 +301,7 @@ bool WRSUtilBar::Impl::load(const string& filename, ostream& os)
 
                     }
 
-                    bool is_recording_enabled = node->get("enable_recording", true);
+                    bool is_recording_enabled = node->get("enable_recording", false);
                     info.is_recording_enabled = is_recording_enabled;
 
                     bool is_ros_enabled = node->get("enable_ros", false);
