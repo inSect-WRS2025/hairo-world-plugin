@@ -394,6 +394,7 @@ void WRSUtilBar::Impl::onOpenButtonClicked()
         selectedInfo = alignmentInfo[7];
     }
 
+    int robot_id = 0;
     for(auto& project : info.robot_projects) {
         ItemList<BodyItem> loadedItems = projectManager->loadProject(project_dir + "/" + project + ".cnoid", worldItem);
         BodyItem* robotItem = nullptr;
@@ -423,13 +424,18 @@ void WRSUtilBar::Impl::onOpenButtonClicked()
 
             if(info.is_ros_enabled) {
                 auto controllerItem = new SimpleControllerItem;
-                controllerItem->setName(robotItem->name() + "-JoystickInput");
+                controllerItem->setName(robotItem->name() + "_JoystickInput");
                 auto mainControllerItem = robotItem->findItem<SimpleControllerItem>();
                 mainControllerItem->addChildItem(controllerItem);
 
                 controllerItem->setController("JoyTopicSubscriberController");
+                if(robot_id != 0) {
+                    string options = "topic joy" + to_string(robot_id + 1);
+                    controllerItem->setOptions(options);
+                }
             }
         }
+        ++robot_id;
     }
 
     if(!info.view_project.empty()) {
