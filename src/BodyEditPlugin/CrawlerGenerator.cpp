@@ -641,7 +641,7 @@ void CrawlerGenerator::Impl::onExportButtonClicked()
     string filename = getSaveFileName(_("Save a configuration file"), "yaml;yml");
 
     if(!filename.empty()) {
-       filesystem::path path(filename);
+       filesystem::path path(fromUTF8(filename));
         string ext = path.extension().string();
         if(ext != ".yaml") {
             filename += ".yaml";

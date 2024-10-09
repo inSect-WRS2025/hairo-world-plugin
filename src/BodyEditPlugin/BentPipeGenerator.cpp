@@ -196,7 +196,8 @@ MappingPtr BentPipeGenerator::Impl::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
-    string name = filesystem::path(fromUTF8(filename)).stem().string();
+    filesystem::path path(fromUTF8(filename));
+    string name = path.stem().string();
 
     node->write("format", "ChoreonoidBody");
     node->write("format_version", "2.0");

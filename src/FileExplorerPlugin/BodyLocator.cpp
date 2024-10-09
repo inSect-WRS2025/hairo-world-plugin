@@ -66,8 +66,9 @@ void BodyLocator::initializeClass(ExtensionManager* ext)
                         QStringList() << item->filePath().c_str()); });
             menuManager.addItem(_("Nautilus"))->sigTriggered().connect(
                 [&, item](){
+                    filesystem::path path(fromUTF8(item->filePath()));
                     QProcess::startDetached("nautilus",
-                        QStringList() << filesystem::path(fromUTF8(item->filePath())).parent_path().string().c_str()); });
+                        QStringList() << path.parent_path().string().c_str()); });
             menuManager.setPath("/");
             menuManager.addItem(_("Body Locator"))->sigTriggered().connect(
                 [&, item](){ locatorInstance->impl->show(); });
