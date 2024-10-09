@@ -14,6 +14,7 @@
 #include <cnoid/RootItem>
 #include <cnoid/Separator>
 #include <cnoid/SpinBox>
+#include <cnoid/UTF8>
 #include <cnoid/stdx/filesystem>
 #include <QBoxLayout>
 #include <QDialogButtonBox>
@@ -65,9 +66,8 @@ void BodyLocator::initializeClass(ExtensionManager* ext)
                         QStringList() << item->filePath().c_str()); });
             menuManager.addItem(_("Nautilus"))->sigTriggered().connect(
                 [&, item](){
-                    filesystem::path path(item->filePath().c_str());
                     QProcess::startDetached("nautilus",
-                        QStringList() << path.parent_path().string().c_str()); });
+                        QStringList() << filesystem::path(fromUTF8(item->filePath())).parent_path().string().c_str()); });
             menuManager.setPath("/");
             menuManager.addItem(_("Body Locator"))->sigTriggered().connect(
                 [&, item](){ locatorInstance->impl->show(); });

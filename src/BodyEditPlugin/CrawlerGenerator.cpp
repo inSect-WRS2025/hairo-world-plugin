@@ -17,10 +17,11 @@
 #include <cnoid/NullOut>
 #include <cnoid/Separator>
 #include <cnoid/SpinBox>
-#include <cnoid/stdx/filesystem>
+#include <cnoid/UTF8>
 #include <cnoid/Widget>
 #include <cnoid/YAMLReader>
 #include <cnoid/YAMLWriter>
+#include <cnoid/stdx/filesystem>
 #include <cnoid/HamburgerMenu>
 #include <QBoxLayout>
 #include <QLabel>
@@ -702,8 +703,7 @@ MappingPtr CrawlerGenerator::Impl::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
-    filesystem::path path(filename);
-    string name = path.stem().string();
+    string name = filesystem::path(fromUTF8(filename)).stem().string();
     bool isAGXChecked = checks[AGX_CHK]->isChecked();
 
     node->write("format", "ChoreonoidBody");
@@ -732,8 +732,7 @@ MappingPtr CrawlerGenerator::Impl::writeConfig(const string& filename)
 {
     MappingPtr node = new Mapping;
 
-    filesystem::path path(filename);
-    string name = path.stem().string();
+    string name = filesystem::path(fromUTF8(filename)).stem().string();
 
     node->write("format", "CrawlerRobotGeneratorYaml");
     node->write("formatVersion", "1.0");

@@ -12,6 +12,7 @@
 #include <cnoid/MenuManager>
 #include <cnoid/Separator>
 #include <cnoid/SpinBox>
+#include <cnoid/UTF8>
 #include <cnoid/YAMLWriter>
 #include <cnoid/stdx/filesystem>
 #include <QBoxLayout>
@@ -160,8 +161,7 @@ MappingPtr SlopeGenerator::Impl::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
-    filesystem::path path(filename);
-    string name = path.stem().string();
+    string name = filesystem::path(fromUTF8(filename)).stem().string();
 
     node->write("format", "ChoreonoidBody");
     node->write("format_version", "2.0");
