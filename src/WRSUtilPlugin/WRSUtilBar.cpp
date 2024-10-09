@@ -11,6 +11,7 @@
 #include <cnoid/ExecutablePath>
 #include <cnoid/ExtensionManager>
 #include <cnoid/Format>
+#include <cnoid/ItemManager>
 #include <cnoid/ItemTreeView>
 #include <cnoid/MessageView>
 #include <cnoid/NullOut>
@@ -95,6 +96,7 @@ public:
     void update();
     void onOpenButtonClicked();
     void onUpdateButtonClicked();
+    void onLoadButtonClicked();
 };
 
 }
@@ -152,13 +154,17 @@ WRSUtilBar::Impl::Impl(WRSUtilBar* self)
     projectCombo->setToolTip(_("Select a project"));
     self->addWidget(projectCombo);
 
+    auto openButton = self->addButton(":/GoogleMaterialSymbols/icon/file_open_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
+    openButton->setToolTip(_("Open a registration file"));
+    openButton->sigClicked().connect([&](){ onOpenButtonClicked(); });
+
     auto updateButton = self->addButton(":/GoogleMaterialSymbols/icon/refresh_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
     updateButton->setToolTip(_("Update projects"));
     updateButton->sigClicked().connect([&](){ onUpdateButtonClicked(); });
 
-    auto openButton = self->addButton(":/GoogleMaterialSymbols/icon/open_in_new_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-    openButton->setToolTip(_("Open the selected project"));
-    openButton->sigClicked().connect([&](){ onOpenButtonClicked(); });
+    auto loadButton = self->addButton(":/GoogleMaterialSymbols/icon/open_in_new_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
+    loadButton->setToolTip(_("Load the selected project"));
+    loadButton->sigClicked().connect([&](){ onLoadButtonClicked(); });
 
     formats.clear();
     initialize();
@@ -225,7 +231,7 @@ void WRSUtilBar::Impl::onUtilOptionsParsed()
             string text = projectCombo->itemText(i).toStdString();
             if(text == project) {
                 projectCombo->setCurrentIndex(i);
-                onOpenButtonClicked();
+                onLoadButtonClicked();
             }
         }
     }
@@ -325,6 +331,23 @@ bool WRSUtilBar::Impl::load(const string& filename, ostream& os)
 
 
 void WRSUtilBar::Impl::onOpenButtonClicked()
+{
+    string filename = getOpenFileName(_("Registration File"), "yaml");
+    if(!filename.empty()) {
+        self->setRegistrationFile(filename);
+        self->update();
+    }
+}
+
+
+void WRSUtilBar::Impl::onUpdateButtonClicked()
+{
+    update();
+    MessageView::instance()->putln(formatR(_("Projects were updated.")));
+}
+
+
+void WRSUtilBar::Impl::onLoadButtonClicked()
 {
     if(project_dir.empty()) {
         return;
@@ -458,11 +481,4 @@ void WRSUtilBar::Impl::onOpenButtonClicked()
     }
 
     projectManager->setCurrentProjectName(info.name);
-}
-
-
-void WRSUtilBar::Impl::onUpdateButtonClicked()
-{
-    update();
-    MessageView::instance()->putln(formatR(_("Projects were updated.")));
 }
