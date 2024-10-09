@@ -12,8 +12,8 @@
 #include <cnoid/TimeBar>
 #include <cnoid/ValueTree>
 #include <cnoid/WorldItem>
+#include <cnoid/WorldLogFileItem>
 #include <cnoid/LoggerUtil>
-#include <src/BodyPlugin/WorldLogFileItem.h>
 #include "HamburgerMenu.h"
 #include "gettext.h"
 

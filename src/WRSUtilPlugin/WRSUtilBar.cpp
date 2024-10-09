@@ -24,8 +24,8 @@
 #include <cnoid/UTF8>
 #include <cnoid/WorldItem>
 #include <cnoid/YAMLReader>
+#include <cnoid/WorldLogFileItem>
 #include <cnoid/stdx/filesystem>
-#include <src/BodyPlugin/WorldLogFileItem.h>
 #include <vector>
 #include "gettext.h"
 
