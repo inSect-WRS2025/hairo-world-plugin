@@ -192,13 +192,12 @@ void WRSUtilBar::setRegistrationFile(const string& filename)
 
 void WRSUtilBar::Impl::initialize()
 {
-    string wrs_dir;
     for(auto& format : formats) {
         int major_version = (int)format.format_version;
         if( (int)format_version == major_version) {
-            wrs_dir = format.directory;
-            project_dir = shareDir() + "/" + wrs_dir + "/project";
-            material_table_file = shareDir() + "/" + wrs_dir + "/share/default/materials.yaml";
+            filesystem::path wrsDir(fromUTF8(format.directory));
+            project_dir = toUTF8((shareDir() / wrsDir / "project").string());
+            material_table_file = toUTF8((shareDir() / wrsDir / "share" / "default" / "materials.yaml").string());
         }
     }
 }
@@ -357,15 +356,17 @@ void WRSUtilBar::Impl::onOpenButtonClicked()
     rootItem->addChildItem(worldItem);
 
     for(auto& project : info.task_projects) {
+        string filename = toUTF8((filesystem::path(fromUTF8(project_dir)) / filesystem::path(fromUTF8(project + ".cnoid"))).string());
         auto taskItem = new SubProjectItem();
         taskItem->setName(project);
-        taskItem->load(project_dir + "/" + project + ".cnoid");
+        taskItem->load(filename);
         worldItem->addChildItem(taskItem);
         itemTreeView->setExpanded(taskItem, false);
     }
 
     for(auto& project : info.simulator_projects) {
-        projectManager->loadProject(project_dir + "/" + project + ".cnoid", worldItem);
+        string filename = toUTF8((filesystem::path(fromUTF8(project_dir)) / filesystem::path(fromUTF8(project + ".cnoid"))).string());
+        projectManager->loadProject(filename, worldItem);
         ItemList<SimulatorItem> simulatorItems = rootItem->selectedItems();
         for(auto& simulatorItem : simulatorItems) {
             simulatorItem->setSelected(false);
@@ -396,7 +397,8 @@ void WRSUtilBar::Impl::onOpenButtonClicked()
 
     int robot_id = 0;
     for(auto& project : info.robot_projects) {
-        ItemList<BodyItem> loadedItems = projectManager->loadProject(project_dir + "/" + project + ".cnoid", worldItem);
+        string filename = toUTF8((filesystem::path(fromUTF8(project_dir)) / filesystem::path(fromUTF8(project + ".cnoid"))).string());
+        ItemList<BodyItem> loadedItems = projectManager->loadProject(filename, worldItem);
         BodyItem* robotItem = nullptr;
 
         if(!loadedItems.size()) {
@@ -439,9 +441,10 @@ void WRSUtilBar::Impl::onOpenButtonClicked()
     }
 
     if(!info.view_project.empty()) {
+        string filename = toUTF8((filesystem::path(fromUTF8(project_dir)) / filesystem::path(fromUTF8(info.view_project + ".cnoid"))).string());
         auto viewItem = new SubProjectItem();
         viewItem->setName(info.view_project);
-        viewItem->load(project_dir + "/" + info.view_project + ".cnoid");
+        viewItem->load(filename);
         rootItem->addChildItem(viewItem);
         itemTreeView->setExpanded(viewItem, false);
     }
