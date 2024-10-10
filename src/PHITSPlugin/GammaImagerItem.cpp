@@ -498,9 +498,9 @@ void GammaImageVisualizerItem::start(bool checked)
         }
 
         if(comptonCamera || pinholeCamera) {
-            string filename = toUTF8((phitsDirPath / "phits").string()) + ".inp";
+            string filename = toUTF8((phitsDirPath / "phits.inp").string());
             filesystem::path filePath(fromUTF8(filename));
-            filesystem::path parentPath(filePath.parent_path());
+            filesystem::path parentDirPath(filePath.parent_path());
 
             string filename0;
             GammaData::CalcInfo calcInfo;
@@ -508,10 +508,10 @@ void GammaImageVisualizerItem::start(bool checked)
             calcInfo.maxbch = maxbch;
             if(comptonCamera) {
                 calcInfo.inputMode = GammaData::COMPTON;
-                filename0 = toUTF8((parentPath / "flux_cross_dmp.out").string());
+                filename0 = toUTF8((parentDirPath / "flux_cross_dmp.out").string());
             } else if(pinholeCamera) {
                 calcInfo.inputMode = GammaData::PINHOLE;
-                filename0 = toUTF8((parentPath / "cross_xz.out").string());
+                filename0 = toUTF8((parentDirPath / "cross_xz.out").string());
             }
 
             GammaImagerItem* parentItem = dynamic_cast<GammaImagerItem*>(this->parentItem());
