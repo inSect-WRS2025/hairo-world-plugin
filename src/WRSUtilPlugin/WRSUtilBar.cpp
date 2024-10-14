@@ -475,7 +475,7 @@ void WRSUtilBar::Impl::onLoadButtonClicked()
     if(info.is_recording_enabled) {
         auto logItem = new WorldLogFileItem;
         logItem->setLogFile(info.name + ".log");
-        logItem->setTimeStampSuffixEnabled(true);
+        logItem->setTimeStampSuffixEnabled(false);
         logItem->setRecordingFrameRate(100);
         worldItem->addChildItem(logItem);
     }
