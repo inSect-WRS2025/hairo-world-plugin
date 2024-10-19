@@ -1,7 +1,3 @@
-#if(NOT ENABLE_GUI)
-#  return()
-#endif()
-
 add_subdirectory(BodyEditPlugin)
 add_subdirectory(CFDPlugin)
 add_subdirectory(GoogleMaterialSymbols)
@@ -11,7 +7,7 @@ add_subdirectory(VFXPlugin)
 add_subdirectory(SimpleColliderPlugin)
 add_subdirectory(WRSUtilPlugin)
 
-if(CMAKE_PROJECT_NAME STREQUAL "Choreonoid")
+if(ENABLE_GUI)
   add_subdirectory(BookmarkPlugin)
   add_subdirectory(PHITSPlugin)
 endif()
