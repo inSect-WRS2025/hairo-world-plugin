@@ -25,3 +25,8 @@ set(target CnoidVFXPlugin)
 choreonoid_make_gettext_mo_files(${target} mofiles)
 choreonoid_add_plugin(${target} ${sources} ${mofiles} HEADERS ${headers})
 target_link_libraries(${target} PUBLIC CnoidBodyPlugin CnoidSimpleColliderPlugin)
+
+include(ChoreonoidVFXPluginBuildFunctions.cmake)
+if(CHOREONOID_INSTALL_SDK)
+  install(FILES ChoreonoidVFXPluginBuildFunctions.cmake DESTINATION ${CHOREONOID_CMAKE_CONFIG_SUBDIR}/ext)
+endif()
