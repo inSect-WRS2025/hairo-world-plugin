@@ -58,7 +58,8 @@ struct SpinInfo
 };
 
 SpinInfo spinInfo[] = {
-    { 2, 1, 0, 359,  0 },
+    { 3, 3, 0, 359,  0 },
+    { 2, 1, 1, 120, 30 },
     { 2, 3, 1, 120, 30 }
 };
 
@@ -71,7 +72,7 @@ class PipeGenerator::Impl : public Dialog
 public:
 
     enum DoubleSpinId { MASS, LENGTH, IN_DIA, OUT_DIA, NUM_DSPINS };
-    enum SpinId { ANGLE, STEP, NUM_SPINS };
+    enum SpinId { ANGLE, IN_STEP, OUT_STEP, NUM_SPINS };
 
     DoubleSpinBox* dspins[NUM_DSPINS];
     SpinBox* spins[NUM_SPINS];
@@ -135,7 +136,7 @@ PipeGenerator::Impl::Impl()
         gbox->addWidget(dspin, info.row, info.column);
     }
 
-    static const char* label1[] = { _("Opening angle [deg]"), _("Step angle [deg]") };
+    static const char* label1[] = { _("Opening angle [deg]"), _("Inner step angle [deg]"), _("Outer step angle [deg]") };
 
     for(int i = 0; i < NUM_SPINS; ++i) {
         SpinInfo info = spinInfo[i];
@@ -262,7 +263,8 @@ void PipeGenerator::Impl::writeLinkShape(Listing* elementsNode)
     double r_out = d_out / 2.0;
 
     int angle = spins[ANGLE]->value();
-    int step = spins[STEP]->value();
+    int step_in = spins[IN_STEP]->value();
+    int step_out = spins[OUT_STEP]->value();
 
     node->write("type", "Shape");
 
@@ -271,10 +273,10 @@ void PipeGenerator::Impl::writeLinkShape(Listing* elementsNode)
     Listing& crossSectionList = *geometryNode->createFlowStyleListing("cross_section");
 
     int range = 360 - angle;
-    int n = ((360 - angle) / step + 1) * 2 + 1;
+    int n = ((360 - angle) / step_in + 1) + ((360 - angle) / step_out + 1) + 1;
     double sx;
     double sy;
-    for(int i = 0; i <= range; i += step) {
+    for(int i = 0; i <= range; i += step_out) {
         double x = r_out * cos(i * TO_RADIAN);
         double y = r_out * sin(i * TO_RADIAN);
         if(i == 0) {
@@ -284,7 +286,7 @@ void PipeGenerator::Impl::writeLinkShape(Listing* elementsNode)
         crossSectionList.append(x, 2, n);
         crossSectionList.append(y, 2, n);
     }
-    for(int i = 0; i <= range; i += step) {
+    for(int i = 0; i <= range; i += step_in) {
         double x = r_in * cos((range - i) * TO_RADIAN);
         double y = r_in * sin((range - i) * TO_RADIAN);
         crossSectionList.append(x, 2, n);

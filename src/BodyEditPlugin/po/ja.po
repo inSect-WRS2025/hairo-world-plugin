@@ -269,6 +269,12 @@ msgstr "開口角度 [deg]"
 msgid "Step angle [deg]"
 msgstr "きざみ角度 [deg]"
 
+msgid "Inner step angle [deg]"
+msgstr "きざみ角度（内側） [deg]"
+
+msgid "Outer step angle [deg]"
+msgstr "きざみ角度（外側） [deg]"
+
 msgid "BentPipe Generator"
 msgstr "ベントパイプ生成"
 
