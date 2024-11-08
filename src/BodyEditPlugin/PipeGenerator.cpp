@@ -3,12 +3,14 @@
 */
 
 #include "PipeGenerator.h"
+#include <cnoid/Action>
 #include <cnoid/Button>
 #include <cnoid/Dialog>
 #include <cnoid/EigenArchive>
 #include <cnoid/EigenTypes>
 #include <cnoid/EigenUtil>
 #include <cnoid/ExtensionManager>
+#include <cnoid/Menu>
 #include <cnoid/MenuManager>
 #include <cnoid/Separator>
 #include <cnoid/SpinBox>
@@ -16,8 +18,12 @@
 #include <cnoid/YAMLWriter>
 #include <cnoid/stdx/filesystem>
 #include <QBoxLayout>
+#include <QDialogButtonBox>
+#include <QContextMenuEvent>
+#include <QFormLayout>
 #include <QGridLayout>
 #include <QLabel>
+#include <QtMath>
 #include "ColorButton.h"
 #include "FileFormWidget.h"
 #include "gettext.h"
@@ -67,6 +73,28 @@ SpinInfo spinInfo[] = {
 
 namespace cnoid {
 
+class SquarePipeGenerator : public Dialog
+{
+public:
+    SquarePipeGenerator(QWidget* parent = nullptr);
+
+    void setWidth(double width) { widthSpin->setValue(width); }
+    double width() const { return widthSpin->value(); }
+
+    void setRadius(double radius) { radiusSpin->setValue(radius); }
+    double  radius() const { return radiusSpin->value(); }
+
+    void setLength(double length) { lengthSpin->setValue(length); }
+    double length() const { return lengthSpin->value(); }
+
+private:
+    DoubleSpinBox* widthSpin;
+    DoubleSpinBox* heightSpin;
+    DoubleSpinBox* radiusSpin;
+    DoubleSpinBox* lengthSpin;
+    QDialogButtonBox* buttonBox;
+};
+
 class PipeGenerator::Impl : public Dialog
 {
 public:
@@ -79,8 +107,13 @@ public:
     ColorButton* colorButton;
     FileFormWidget* formWidget;
     YAMLWriter yamlWriter;
+    Action* configureAct;
 
     Impl();
+
+    virtual void contextMenuEvent(QContextMenuEvent* event) override;
+
+    void configure();
 
     bool save(const string& filename);
     void onInnerDiameterChanged(const double& diameter);
@@ -155,6 +188,10 @@ PipeGenerator::Impl::Impl()
 
     formWidget = new FileFormWidget;
 
+    configureAct = new Action;
+    configureAct->setText(_("Advanced settings"));
+    configureAct->sigTriggered().connect([this](){ configure(); });
+
     auto vbox = new QVBoxLayout;
     vbox->addLayout(gbox);
     vbox->addStretch();
@@ -171,6 +208,31 @@ PipeGenerator::Impl::Impl()
 PipeGenerator::~PipeGenerator()
 {
     delete impl;
+}
+
+
+void PipeGenerator::Impl::contextMenuEvent(QContextMenuEvent* event)
+{
+    Menu menu(this);
+    menu.addAction(configureAct);
+    menu.exec(event->globalPos());
+}
+
+
+void PipeGenerator::Impl::configure()
+{
+    SquarePipeGenerator dialog;
+    dialog.setWidth(dspins[OUT_DIA]->value() / qSqrt(2.0));
+    dialog.setRadius(dspins[IN_DIA]->value() / 2.0);
+    dialog.setLength(dspins[LENGTH]->value());
+
+    if(dialog.exec() == QDialog::Accepted) {
+        dspins[LENGTH]->setValue(dialog.length());
+        dspins[OUT_DIA]->setValue(dialog.width() * qSqrt(2.0));
+        dspins[IN_DIA]->setValue(dialog.radius() * 2.0);
+        spins[OUT_STEP]->setValue(90);
+        spins[IN_STEP]->setValue(90);
+    }
 }
 
 
@@ -351,4 +413,51 @@ VectorXd PipeGenerator::Impl::calcInertia()
     }
 
     return outerInertia - innerInertia;
+}
+
+
+SquarePipeGenerator::SquarePipeGenerator(QWidget* parent)
+    : Dialog(parent)
+{
+    setWindowTitle(_("SquarePipe Generator"));
+
+    widthSpin = new DoubleSpinBox;
+    widthSpin->setRange(0.01, 1000.0);
+    widthSpin->setSingleStep(0.01);
+    widthSpin->setDecimals(3);
+    widthSpin->sigValueChanged().connect([&](double value){ heightSpin->setValue(value); });
+
+    heightSpin = new DoubleSpinBox;
+    heightSpin->setRange(0.01, 1000.0);
+    heightSpin->setSingleStep(0.01);
+    heightSpin->setDecimals(3);
+    heightSpin->setEnabled(false);
+
+    radiusSpin = new DoubleSpinBox;
+    radiusSpin->setRange(0.01, 1000.0);
+    radiusSpin->setSingleStep(0.01);
+    radiusSpin->setDecimals(3);
+
+    lengthSpin = new DoubleSpinBox;
+    lengthSpin->setRange(0.01, 1000.0);
+    lengthSpin->setSingleStep(0.01);
+    lengthSpin->setDecimals(3);
+
+    auto formLayout = new QFormLayout;
+    formLayout->addRow(_("Width [m]"), widthSpin);
+    formLayout->addRow(_("Height [m]"), heightSpin);
+    formLayout->addRow(_("Radius [m]"), radiusSpin);
+    formLayout->addRow(_("Length [m]"), lengthSpin);
+
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
+                                     | QDialogButtonBox::Cancel);
+
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+    auto vbox = new QVBoxLayout;
+    vbox->addLayout(formLayout);
+    vbox->addWidget(new HSeparator);
+    vbox->addWidget(buttonBox);
+    setLayout(vbox);
 }

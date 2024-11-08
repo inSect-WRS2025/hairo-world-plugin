@@ -379,3 +379,12 @@ msgstr "{0} はサポートされていません．"
 
 msgid "{0} has been generated."
 msgstr "{0} が生成されました．"
+
+msgid "Advanced settings"
+msgstr "高度な設定"
+
+msgid "SquarePipe Generator"
+msgstr "角パイプ生成"
+
+msgid "Radius [m]"
+msgstr "半径 [m]"
