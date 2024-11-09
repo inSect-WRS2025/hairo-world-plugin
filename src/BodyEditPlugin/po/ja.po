@@ -207,7 +207,10 @@ msgid "File"
 msgstr "ファイル"
 
 msgid "&Save"
-msgstr "保存(&S)"
+msgstr "保存"
+
+msgid "Save &As..."
+msgstr "上書き保存"
 
 msgid "Save a body"
 msgstr "ボディを保存"

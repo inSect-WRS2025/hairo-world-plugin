@@ -200,7 +200,7 @@ void WRSUtilBar::Impl::initialize()
 {
     for(auto& format : formats) {
         int major_version = (int)format.format_version;
-        if( (int)format_version == major_version) {
+        if((int)format_version == major_version) {
             filesystem::path wrsDirPath(fromUTF8(format.directory));
             project_dir = toUTF8((shareDir() / wrsDirPath / "project").string());
             material_table_file = toUTF8((shareDir() / wrsDirPath / "share" / "default" / "materials.yaml").string());
