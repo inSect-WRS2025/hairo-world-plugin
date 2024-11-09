@@ -27,7 +27,7 @@
 #include <QLabel>
 #include <QStackedWidget>
 #include "ColorButton.h"
-#include "FileFormWidget.h"
+#include "GeneratorBar.h"
 #include "gettext.h"
 
 using namespace std;
@@ -247,7 +247,7 @@ public:
     RadioButton setting1Radio;
     RadioButton setting2Radio;
     QStackedWidget* topWidget;
-    FileFormWidget* formWidget;
+    GeneratorBar* generatorBar;
     YAMLWriter yamlWriter;
     YAMLWriter yamlWriter2;
 
@@ -442,7 +442,7 @@ CrawlerGenerator::Impl::Impl()
         hbox->addWidget(button);
     }
 
-    formWidget = new FileFormWidget;
+    generatorBar = new GeneratorBar;
 
     initialize();
 
@@ -474,14 +474,14 @@ CrawlerGenerator::Impl::Impl()
     vbox->addLayout(hbox);
     vbox->addWidget(topWidget);
     vbox->addWidget(new HSeparator);
-    vbox->addWidget(formWidget);
+    vbox->addWidget(generatorBar);
     setLayout(vbox);
 
     toolButtons[RESET]->sigClicked().connect([&](){ onResetButtonClicked(); });
     toolButtons[IMPORT]->sigClicked().connect([&](){ onImportButtonClicked(); });
     toolButtons[EXPORT]->sigClicked().connect([&](){ onExportButtonClicked(); });
     checks[AGX_CHK]->sigToggled().connect([&](bool checked){ onEnableAGXCheckToggled(checked); });
-    formWidget->sigClicked().connect([&](string filename){ save(filename); });
+    generatorBar->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

@@ -22,7 +22,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
-#include "FileFormWidget.h"
+#include "GeneratorBar.h"
 #include "gettext.h"
 
 using namespace std;
@@ -71,7 +71,7 @@ public:
 
     LineEdit* inputFileLine;
     TerrainData* data;
-    FileFormWidget* formWidget;
+    GeneratorBar* generatorBar;
     DoubleSpinBox* scaleSpin;
     YAMLWriter yamlWriter;
 
@@ -139,17 +139,17 @@ TerrainGenerator::Impl::Impl()
     gbox->addWidget(new QLabel(_("scale[0.1-10.0]")), index, 0);
     gbox->addWidget(scaleSpin, index++, 1);
 
-    formWidget = new FileFormWidget;
+    generatorBar = new GeneratorBar;
 
     auto vbox = new QVBoxLayout;
     vbox->addLayout(gbox);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
-    vbox->addWidget(formWidget);
+    vbox->addWidget(generatorBar);
     setLayout(vbox);
 
     loadButton->sigClicked().connect([&](){ onLoadButtonClicked(); });
-    formWidget->sigClicked().connect([&](string filename){ save(filename); });
+    generatorBar->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

@@ -2,8 +2,7 @@ set(sources
   BodyConverter.cpp
   ColorButton.cpp
   CrawlerGenerator.cpp
-  FileFormWidget.cpp
-  GeneratorWindow.cpp
+  GeneratorBar.cpp
   GratingGenerator.cpp
   BodyEditPlugin.cpp
   InertiaCalculator.cpp
@@ -20,8 +19,7 @@ set(headers
   BodyConverter.h
   ColorButton.h
   CrawlerGenerator.h
-  FileFormWidget.h
-  GeneratorWindow.h
+  GeneratorBar.h
   GratingGenerator.h
   InertiaCalculator.h
   PipeGenerator.h

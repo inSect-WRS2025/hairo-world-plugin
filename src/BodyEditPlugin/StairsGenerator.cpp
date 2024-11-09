@@ -19,7 +19,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include "ColorButton.h"
-#include "FileFormWidget.h"
+#include "GeneratorBar.h"
 #include "gettext.h"
 
 using namespace std;
@@ -66,7 +66,7 @@ public:
     DoubleSpinBox* dspins[NUM_DSPINS];
     SpinBox* stepsSpin;
     ColorButton* colorButton;
-    FileFormWidget* formWidget;
+    GeneratorBar* generatorBar;
     YAMLWriter yamlWriter;
 
     Impl();
@@ -137,16 +137,16 @@ StairsGenerator::Impl::Impl()
     gbox->addWidget(new QLabel(_("Color [-]")), 3, 0);
     gbox->addWidget(colorButton, 3, 1);
 
-    formWidget = new FileFormWidget;
+    generatorBar = new GeneratorBar;
 
     auto vbox = new QVBoxLayout;
     vbox->addLayout(gbox);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
-    vbox->addWidget(formWidget);
+    vbox->addWidget(generatorBar);
     setLayout(vbox);
 
-    formWidget->sigClicked().connect([&](string filename){ save(filename); });
+    generatorBar->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

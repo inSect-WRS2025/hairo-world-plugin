@@ -25,7 +25,7 @@
 #include <QLabel>
 #include <QtMath>
 #include "ColorButton.h"
-#include "FileFormWidget.h"
+#include "GeneratorBar.h"
 #include "gettext.h"
 
 using namespace std;
@@ -105,7 +105,7 @@ public:
     DoubleSpinBox* dspins[NUM_DSPINS];
     SpinBox* spins[NUM_SPINS];
     ColorButton* colorButton;
-    FileFormWidget* formWidget;
+    GeneratorBar* generatorBar;
     YAMLWriter yamlWriter;
     Action* configureAct;
 
@@ -186,7 +186,7 @@ PipeGenerator::Impl::Impl()
     gbox->addWidget(new QLabel(_("Color [-]")), 3, 0);
     gbox->addWidget(colorButton, 3, 1);
 
-    formWidget = new FileFormWidget;
+    generatorBar = new GeneratorBar;
 
     configureAct = new Action;
     configureAct->setText(_("Advanced settings"));
@@ -196,12 +196,12 @@ PipeGenerator::Impl::Impl()
     vbox->addLayout(gbox);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
-    vbox->addWidget(formWidget);
+    vbox->addWidget(generatorBar);
     setLayout(vbox);
 
     dspins[IN_DIA]->sigValueChanged().connect([&](double value){ onInnerDiameterChanged(value); });
     dspins[OUT_DIA]->sigValueChanged().connect([&](double value){ onOuterDiameterChanged(value); });
-    formWidget->sigClicked().connect([&](string filename){ save(filename); });
+    generatorBar->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

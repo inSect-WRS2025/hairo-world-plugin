@@ -212,8 +212,8 @@ msgstr "保存"
 msgid "Save &As..."
 msgstr "上書き保存"
 
-msgid "Save a body"
-msgstr "ボディを保存"
+msgid "Body"
+msgstr "ボディ"
 
 msgid "Body files (*.body)"
 msgstr "ボディファイル (*.body)"

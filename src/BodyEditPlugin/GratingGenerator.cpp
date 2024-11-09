@@ -18,7 +18,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include "ColorButton.h"
-#include "FileFormWidget.h"
+#include "GeneratorBar.h"
 #include "gettext.h"
 
 using namespace std;
@@ -83,7 +83,7 @@ public:
 
     QLabel* sizeLabel;
     ColorButton* colorButton;
-    FileFormWidget* formWidget;
+    GeneratorBar* generatorBar;
     YAMLWriter yamlWriter;
 
     Impl();
@@ -173,13 +173,13 @@ GratingGenerator::Impl::Impl()
     gbox->addWidget(new QLabel(_("Size [m, m, m]")), 5, 0);
     gbox->addWidget(sizeLabel, 5, 1, 1, 3);
 
-    formWidget = new FileFormWidget;
+    generatorBar = new GeneratorBar;
 
     auto vbox = new QVBoxLayout;
     vbox->addLayout(gbox);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
-    vbox->addWidget(formWidget);
+    vbox->addWidget(generatorBar);
     setLayout(vbox);
 
     onValueChanged();
@@ -191,7 +191,7 @@ GratingGenerator::Impl::Impl()
     spins[H_GRID]->sigValueChanged().connect([&](double value){ onValueChanged(); });
     spins[V_GRID]->sigValueChanged().connect([&](double value){ onValueChanged(); });
     dspins[HEIGHT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    formWidget->sigClicked().connect([&](string filename){ save(filename); });
+    generatorBar->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 
