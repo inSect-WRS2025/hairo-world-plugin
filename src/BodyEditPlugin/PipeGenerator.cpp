@@ -26,6 +26,7 @@
 #include <QtMath>
 #include "ColorButton.h"
 #include "GeneratorBar.h"
+#include "WidgetInfo.h"
 #include "gettext.h"
 
 using namespace std;
@@ -36,37 +37,17 @@ namespace {
 
 PipeGenerator* pipeInstance = nullptr;
 
-struct DoubleSpinInfo
-{
-    int row;
-    int column;
-    double min;
-    double max;
-    double step;
-    double decimals;
-    double value;
-};
-
 DoubleSpinInfo doubleSpinInfo[] = {
-    { 0, 1, 0.01, 1000.0, 0.01, 3, 1.00 },
-    { 0, 3, 0.01, 1000.0, 0.01, 3, 1.00 },
-    { 1, 1, 0.01, 1000.0, 0.01, 3, 0.03 },
-    { 1, 3, 0.01, 1000.0, 0.01, 3, 0.05 }
-};
-
-struct SpinInfo
-{
-    int row;
-    int column;
-    int min;
-    int max;
-    int value;
+    { 0, 1, 0.01, 1000.0, 0.01, 3, 1.00,           "mass", nullptr },
+    { 0, 3, 0.01, 1000.0, 0.01, 3, 1.00,         "length", nullptr },
+    { 1, 1, 0.01, 1000.0, 0.01, 3, 0.03, "inner_diameter", nullptr },
+    { 1, 3, 0.01, 1000.0, 0.01, 3, 0.05, "outer_diameter", nullptr }
 };
 
 SpinInfo spinInfo[] = {
-    { 3, 3, 0, 359,  0 },
-    { 2, 1, 1, 120, 30 },
-    { 2, 3, 1, 120, 30 }
+    { 3, 3, 0, 359, 1,  0,      "angle", nullptr },
+    { 2, 1, 1, 120, 1, 30, "inter_step", nullptr },
+    { 2, 3, 1, 120, 1, 30, "outer_step", nullptr }
 };
 
 }
@@ -159,26 +140,24 @@ PipeGenerator::Impl::Impl()
 
     for(int i = 0; i < NUM_DSPINS; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
-        dspins[i] = new DoubleSpinBox;
-        DoubleSpinBox* dspin = dspins[i];
-        dspin->setRange(info.min, info.max);
-        dspin->setSingleStep(info.step);
-        dspin->setDecimals(info.decimals);
-        dspin->setValue(info.value);
+        info.spin = dspins[i] = new DoubleSpinBox;
+        info.spin->setRange(info.min, info.max);
+        info.spin->setSingleStep(info.step);
+        info.spin->setDecimals(info.decimals);
+        info.spin->setValue(info.value);
         gbox->addWidget(new QLabel(label0[i]), info.row, info.column - 1);
-        gbox->addWidget(dspin, info.row, info.column);
+        gbox->addWidget(info.spin, info.row, info.column);
     }
 
     static const char* label1[] = { _("Opening angle [deg]"), _("Inner step angle [deg]"), _("Outer step angle [deg]") };
 
     for(int i = 0; i < NUM_SPINS; ++i) {
         SpinInfo info = spinInfo[i];
-        spins[i] = new SpinBox;
-        SpinBox* spin = spins[i];
-        spin->setRange(info.min, info.max);
-        spin->setValue(info.value);
+        info.spin = spins[i] = new SpinBox;
+        info.spin->setRange(info.min, info.max);
+        info.spin->setValue(info.value);
         gbox->addWidget(new QLabel(label1[i]), info.row, info.column - 1);
-        gbox->addWidget(spin, info.row, info.column);
+        gbox->addWidget(info.spin, info.row, info.column);
     }
 
     colorButton = new ColorButton;

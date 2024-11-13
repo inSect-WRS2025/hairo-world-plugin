@@ -332,22 +332,19 @@ CrawlerGenerator::Impl::Impl()
 
     for(int i = 0; i < NUM_DSPINS; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
-        dspins[i] = new DoubleSpinBox;
-        DoubleSpinBox* dspin = dspins[i];
+        DoubleSpinBox* dspin = dspins[i] = new DoubleSpinBox;
         gbox[info.page]->addWidget(dspin, info.row, info.column);
     }
 
     for(int i = 0; i < NUM_AGXDSPINS; ++i) {
         DoubleSpinInfo info = agxdoubleSpinInfo[i];
-        agxdspins[i] = new DoubleSpinBox;
-        DoubleSpinBox* agxdspin = agxdspins[i];
+        DoubleSpinBox* agxdspin = agxdspins[i] = new DoubleSpinBox;
         agbox->addWidget(agxdspin, info.row, info.column);
     }
 
     for(int i = 0; i < NUM_SPINS; ++i) {
-        agxspins[i] = new SpinBox;
         SpinInfo info = agxspinInfo[i];
-        SpinBox* spin = agxspins[i];
+        SpinBox* spin = agxspins[i] = new SpinBox;
         agbox->addWidget(spin, info.row, info.column);
     }
 

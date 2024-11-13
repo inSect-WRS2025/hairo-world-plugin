@@ -20,6 +20,7 @@
 #include <QLabel>
 #include "ColorButton.h"
 #include "GeneratorBar.h"
+#include "WidgetInfo.h"
 #include "gettext.h"
 
 using namespace std;
@@ -30,23 +31,12 @@ namespace {
 
 StairsGenerator* stairsInstance = nullptr;
 
-struct DoubleSpinInfo
-{
-    int row;
-    int column;
-    double min;
-    double max;
-    double step;
-    int decimals;
-    double value;
-};
-
 DoubleSpinInfo doubleSpinInfo[] = {
-    { 0, 1, 0.001, 1000.0, 0.01, 3, 0.15 },
-    { 0, 3, 0.001, 1000.0, 0.01, 3, 0.75 },
-    { 1, 1, 0.001, 1000.0, 0.01, 3, 0.23 },
-    { 1, 3, 0.001, 1000.0, 0.01, 3, 0.05 },
-    { 2, 1, 0.001, 1000.0, 0.01, 3, 0.02 },
+    { 0, 1, 0.001, 1000.0, 0.01, 3, 0.15,     "tread", nullptr },
+    { 0, 3, 0.001, 1000.0, 0.01, 3, 0.75,     "width", nullptr },
+    { 1, 1, 0.001, 1000.0, 0.01, 3, 0.23,     "riser", nullptr },
+    { 1, 3, 0.001, 1000.0, 0.01, 3, 0.05,  "stringer", nullptr },
+    { 2, 1, 0.001, 1000.0, 0.01, 3, 0.02, "thickness", nullptr }
 };
 
 }
@@ -117,13 +107,13 @@ StairsGenerator::Impl::Impl()
 
     for(int i = 0; i < NUM_DSPINS; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
-        dspins[i] = new DoubleSpinBox;
-        dspins[i]->setRange(info.min, info.max);
-        dspins[i]->setSingleStep(info.step);
-        dspins[i]->setDecimals(info.decimals);
-        dspins[i]->setValue(info.value);
+        info.spin = dspins[i] = new DoubleSpinBox;
+        info.spin->setRange(info.min, info.max);
+        info.spin->setSingleStep(info.step);
+        info.spin->setDecimals(info.decimals);
+        info.spin->setValue(info.value);
         gbox->addWidget(new QLabel(label[i]), info.row, info.column - 1);
-        gbox->addWidget(dspins[i], info.row, info.column);
+        gbox->addWidget(info.spin, info.row, info.column);
     }
 
     stepsSpin = new SpinBox;

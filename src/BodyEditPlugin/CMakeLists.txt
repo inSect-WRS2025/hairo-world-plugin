@@ -29,6 +29,7 @@ set(headers
   BentPipeGenerator.h
   FileDroppableWidget.h
   Notepad.h
+  WidgetInfo.h
   exportdecl.h
 )
 

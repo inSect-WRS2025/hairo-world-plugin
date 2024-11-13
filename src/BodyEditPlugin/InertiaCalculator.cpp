@@ -32,13 +32,14 @@ struct DoubleSpinInfo {
     int row;
     int column;
     int page;
+    DoubleSpinBox* spin;
 };
 
 DoubleSpinInfo dspinInfo[] = {
-    { 0, 1, 0 }, { 1, 1, 0 }, { 2, 1, 0 }, { 3, 1, 0 },
-    { 0, 1, 1 }, { 1, 1, 1 },
-    { 0, 1, 2 }, { 1, 1, 2 }, { 2, 1, 2 },
-    { 0, 1, 3 }, { 1, 1, 3 }, { 2, 1, 3 }
+    { 0, 1, 0, nullptr }, { 1, 1, 0, nullptr }, { 2, 1, 0, nullptr }, { 3, 1, 0, nullptr },
+    { 0, 1, 1, nullptr }, { 1, 1, 1, nullptr },
+    { 0, 1, 2, nullptr }, { 1, 1, 2, nullptr }, { 2, 1, 2, nullptr },
+    { 0, 1, 3, nullptr }, { 1, 1, 3, nullptr }, { 2, 1, 3, nullptr }
 };
 
 struct LabelInfo {
@@ -147,13 +148,12 @@ InertiaCalculator::Impl::Impl()
     }
 
     for(int i = 0; i < NUM_DSPINS; ++i) {
-        dspins[i] = new DoubleSpinBox;
-        DoubleSpinBox* dspin = dspins[i];
         DoubleSpinInfo info = dspinInfo[i];
-        dspin->setDecimals(7);
-        dspin->setSingleStep(0.01);
-        dspin->setRange(0.000, 9999.999);
-        gbox[info.page]->addWidget(dspin, info.row, info.column);
+        info.spin = dspins[i] = new DoubleSpinBox;
+        info.spin->setDecimals(7);
+        info.spin->setSingleStep(0.01);
+        info.spin->setRange(0.000, 9999.999);
+        gbox[info.page]->addWidget(info.spin, info.row, info.column);
     }
 
     static const char* label[] = {

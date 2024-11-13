@@ -20,6 +20,7 @@
 #include <QLabel>
 #include "ColorButton.h"
 #include "GeneratorBar.h"
+#include "WidgetInfo.h"
 #include "gettext.h"
 
 using namespace std;
@@ -30,22 +31,11 @@ namespace {
 
 SlopeGenerator* slopeInstance = nullptr;
 
-struct DoubleSpinInfo
-{
-    int row;
-    int column;
-    double min;
-    double max;
-    double step;
-    int decimals;
-    double value;
-};
-
 DoubleSpinInfo doubleSpinInfo[] = {
-    { 0, 1, 0.001, 1000.0, 0.01, 3, 1.0 },
-    { 0, 3, 0.001, 1000.0, 0.01, 3, 1.0 },
-    { 1, 1, 0.001, 1000.0, 0.01, 3, 1.0 },
-    { 1, 3, 0.001, 1000.0, 0.01, 3, 1.0 }
+    { 0, 1, 0.001, 1000.0, 0.01, 3, 1.0,   "mass", nullptr },
+    { 0, 3, 0.001, 1000.0, 0.01, 3, 1.0,  "width", nullptr },
+    { 1, 1, 0.001, 1000.0, 0.01, 3, 1.0, "height", nullptr },
+    { 1, 3, 0.001, 1000.0, 0.01, 3, 1.0, "length", nullptr }
 };
 
 }
@@ -110,13 +100,13 @@ SlopeGenerator::Impl::Impl()
 
     for(int i = 0; i < NUM_DSPINS; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
-        dspins[i] = new DoubleSpinBox;
-        dspins[i]->setRange(info.min, info.max);
-        dspins[i]->setSingleStep(info.step);
-        dspins[i]->setDecimals(info.decimals);
-        dspins[i]->setValue(info.value);
+        info.spin = dspins[i] = new DoubleSpinBox;
+        info.spin->setRange(info.min, info.max);
+        info.spin->setSingleStep(info.step);
+        info.spin->setDecimals(info.decimals);
+        info.spin->setValue(info.value);
         gbox->addWidget(new QLabel(label0[i]), info.row, info.column - 1);
-        gbox->addWidget(dspins[i], info.row, info.column);
+        gbox->addWidget(info.spin, info.row, info.column);
     }
 
     colorButton = new ColorButton;
