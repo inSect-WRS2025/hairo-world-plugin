@@ -27,7 +27,7 @@
 #include <QLabel>
 #include <QStackedWidget>
 #include "ColorButton.h"
-#include "GeneratorBar.h"
+#include "GeneratorButtonBox.h"
 #include "gettext.h"
 
 using namespace std;
@@ -247,7 +247,7 @@ public:
     RadioButton setting1Radio;
     RadioButton setting2Radio;
     QStackedWidget* topWidget;
-    GeneratorBar* generatorBar;
+    GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
     YAMLWriter yamlWriter2;
 
@@ -325,34 +325,34 @@ CrawlerGenerator::Impl::Impl()
     yamlWriter.setKeyOrderPreservationMode(true);
     yamlWriter2.setKeyOrderPreservationMode(true);
 
-    QGridLayout* gbox[2];
-    gbox[0] = new QGridLayout;
-    gbox[1] = new QGridLayout;
-    QGridLayout* agbox = new QGridLayout;
+    QGridLayout* gridLayout[2];
+    gridLayout[0] = new QGridLayout;
+    gridLayout[1] = new QGridLayout;
+    auto gridLayout2 = new QGridLayout;
 
     for(int i = 0; i < NUM_DSPINS; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
         DoubleSpinBox* dspin = dspins[i] = new DoubleSpinBox;
-        gbox[info.page]->addWidget(dspin, info.row, info.column);
+        gridLayout[info.page]->addWidget(dspin, info.row, info.column);
     }
 
     for(int i = 0; i < NUM_AGXDSPINS; ++i) {
         DoubleSpinInfo info = agxdoubleSpinInfo[i];
         DoubleSpinBox* agxdspin = agxdspins[i] = new DoubleSpinBox;
-        agbox->addWidget(agxdspin, info.row, info.column);
+        gridLayout2->addWidget(agxdspin, info.row, info.column);
     }
 
     for(int i = 0; i < NUM_SPINS; ++i) {
         SpinInfo info = agxspinInfo[i];
         SpinBox* spin = agxspins[i] = new SpinBox;
-        agbox->addWidget(spin, info.row, info.column);
+        gridLayout2->addWidget(spin, info.row, info.column);
     }
 
     for(int i = 0; i < NUM_BUTTONS; ++i) {
         ButtonInfo info = buttonInfo[i];
         buttons[i] = new ColorButton;
         PushButton* button = buttons[i];
-        gbox[info.page]->addWidget(button, info.row, info.column);
+        gridLayout[info.page]->addWidget(button, info.row, info.column);
     }
 
     static const char* label0[] = {
@@ -361,7 +361,7 @@ CrawlerGenerator::Impl::Impl()
 
     for(int i = 0; i < 5; ++i) {
         Info info = separatorInfo[i];
-        gbox[info.page]->addLayout(new HSeparatorBox(new QLabel(label0[i])), info.row, info.column, 1, 4);
+        gridLayout[info.page]->addLayout(new HSeparatorBox(new QLabel(label0[i])), info.row, info.column, 1, 4);
     }
 
     static const char* label1[] = {
@@ -374,14 +374,14 @@ CrawlerGenerator::Impl::Impl()
 
     for(int i = 0; i < 22; ++i) {
         LabelInfo info = labelInfo[i];
-        gbox[info.page]->addWidget(new QLabel(label1[i]), info.row, info.column);
+        gridLayout[info.page]->addWidget(new QLabel(label1[i]), info.row, info.column);
     }
 
     static const char* label2[] = { _("Track Belt"), _("SubTrack Belt") };
 
     for(int i = 0; i < 2; ++i) {
         Info info = agxseparatorInfo[i];
-        agbox->addLayout(new HSeparatorBox(new QLabel(label2[i])), info.row, info.column, 1, 6);
+        gridLayout2->addLayout(new HSeparatorBox(new QLabel(label2[i])), info.row, info.column, 1, 6);
     }
 
     static const char* label3[] = {
@@ -395,7 +395,7 @@ CrawlerGenerator::Impl::Impl()
 
     for(int i = 0; i < 24; ++i) {
         LabelInfo info = agxlabelInfo[i];
-        agbox->addWidget(new QLabel(label3[i % 12]), info.row, info.column);
+        gridLayout2->addWidget(new QLabel(label3[i % 12]), info.row, info.column);
     }
 
     static const char* label4[] = { _("Front SubTrack"), _("Rear SubTrack"), _("AGX") };
@@ -439,26 +439,26 @@ CrawlerGenerator::Impl::Impl()
         hbox->addWidget(button);
     }
 
-    generatorBar = new GeneratorBar;
+    buttonBox = new GeneratorButtonBox;
 
     initialize();
 
     Widget* page1Widget = new Widget;
     auto vbox1 = new QVBoxLayout;
-    vbox1->addLayout(gbox[0]);
+    vbox1->addLayout(gridLayout[0]);
     vbox1->addStretch();
     page1Widget->setLayout(vbox1);
 
     Widget* page2Widget = new Widget;
     auto vbox2 = new QVBoxLayout;
     vbox2->addLayout(hbox1);
-    vbox2->addLayout(gbox[1]);
+    vbox2->addLayout(gridLayout[1]);
     vbox2->addStretch();
     page2Widget->setLayout(vbox2);
 
     Widget* page3Widget = new Widget;
     auto vbox3 = new QVBoxLayout;
-    vbox3->addLayout(agbox);
+    vbox3->addLayout(gridLayout2);
     vbox3->addStretch();
     page3Widget->setLayout(vbox3);
 
@@ -471,14 +471,14 @@ CrawlerGenerator::Impl::Impl()
     vbox->addLayout(hbox);
     vbox->addWidget(topWidget);
     vbox->addWidget(new HSeparator);
-    vbox->addWidget(generatorBar);
+    vbox->addWidget(buttonBox);
     setLayout(vbox);
 
     toolButtons[RESET]->sigClicked().connect([&](){ onResetButtonClicked(); });
     toolButtons[IMPORT]->sigClicked().connect([&](){ onImportButtonClicked(); });
     toolButtons[EXPORT]->sigClicked().connect([&](){ onExportButtonClicked(); });
     checks[AGX_CHK]->sigToggled().connect([&](bool checked){ onEnableAGXCheckToggled(checked); });
-    generatorBar->sigSaveTriggered().connect([&](string filename){ save(filename); });
+    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

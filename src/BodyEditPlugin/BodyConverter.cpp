@@ -218,8 +218,8 @@ BodyConverter::Impl::Impl()
     mainLayout->addStretch();
     mainLayout->addWidget(new HSeparator);
     mainLayout->addWidget(buttonBox);
-
     setLayout(mainLayout);
+
     setWindowTitle(_("Body Loader"));
 }
 

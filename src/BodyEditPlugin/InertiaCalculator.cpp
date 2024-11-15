@@ -128,20 +128,20 @@ InertiaCalculator::Impl::Impl()
         combos[i] = new ComboBox;
     }
 
-    const QStringList shapeList = { _("Box"), _("Sphere"), _("Cylinder"), _("Cone") };
-    combos[SHAPE]->addItems(shapeList);
+    const QStringList list = { _("Box"), _("Sphere"), _("Cylinder"), _("Cone") };
+    combos[SHAPE]->addItems(list);
     auto hbox = new QHBoxLayout;
     hbox->addWidget(new QLabel(_("Shape")));
     hbox->addWidget(combos[SHAPE]);
     hbox->addStretch();
 
     topWidget = new QStackedWidget;
-    QGridLayout* gbox[NUM_PAGES];
+    QGridLayout* gridLayout[NUM_PAGES];
     for(int i = 0; i < NUM_PAGES; ++i) {
         Widget* pageWidget = new Widget;
-        gbox[i] = new QGridLayout;
+        gridLayout[i] = new QGridLayout;
         auto vbox = new QVBoxLayout;
-        vbox->addLayout(gbox[i]);
+        vbox->addLayout(gridLayout[i]);
         vbox->addStretch();
         pageWidget->setLayout(vbox);
         topWidget->addWidget(pageWidget);
@@ -153,10 +153,10 @@ InertiaCalculator::Impl::Impl()
         info.spin->setDecimals(7);
         info.spin->setSingleStep(0.01);
         info.spin->setRange(0.000, 9999.999);
-        gbox[info.page]->addWidget(info.spin, info.row, info.column);
+        gridLayout[info.page]->addWidget(info.spin, info.row, info.column);
     }
 
-    static const char* label[] = {
+    const QStringList list2 = {
         _("mass [kg]"), _("x [m]"), _("y [m]"), _("z [m]"),
         _("mass [kg]"), _("radius [m]"),
         _("mass [kg]"), _("radius [m]"), _("height [m]"), _("axis [-]"),
@@ -165,14 +165,14 @@ InertiaCalculator::Impl::Impl()
 
     for(int i = 0; i < 14; ++i) {
         LabelInfo info = labelInfo[i];
-        gbox[info.page]->addWidget(new QLabel(label[i]), info.row, info.column);
+        gridLayout[info.page]->addWidget(new QLabel(list2[i]), info.row, info.column);
     }
 
-    const QStringList axisList = { "x", "y", "z" };
-    combos[CLD_AXIS]->addItems(axisList);
-    combos[CON_AXIS]->addItems(axisList);
-    gbox[CYLINDER]->addWidget(combos[CLD_AXIS], 3, 1);
-    gbox[CONE]->addWidget(combos[CON_AXIS], 3, 1);
+    const QStringList list3 = { "x", "y", "z" };
+    combos[CLD_AXIS]->addItems(list3);
+    combos[CON_AXIS]->addItems(list3);
+    gridLayout[CYLINDER]->addWidget(combos[CLD_AXIS], 3, 1);
+    gridLayout[CONE]->addWidget(combos[CON_AXIS], 3, 1);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(this);
     PushButton* calcButton = new PushButton(_("&Calc"));

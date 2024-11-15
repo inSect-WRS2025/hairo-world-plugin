@@ -544,14 +544,14 @@ DoseConfigDialog::DoseConfigDialog()
     maxBchSpin->setRange(1, 1000000);
     maxBchSpin->setValue(2);
 
-    QGridLayout* rgbox = new QGridLayout;
-    static const char* xyzLabels[] = { "X (n, min[m], max[m])", "Y (n, min[m], max[m])", "Z (n, min[m], max[m])", "Energy (n, min[m], max[m])" };
+    auto gridLayout = new QGridLayout;
+    const QStringList list = { "X (n, min[m], max[m])", "Y (n, min[m], max[m])", "Z (n, min[m], max[m])", "Energy (n, min[m], max[m])" };
     for(int i = 0; i < MAX_PARAMETER; ++i) {
-        //rgbox->addWidget(new QLabel(xyzLabels[i], frame), i + 1, 0, Qt::AlignCenter);
-        rgbox->addWidget(new QLabel(xyzLabels[i]), i + 1, 0, Qt::AlignCenter);
-        rgbox->addWidget(&nSpin[i], i + 1, 1);
-        rgbox->addWidget(&minSpin[i], i + 1, 2);
-        rgbox->addWidget(&maxSpin[i], i + 1, 3);
+        //gridLayout->addWidget(new QLabel(list[i], frame), i + 1, 0, Qt::AlignCenter);
+        gridLayout->addWidget(new QLabel(list[i]), i + 1, 0, Qt::AlignCenter);
+        gridLayout->addWidget(&nSpin[i], i + 1, 1);
+        gridLayout->addWidget(&minSpin[i], i + 1, 2);
+        gridLayout->addWidget(&maxSpin[i], i + 1, 3);
 
         if(i < 3) {
             nSpin[i].setAlignment(Qt::AlignCenter);
@@ -592,24 +592,24 @@ DoseConfigDialog::DoseConfigDialog()
     QGroupBox* rangeBox = new QGroupBox;
     rangeBox->setTitle(_("Dose Distribution Range"));
     rangeBox->setAlignment(Qt::AlignCenter);
-    rangeBox->setLayout(rgbox);
+    rangeBox->setLayout(gridLayout);
 
-    QGridLayout* gbox1 = new QGridLayout;
+    auto gridLayout2 = new QGridLayout;
     int index = 0;
-    gbox1->addWidget(new QLabel(_("maxcas")), index, 0);
-    gbox1->addWidget(maxCasSpin, index, 1);
-    gbox1->addWidget(new QLabel(_("maxbch")), index, 2);
-    gbox1->addWidget(maxBchSpin, index++, 3);
-    gbox1->addWidget(new QLabel(_("Code")), index, 0);
-    gbox1->addWidget(codeCombo, index, 1);
-    gbox1->addWidget(messageCheck, index++, 2, 1, 2);
+    gridLayout2->addWidget(new QLabel(_("maxcas")), index, 0);
+    gridLayout2->addWidget(maxCasSpin, index, 1);
+    gridLayout2->addWidget(new QLabel(_("maxbch")), index, 2);
+    gridLayout2->addWidget(maxBchSpin, index++, 3);
+    gridLayout2->addWidget(new QLabel(_("Code")), index, 0);
+    gridLayout2->addWidget(codeCombo, index, 1);
+    gridLayout2->addWidget(messageCheck, index++, 2, 1, 2);
 
-    QGridLayout* gbox2 = new QGridLayout;
-    static const char* label[] = { "XY", "YZ", "ZX" };
+    auto gridLayout3 = new QGridLayout;
+    const QStringList list2 = { "XY", "YZ", "ZX" };
 
     plainCombo = new ComboBox;
     for(int i = 0; i < 3; ++i) {
-        plainCombo->addItem(label[i]);
+        plainCombo->addItem(list2[i]);
     }
     dspin = new DoubleSpinBox;
     dspin->setRange(0.0, 100.0);
@@ -617,9 +617,9 @@ DoseConfigDialog::DoseConfigDialog()
     dspin->setSingleStep(0.01);
     slider = new Slider(Qt::Horizontal);
     slider->setRange(0, 100);
-    gbox2->addWidget(plainCombo, 0, 0, 1, 1);
-    gbox2->addWidget(slider, 0, 1, 1, 2);
-    gbox2->addWidget(dspin, 0, 3, 1, 1);
+    gridLayout3->addWidget(plainCombo, 0, 0, 1, 1);
+    gridLayout3->addWidget(slider, 0, 1, 1, 2);
+    gridLayout3->addWidget(dspin, 0, 3, 1, 1);
 
     dspin->sigValueChanged().connect([&](double value){
         sigValueChanged_(value);
@@ -643,9 +643,9 @@ DoseConfigDialog::DoseConfigDialog()
     auto vbox = new QVBoxLayout;
     vbox->addLayout(new HSeparatorBox(new QLabel("PHITS/QAD")));
     vbox->addWidget(rangeBox);
-    vbox->addLayout(gbox1);
+    vbox->addLayout(gridLayout2);
     vbox->addLayout(new HSeparatorBox(new QLabel(_("Plain"))));
-    vbox->addLayout(gbox2);
+    vbox->addLayout(gridLayout3);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
     vbox->addWidget(buttonBox);

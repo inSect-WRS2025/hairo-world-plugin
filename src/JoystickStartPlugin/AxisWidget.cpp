@@ -69,14 +69,14 @@ AxisWidget::Impl::Impl(AxisWidget *self)
     radius = 5;
     self->update();
 
-    QGridLayout* gbox = new QGridLayout;
-    gbox->addWidget(new VSeparator, 0, 1);
-    gbox->addWidget(new VSeparator, 2, 1);
-    gbox->addWidget(new HSeparator, 1, 0);
-    gbox->addWidget(new HSeparator, 1, 2);
+    auto gridLayout = new QGridLayout;
+    gridLayout->addWidget(new VSeparator, 0, 1);
+    gridLayout->addWidget(new VSeparator, 2, 1);
+    gridLayout->addWidget(new HSeparator, 1, 0);
+    gridLayout->addWidget(new HSeparator, 1, 2);
 
     auto vbox = new QVBoxLayout;
-    vbox->addLayout(gbox);
+    vbox->addLayout(gridLayout);
     self->setLayout(vbox);
 }
 

@@ -19,7 +19,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include "ColorButton.h"
-#include "GeneratorBar.h"
+#include "GeneratorButtonBox.h"
 #include "WidgetInfo.h"
 #include "gettext.h"
 
@@ -56,7 +56,7 @@ public:
     DoubleSpinBox* dspins[NUM_DSPINS];
     SpinBox* stepsSpin;
     ColorButton* colorButton;
-    GeneratorBar* generatorBar;
+    GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
 
     Impl();
@@ -97,9 +97,9 @@ StairsGenerator::Impl::Impl()
     setWindowTitle(_("Stairs Generator"));
     yamlWriter.setKeyOrderPreservationMode(true);
 
-    QGridLayout* gbox = new QGridLayout;
+    auto gridLayout = new QGridLayout;
 
-    static const char* label[] = {
+    const QStringList list = {
         _("Tread [m]"), _("Stair width [m]"),
         _("Riser [m]"), _("Width of stringer [m]"),
         _("Tread thickness [m]")
@@ -112,31 +112,31 @@ StairsGenerator::Impl::Impl()
         info.spin->setSingleStep(info.step);
         info.spin->setDecimals(info.decimals);
         info.spin->setValue(info.value);
-        gbox->addWidget(new QLabel(label[i]), info.row, info.column - 1);
-        gbox->addWidget(info.spin, info.row, info.column);
+        gridLayout->addWidget(new QLabel(list[i]), info.row, info.column - 1);
+        gridLayout->addWidget(info.spin, info.row, info.column);
     }
 
     stepsSpin = new SpinBox;
     stepsSpin->setRange(1, 9999);
     stepsSpin->setValue(10);
-    gbox->addWidget(new QLabel(_("Number of steps [-]")), 2, 2);
-    gbox->addWidget(stepsSpin, 2, 3);
+    gridLayout->addWidget(new QLabel(_("Number of steps [-]")), 2, 2);
+    gridLayout->addWidget(stepsSpin, 2, 3);
 
     colorButton = new ColorButton;
     colorButton->setColor(Vector3(0.5, 0.5, 0.5));
-    gbox->addWidget(new QLabel(_("Color [-]")), 3, 0);
-    gbox->addWidget(colorButton, 3, 1);
+    gridLayout->addWidget(new QLabel(_("Color [-]")), 3, 0);
+    gridLayout->addWidget(colorButton, 3, 1);
 
-    generatorBar = new GeneratorBar;
+    buttonBox = new GeneratorButtonBox;
 
     auto vbox = new QVBoxLayout;
-    vbox->addLayout(gbox);
+    vbox->addLayout(gridLayout);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
-    vbox->addWidget(generatorBar);
+    vbox->addWidget(buttonBox);
     setLayout(vbox);
 
-    generatorBar->sigSaveTriggered().connect([&](string filename){ save(filename); });
+    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

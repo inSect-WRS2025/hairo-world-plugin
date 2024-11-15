@@ -19,7 +19,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include "ColorButton.h"
-#include "GeneratorBar.h"
+#include "GeneratorButtonBox.h"
 #include "WidgetInfo.h"
 #include "gettext.h"
 
@@ -58,7 +58,7 @@ public:
     DoubleSpinBox* dspins[NUM_DSPINS];
     SpinBox* spins[NUM_SPINS];
     ColorButton* colorButton;
-    GeneratorBar* generatorBar;
+    GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
 
     Impl();
@@ -100,7 +100,7 @@ BentPipeGenerator::Impl::Impl()
     setWindowTitle(_("BentPipe Generator"));
     yamlWriter.setKeyOrderPreservationMode(true);
 
-    QGridLayout* gbox = new QGridLayout;
+    auto gridLayout = new QGridLayout;
 
     const QStringList list = {
         _("Mass [kg]"), _("Bent radius [m]"),
@@ -114,8 +114,8 @@ BentPipeGenerator::Impl::Impl()
         info.spin->setSingleStep(info.step);
         info.spin->setDecimals(info.decimals);
         info.spin->setValue(info.value);
-        gbox->addWidget(new QLabel(list[i]), info.row, info.column - 1);
-        gbox->addWidget(info.spin, info.row, info.column);
+        gridLayout->addWidget(new QLabel(list[i]), info.row, info.column - 1);
+        gridLayout->addWidget(info.spin, info.row, info.column);
     }
 
     const QStringList list2 = {
@@ -128,25 +128,25 @@ BentPipeGenerator::Impl::Impl()
         info.spin = spins[i] = new SpinBox;
         info.spin->setRange(info.min, info.max);
         info.spin->setValue(info.value);
-        gbox->addWidget(new QLabel(list2[i]), info.row, info.column - 1);
-        gbox->addWidget(info.spin, info.row, info.column);
+        gridLayout->addWidget(new QLabel(list2[i]), info.row, info.column - 1);
+        gridLayout->addWidget(info.spin, info.row, info.column);
     }
 
     colorButton = new ColorButton;
     colorButton->setColor(Vector3(0.5, 0.5, 0.5));
-    gbox->addWidget(new QLabel(_("Color [-]")), 3, 0);
-    gbox->addWidget(colorButton, 3, 1);
+    gridLayout->addWidget(new QLabel(_("Color [-]")), 3, 0);
+    gridLayout->addWidget(colorButton, 3, 1);
 
-    generatorBar = new GeneratorBar;
+    buttonBox = new GeneratorButtonBox;
 
     auto vbox = new QVBoxLayout;
-    vbox->addLayout(gbox);
+    vbox->addLayout(gridLayout);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
-    vbox->addWidget(generatorBar);
+    vbox->addWidget(buttonBox);
     setLayout(vbox);
 
-    generatorBar->sigSaveTriggered().connect([&](string filename){ save(filename); });
+    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
     spins[BENT_ANGLE]->sigValueChanged().connect([&](double value){ onBentAngleChanged(value); });
     dspins[IN_DIA]->sigValueChanged().connect([&](double value){ onInnerDiameterChanged(value); });
     dspins[OUT_DIA]->sigValueChanged().connect([&](double value){ onOuterDiameterChanged(value); });

@@ -77,9 +77,9 @@ KeyConfig::Impl::Impl()
 {
     setWindowTitle(_("KeyConfig"));
 
-    QGridLayout* agbox = new QGridLayout;
-    agbox->addWidget(new QLabel("Axis"), 0, 0);
-    agbox->addWidget(new QLabel("ID"), 0, 1);
+    auto gridLayout = new QGridLayout;
+    gridLayout->addWidget(new QLabel("Axis"), 0, 0);
+    gridLayout->addWidget(new QLabel("ID"), 0, 1);
     for(int i = 0; i < Joystick::NUM_STD_AXES; ++i) {
         axisCombos[i] = new ComboBox;
         for(int j = 0; j < Joystick::NUM_STD_AXES; ++j) {
@@ -87,16 +87,16 @@ KeyConfig::Impl::Impl()
             axisCombos[i]->addItem(info.name);
         }
         axisCombos[i]->setCurrentIndex(i);
-        agbox->addWidget(new QLabel(axisInfo[i].name));
-        agbox->addWidget(axisCombos[i], i + 1, 1);
+        gridLayout->addWidget(new QLabel(axisInfo[i].name));
+        gridLayout->addWidget(axisCombos[i], i + 1, 1);
     }
     auto avbox = new QVBoxLayout;
-    avbox->addLayout(agbox);
+    avbox->addLayout(gridLayout);
     avbox->addStretch();
 
-    QGridLayout* bgbox = new QGridLayout;
-    bgbox->addWidget(new QLabel("Button"), 0, 0);
-    bgbox->addWidget(new QLabel("ID"), 0, 1);
+    auto gridLayout2 = new QGridLayout;
+    gridLayout2->addWidget(new QLabel("Button"), 0, 0);
+    gridLayout2->addWidget(new QLabel("ID"), 0, 1);
     for(int i = 0; i < Joystick::NUM_STD_BUTTONS; ++i) {
         buttonCombos[i] = new ComboBox;
         for(int j = 0; j < Joystick::NUM_STD_BUTTONS; ++j) {
@@ -104,11 +104,11 @@ KeyConfig::Impl::Impl()
             buttonCombos[i]->addItem(info.name);
         }
         buttonCombos[i]->setCurrentIndex(i);
-        bgbox->addWidget(new QLabel(buttonInfo[i].name));
-        bgbox->addWidget(buttonCombos[i], i + 1, 1);
+        gridLayout2->addWidget(new QLabel(buttonInfo[i].name));
+        gridLayout2->addWidget(buttonCombos[i], i + 1, 1);
     }
     auto bvbox = new QVBoxLayout;
-    bvbox->addLayout(bgbox);
+    bvbox->addLayout(gridLayout2);
     bvbox->addStretch();
 
     auto buttonBox = new QDialogButtonBox(this);

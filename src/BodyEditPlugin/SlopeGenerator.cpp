@@ -19,7 +19,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include "ColorButton.h"
-#include "GeneratorBar.h"
+#include "GeneratorButtonBox.h"
 #include "WidgetInfo.h"
 #include "gettext.h"
 
@@ -53,7 +53,7 @@ public:
 
     DoubleSpinBox* dspins[NUM_DSPINS];
     ColorButton* colorButton;
-    GeneratorBar* generatorBar;
+    GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
 
     Impl();
@@ -92,9 +92,9 @@ SlopeGenerator::Impl::Impl()
     setWindowTitle(_("Slope Generator"));
     yamlWriter.setKeyOrderPreservationMode(true);
 
-    QGridLayout* gbox = new QGridLayout;
+    auto gridLayout = new QGridLayout;
 
-    static const char* label0[] = {
+    const QStringList list = {
         _("Mass [kg]"), _("Width [m]"), _("Height [m]"), _("Length [m]")
     };
 
@@ -105,25 +105,25 @@ SlopeGenerator::Impl::Impl()
         info.spin->setSingleStep(info.step);
         info.spin->setDecimals(info.decimals);
         info.spin->setValue(info.value);
-        gbox->addWidget(new QLabel(label0[i]), info.row, info.column - 1);
-        gbox->addWidget(info.spin, info.row, info.column);
+        gridLayout->addWidget(new QLabel(list[i]), info.row, info.column - 1);
+        gridLayout->addWidget(info.spin, info.row, info.column);
     }
 
     colorButton = new ColorButton;
     colorButton->setColor(Vector3(0.5, 0.5, 0.5));
-    gbox->addWidget(new QLabel(_("Color [-]")), 2, 0);
-    gbox->addWidget(colorButton, 2, 1);
+    gridLayout->addWidget(new QLabel(_("Color [-]")), 2, 0);
+    gridLayout->addWidget(colorButton, 2, 1);
 
-    generatorBar = new GeneratorBar;
+    buttonBox = new GeneratorButtonBox;
 
     auto vbox = new QVBoxLayout;
-    vbox->addLayout(gbox);
+    vbox->addLayout(gridLayout);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
-    vbox->addWidget(generatorBar);
+    vbox->addWidget(buttonBox);
     setLayout(vbox);
 
-    generatorBar->sigSaveTriggered().connect([&](string filename){ save(filename); });
+    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

@@ -77,15 +77,15 @@ NetworkEmulator::Impl::Impl()
 
     emulator = new NetEm;
 
-    static const char* label[] = {
+    const QStringList list = {
         _("Interface"), _("IFB Device"),
         _("Inbound Delay [ms]"), _("Inbound Rate [kbit/s]"),_("Inbound Loss [%]"),
         _("Outbound Delay [ms]"), _("Outbound Rate [kbit/s]"), _("Outbound Loss [%]")
     };
 
-    QGridLayout* gbox = new QGridLayout;
+    auto gridLayout = new QGridLayout;
     for(int i = 0; i < 8; ++i) {
-        gbox->addWidget(new QLabel(label[i]), i, 0);
+        gridLayout->addWidget(new QLabel(list[i]), i, 0);
     }
 
     interfaceCombo = new ComboBox;
@@ -105,14 +105,14 @@ NetworkEmulator::Impl::Impl()
         lossSpins[i]->setRange(0.0, 100.0);
     }
 
-    gbox->addWidget(interfaceCombo, 0, 1);
-    gbox->addWidget(ifbdeviceCombo, 1, 1);
-    gbox->addWidget(delaySpins[0], 2, 1);
-    gbox->addWidget(rateSpins[0], 3, 1);
-    gbox->addWidget(lossSpins[0], 4, 1);
-    gbox->addWidget(delaySpins[1], 5, 1);
-    gbox->addWidget(rateSpins[1], 6, 1);
-    gbox->addWidget(lossSpins[1], 7, 1);
+    gridLayout->addWidget(interfaceCombo, 0, 1);
+    gridLayout->addWidget(ifbdeviceCombo, 1, 1);
+    gridLayout->addWidget(delaySpins[0], 2, 1);
+    gridLayout->addWidget(rateSpins[0], 3, 1);
+    gridLayout->addWidget(lossSpins[0], 4, 1);
+    gridLayout->addWidget(delaySpins[1], 5, 1);
+    gridLayout->addWidget(rateSpins[1], 6, 1);
+    gridLayout->addWidget(lossSpins[1], 7, 1);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(this);
     startButton = new PushButton(_("&Start"));
@@ -121,7 +121,7 @@ NetworkEmulator::Impl::Impl()
     startButton->sigToggled().connect([&](bool checked){ onStartButtonToggled(checked); });
 
     auto vbox = new QVBoxLayout;
-    vbox->addLayout(gbox);
+    vbox->addLayout(gridLayout);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
     vbox->addWidget(buttonBox);

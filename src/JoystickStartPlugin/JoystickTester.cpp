@@ -106,9 +106,9 @@ JoystickTester::Impl::Impl()
     joystick.sigButton().connect(
         [&](int id, bool isPressed){ onButton(id, isPressed); });
 
-    QGroupBox* gbox2 = new QGroupBox(_("Axes"));
+    QGroupBox* groupBox = new QGroupBox(_("Axes"));
     auto vbox1 = new QVBoxLayout;
-    QGridLayout* gbox1 = new QGridLayout;
+    auto gridLayout = new QGridLayout;
     for(int i = 0; i < joystick.numAxes(); ++i) {
         QProgressBar* bar = new QProgressBar;
         bar->setValue(0);
@@ -116,14 +116,14 @@ JoystickTester::Impl::Impl()
         bar->setFormat(formatC("{0:.3}%", 0.0).c_str());
         bars.push_back(bar);
         const string label = "Axis " + to_string(i) + ":";
-        gbox1->addWidget(new QLabel(label.c_str()), i, 0);
-        gbox1->addWidget(bar, i, 1);
+        gridLayout->addWidget(new QLabel(label.c_str()), i, 0);
+        gridLayout->addWidget(bar, i, 1);
     }
-    vbox1->addLayout(gbox1);
+    vbox1->addLayout(gridLayout);
     vbox1->addStretch();
-    gbox2->setLayout(vbox1);
+    groupBox->setLayout(vbox1);
 
-    QGroupBox* gbox3 = new QGroupBox(_("Buttons"));
+    QGroupBox* groupBox2 = new QGroupBox(_("Buttons"));
     auto vbox2 = new QVBoxLayout;
     for(int i = 0; i < joystick.numButtons(); ++i) {
         PushButton* button = new PushButton(to_string(i).c_str());
@@ -131,11 +131,11 @@ JoystickTester::Impl::Impl()
         vbox2->addWidget(button);
     }
     vbox2->addStretch();
-    gbox3->setLayout(vbox2);
+    groupBox2->setLayout(vbox2);
 
     auto hbox = new QHBoxLayout;
-    hbox->addWidget(gbox2);
-    hbox->addWidget(gbox3);
+    hbox->addWidget(groupBox);
+    hbox->addWidget(groupBox2);
 
     auto okButton = new QPushButton(_("&Ok"));
     okButton->setDefault(true);

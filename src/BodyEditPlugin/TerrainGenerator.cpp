@@ -22,7 +22,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
-#include "GeneratorBar.h"
+#include "GeneratorButtonBox.h"
 #include "gettext.h"
 
 using namespace std;
@@ -71,7 +71,7 @@ public:
 
     LineEdit* inputFileLine;
     TerrainData* data;
-    GeneratorBar* generatorBar;
+    GeneratorButtonBox* buttonBox;
     DoubleSpinBox* scaleSpin;
     YAMLWriter yamlWriter;
 
@@ -131,25 +131,25 @@ TerrainGenerator::Impl::Impl()
         loadButton->setIcon(openIcon);
     }
 
-    QGridLayout* gbox = new QGridLayout;
+    auto gridLayout = new QGridLayout;
     int index = 0;
-    gbox->addWidget(new QLabel(_("Input File (.csv)")), index, 0);
-    gbox->addWidget(inputFileLine, index, 1, 1, 2);
-    gbox->addWidget(loadButton, index++, 3);
-    gbox->addWidget(new QLabel(_("scale[0.1-10.0]")), index, 0);
-    gbox->addWidget(scaleSpin, index++, 1);
+    gridLayout->addWidget(new QLabel(_("Input File (.csv)")), index, 0);
+    gridLayout->addWidget(inputFileLine, index, 1, 1, 2);
+    gridLayout->addWidget(loadButton, index++, 3);
+    gridLayout->addWidget(new QLabel(_("scale[0.1-10.0]")), index, 0);
+    gridLayout->addWidget(scaleSpin, index++, 1);
 
-    generatorBar = new GeneratorBar;
+    buttonBox = new GeneratorButtonBox;
 
     auto vbox = new QVBoxLayout;
-    vbox->addLayout(gbox);
+    vbox->addLayout(gridLayout);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
-    vbox->addWidget(generatorBar);
+    vbox->addWidget(buttonBox);
     setLayout(vbox);
 
     loadButton->sigClicked().connect([&](){ onLoadButtonClicked(); });
-    generatorBar->sigSaveTriggered().connect([&](string filename){ save(filename); });
+    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

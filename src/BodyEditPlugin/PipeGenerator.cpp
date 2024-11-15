@@ -25,7 +25,7 @@
 #include <QLabel>
 #include <QtMath>
 #include "ColorButton.h"
-#include "GeneratorBar.h"
+#include "GeneratorButtonBox.h"
 #include "WidgetInfo.h"
 #include "gettext.h"
 
@@ -86,7 +86,7 @@ public:
     DoubleSpinBox* dspins[NUM_DSPINS];
     SpinBox* spins[NUM_SPINS];
     ColorButton* colorButton;
-    GeneratorBar* generatorBar;
+    GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
     Action* configureAct;
 
@@ -132,9 +132,9 @@ PipeGenerator::Impl::Impl()
     setWindowTitle(_("Pipe Generator"));
     yamlWriter.setKeyOrderPreservationMode(true);
 
-    QGridLayout* gbox = new QGridLayout;
+    auto gridLayout = new QGridLayout;
 
-    static const char* label0[] = { _("Mass [kg]"), _("Length [m]"),
+    const QStringList list = { _("Mass [kg]"), _("Length [m]"),
                               _("Inner diameter [m]"), _("Outer diameter [m]")
                             };
 
@@ -145,42 +145,42 @@ PipeGenerator::Impl::Impl()
         info.spin->setSingleStep(info.step);
         info.spin->setDecimals(info.decimals);
         info.spin->setValue(info.value);
-        gbox->addWidget(new QLabel(label0[i]), info.row, info.column - 1);
-        gbox->addWidget(info.spin, info.row, info.column);
+        gridLayout->addWidget(new QLabel(list[i]), info.row, info.column - 1);
+        gridLayout->addWidget(info.spin, info.row, info.column);
     }
 
-    static const char* label1[] = { _("Opening angle [deg]"), _("Inner step angle [deg]"), _("Outer step angle [deg]") };
+    const QStringList list2 = { _("Opening angle [deg]"), _("Inner step angle [deg]"), _("Outer step angle [deg]") };
 
     for(int i = 0; i < NUM_SPINS; ++i) {
         SpinInfo info = spinInfo[i];
         info.spin = spins[i] = new SpinBox;
         info.spin->setRange(info.min, info.max);
         info.spin->setValue(info.value);
-        gbox->addWidget(new QLabel(label1[i]), info.row, info.column - 1);
-        gbox->addWidget(info.spin, info.row, info.column);
+        gridLayout->addWidget(new QLabel(list2[i]), info.row, info.column - 1);
+        gridLayout->addWidget(info.spin, info.row, info.column);
     }
 
     colorButton = new ColorButton;
     colorButton->setColor(Vector3(0.5, 0.5, 0.5));
-    gbox->addWidget(new QLabel(_("Color [-]")), 3, 0);
-    gbox->addWidget(colorButton, 3, 1);
+    gridLayout->addWidget(new QLabel(_("Color [-]")), 3, 0);
+    gridLayout->addWidget(colorButton, 3, 1);
 
-    generatorBar = new GeneratorBar;
+    buttonBox = new GeneratorButtonBox;
 
     configureAct = new Action;
     configureAct->setText(_("Advanced settings"));
     configureAct->sigTriggered().connect([this](){ configure(); });
 
     auto vbox = new QVBoxLayout;
-    vbox->addLayout(gbox);
+    vbox->addLayout(gridLayout);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
-    vbox->addWidget(generatorBar);
+    vbox->addWidget(buttonBox);
     setLayout(vbox);
 
     dspins[IN_DIA]->sigValueChanged().connect([&](double value){ onInnerDiameterChanged(value); });
     dspins[OUT_DIA]->sigValueChanged().connect([&](double value){ onOuterDiameterChanged(value); });
-    generatorBar->sigSaveTriggered().connect([&](string filename){ save(filename); });
+    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

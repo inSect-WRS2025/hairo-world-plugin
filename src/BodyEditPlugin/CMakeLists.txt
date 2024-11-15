@@ -2,7 +2,7 @@ set(sources
   BodyConverter.cpp
   ColorButton.cpp
   CrawlerGenerator.cpp
-  GeneratorBar.cpp
+  GeneratorButtonBox.cpp
   GratingGenerator.cpp
   BodyEditPlugin.cpp
   InertiaCalculator.cpp
@@ -19,7 +19,7 @@ set(headers
   BodyConverter.h
   ColorButton.h
   CrawlerGenerator.h
-  GeneratorBar.h
+  GeneratorButtonBox.h
   GratingGenerator.h
   InertiaCalculator.h
   PipeGenerator.h
