@@ -52,15 +52,15 @@ class GratingGenerator::Impl : public Dialog
 {
 public:
 
-    enum DoubleSpinId {
+    enum {
         MASS, HEIGHT, FRAME_WDT,
         FRAME_HGT, GRID_WDT, GRID_HGT,
-        NUM_DSPINS
+        NumDoubleSpinBoxes
     };
-    enum SpinId { H_GRID, V_GRID, NUM_SPINS };
+    enum { H_GRID, V_GRID, NumSpinBoxes };
 
-    DoubleSpinBox* dspins[NUM_DSPINS];
-    SpinBox* spins[NUM_SPINS];
+    DoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
+    SpinBox* spinBoxes[NumSpinBoxes];
 
     QLabel* sizeLabel;
     ColorButton* colorButton;
@@ -112,9 +112,9 @@ GratingGenerator::Impl::Impl()
         _("Frame height [m]"), _("Grid width [m]"), _("Grid height [m]")
     };
 
-    for(int i = 0; i < NUM_DSPINS; ++i) {
+    for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
-        info.spin = dspins[i] = new DoubleSpinBox;
+        info.spin = doubleSpinBoxes[i] = new DoubleSpinBox;
         info.spin->setRange(info.min, info.max);
         info.spin->setSingleStep(info.step);
         info.spin->setDecimals(info.decimals);
@@ -125,9 +125,9 @@ GratingGenerator::Impl::Impl()
 
     const QStringList list2 = { _("Horizontal grid [-]"), _("Vertical grid [-]") };
 
-    for(int i = 0; i < NUM_SPINS; ++i) {
+    for(int i = 0; i < NumSpinBoxes; ++i) {
         SpinInfo info = spinInfo[i];
-        info.spin = spins[i] = new SpinBox;        
+        info.spin = spinBoxes[i] = new SpinBox;        
         info.spin->setRange(info.min, info.max);
         info.spin->setValue(info.value);
         gridLayout->addWidget(new QLabel(list2[i]), info.row, info.column - 1);
@@ -154,13 +154,13 @@ GratingGenerator::Impl::Impl()
 
     onValueChanged();
 
-    dspins[FRAME_WDT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    dspins[FRAME_HGT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    dspins[GRID_WDT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    dspins[GRID_HGT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    spins[H_GRID]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    spins[V_GRID]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    dspins[HEIGHT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
+    doubleSpinBoxes[FRAME_WDT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
+    doubleSpinBoxes[FRAME_HGT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
+    doubleSpinBoxes[GRID_WDT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
+    doubleSpinBoxes[GRID_HGT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
+    spinBoxes[H_GRID]->sigValueChanged().connect([&](double value){ onValueChanged(); });
+    spinBoxes[V_GRID]->sigValueChanged().connect([&](double value){ onValueChanged(); });
+    doubleSpinBoxes[HEIGHT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
     buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
@@ -187,13 +187,13 @@ bool GratingGenerator::Impl::save(const string& filename)
 
 void GratingGenerator::Impl::onValueChanged()
 {
-    double frameWidth = dspins[FRAME_WDT]->value();
-    double frameHeight = dspins[FRAME_HGT]->value();
-    double gridWidth = dspins[GRID_WDT]->value();
-    double gridHeight = dspins[GRID_HGT]->value();
-    int horizontalGrid = spins[H_GRID]->value();
-    int verticalGrid = spins[V_GRID]->value();
-    double height = dspins[HEIGHT]->value();
+    double frameWidth = doubleSpinBoxes[FRAME_WDT]->value();
+    double frameHeight = doubleSpinBoxes[FRAME_HGT]->value();
+    double gridWidth = doubleSpinBoxes[GRID_WDT]->value();
+    double gridHeight = doubleSpinBoxes[GRID_HGT]->value();
+    int horizontalGrid = spinBoxes[H_GRID]->value();
+    int verticalGrid = spinBoxes[V_GRID]->value();
+    double height = doubleSpinBoxes[HEIGHT]->value();
 
     double w = frameWidth * (horizontalGrid + 1) + gridWidth * horizontalGrid;
     double h = frameHeight * (verticalGrid + 1) + gridHeight * verticalGrid;
@@ -231,7 +231,7 @@ MappingPtr GratingGenerator::Impl::writeLink()
 {
     MappingPtr node = new Mapping;
 
-    double mass = dspins[MASS]->value();
+    double mass = doubleSpinBoxes[MASS]->value();
 
     node->write("name", "Root");
     node->write("joint_type", "free");
@@ -251,13 +251,13 @@ MappingPtr GratingGenerator::Impl::writeLink()
 
 void GratingGenerator::Impl::writeLinkShape(Listing* elementsNode)
 {
-    double frameWidth = dspins[FRAME_WDT]->value();
-    double frameHeight = dspins[FRAME_HGT]->value();
-    double gridWidth = dspins[GRID_WDT]->value();
-    double gridHeight = dspins[GRID_HGT]->value();
-    int horizontalGrid = spins[H_GRID]->value();
-    int verticalGrid = spins[V_GRID]->value();
-    double height = dspins[HEIGHT]->value();
+    double frameWidth = doubleSpinBoxes[FRAME_WDT]->value();
+    double frameHeight = doubleSpinBoxes[FRAME_HGT]->value();
+    double gridWidth = doubleSpinBoxes[GRID_WDT]->value();
+    double gridHeight = doubleSpinBoxes[GRID_HGT]->value();
+    int horizontalGrid = spinBoxes[H_GRID]->value();
+    int verticalGrid = spinBoxes[V_GRID]->value();
+    double height = doubleSpinBoxes[HEIGHT]->value();
 
     double w = frameWidth * (horizontalGrid + 1) + gridWidth * horizontalGrid;
     double h = frameHeight * (verticalGrid + 1) + gridHeight * verticalGrid;
@@ -405,17 +405,17 @@ VectorXd GratingGenerator::Impl::calcInertia()
     inertia.resize(9);
     inertia << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-    double mass = dspins[MASS]->value();
-    double frameWidth = dspins[FRAME_WDT]->value();
-    double frameHeight = dspins[FRAME_HGT]->value();
-    double gridWidth = dspins[GRID_WDT]->value();
-    double gridHeight = dspins[GRID_HGT]->value();
-    int horizontalGrid = spins[H_GRID]->value();
-    int verticalGrid = spins[V_GRID]->value();
+    double mass = doubleSpinBoxes[MASS]->value();
+    double frameWidth = doubleSpinBoxes[FRAME_WDT]->value();
+    double frameHeight = doubleSpinBoxes[FRAME_HGT]->value();
+    double gridWidth = doubleSpinBoxes[GRID_WDT]->value();
+    double gridHeight = doubleSpinBoxes[GRID_HGT]->value();
+    int horizontalGrid = spinBoxes[H_GRID]->value();
+    int verticalGrid = spinBoxes[V_GRID]->value();
 
     double x = frameWidth * (horizontalGrid + 1) + gridWidth * horizontalGrid;
     double y = frameHeight * (verticalGrid + 1) + gridHeight * verticalGrid;
-    double z = dspins[HEIGHT]->value();
+    double z = doubleSpinBoxes[HEIGHT]->value();
 
     double ix = mass / 12.0 * (y * y + z * z);
     double iy = mass / 12.0 * (z * z + x * x);

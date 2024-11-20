@@ -59,8 +59,8 @@ public:
 
     Impl();
 
-    ComboBox* axisCombos[Joystick::NUM_STD_AXES];
-    ComboBox* buttonCombos[Joystick::NUM_STD_BUTTONS];
+    ComboBox* axisComboBoxes[Joystick::NUM_STD_AXES];
+    ComboBox* buttonComboBoxes[Joystick::NUM_STD_BUTTONS];
 };
 
 }
@@ -81,14 +81,14 @@ KeyConfig::Impl::Impl()
     gridLayout->addWidget(new QLabel("Axis"), 0, 0);
     gridLayout->addWidget(new QLabel("ID"), 0, 1);
     for(int i = 0; i < Joystick::NUM_STD_AXES; ++i) {
-        axisCombos[i] = new ComboBox;
+        axisComboBoxes[i] = new ComboBox;
         for(int j = 0; j < Joystick::NUM_STD_AXES; ++j) {
             ItemInfo info = axisInfo[j];
-            axisCombos[i]->addItem(info.name);
+            axisComboBoxes[i]->addItem(info.name);
         }
-        axisCombos[i]->setCurrentIndex(i);
+        axisComboBoxes[i]->setCurrentIndex(i);
         gridLayout->addWidget(new QLabel(axisInfo[i].name));
-        gridLayout->addWidget(axisCombos[i], i + 1, 1);
+        gridLayout->addWidget(axisComboBoxes[i], i + 1, 1);
     }
     auto avbox = new QVBoxLayout;
     avbox->addLayout(gridLayout);
@@ -98,14 +98,14 @@ KeyConfig::Impl::Impl()
     gridLayout2->addWidget(new QLabel("Button"), 0, 0);
     gridLayout2->addWidget(new QLabel("ID"), 0, 1);
     for(int i = 0; i < Joystick::NUM_STD_BUTTONS; ++i) {
-        buttonCombos[i] = new ComboBox;
+        buttonComboBoxes[i] = new ComboBox;
         for(int j = 0; j < Joystick::NUM_STD_BUTTONS; ++j) {
             ItemInfo info = buttonInfo[j];
-            buttonCombos[i]->addItem(info.name);
+            buttonComboBoxes[i]->addItem(info.name);
         }
-        buttonCombos[i]->setCurrentIndex(i);
+        buttonComboBoxes[i]->setCurrentIndex(i);
         gridLayout2->addWidget(new QLabel(buttonInfo[i].name));
-        gridLayout2->addWidget(buttonCombos[i], i + 1, 1);
+        gridLayout2->addWidget(buttonComboBoxes[i], i + 1, 1);
     }
     auto bvbox = new QVBoxLayout;
     bvbox->addLayout(gridLayout2);
@@ -144,7 +144,7 @@ int KeyConfig::axisID(const int& axis)
             index = i;
         }
     }
-    return impl->axisCombos[index]->currentIndex();
+    return impl->axisComboBoxes[index]->currentIndex();
 }
 
 
@@ -157,7 +157,7 @@ int KeyConfig::buttonID(const int& button)
             index = i;
         }
     }
-    return impl->buttonCombos[index]->currentIndex();
+    return impl->buttonComboBoxes[index]->currentIndex();
 }
 
 

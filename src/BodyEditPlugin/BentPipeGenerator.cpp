@@ -52,11 +52,11 @@ class BentPipeGenerator::Impl : public Dialog
 {
 public:
 
-    enum DoubleSpinId { MASS, BENT_RAD, IN_DIA, OUT_DIA, NUM_DSPINS };
-    enum SpinId { BENT_ANGLE, BENT_STEP, STEP, NUM_SPINS };
+    enum { MASS, BENT_RAD, IN_DIA, OUT_DIA, NumDoubleSpinBoxes };
+    enum { BENT_ANGLE, BENT_STEP, STEP, NumSpinBoxes };
 
-    DoubleSpinBox* dspins[NUM_DSPINS];
-    SpinBox* spins[NUM_SPINS];
+    DoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
+    SpinBox* spinBoxes[NumSpinBoxes];
     ColorButton* colorButton;
     GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
@@ -107,9 +107,9 @@ BentPipeGenerator::Impl::Impl()
         _("Inner diameter [m]"), _("Outer diameter [m]")
     };
 
-    for(int i = 0; i < NUM_DSPINS; ++i) {
+    for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
-        info.spin = dspins[i] = new DoubleSpinBox;
+        info.spin = doubleSpinBoxes[i] = new DoubleSpinBox;
         info.spin->setRange(info.min, info.max);
         info.spin->setSingleStep(info.step);
         info.spin->setDecimals(info.decimals);
@@ -123,9 +123,9 @@ BentPipeGenerator::Impl::Impl()
          _("Step angle [deg]")
     };
 
-    for(int i = 0; i < NUM_SPINS; ++i) {
+    for(int i = 0; i < NumSpinBoxes; ++i) {
         SpinInfo info = spinInfo[i];
-        info.spin = spins[i] = new SpinBox;
+        info.spin = spinBoxes[i] = new SpinBox;
         info.spin->setRange(info.min, info.max);
         info.spin->setValue(info.value);
         gridLayout->addWidget(new QLabel(list2[i]), info.row, info.column - 1);
@@ -147,9 +147,9 @@ BentPipeGenerator::Impl::Impl()
     setLayout(vbox);
 
     buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
-    spins[BENT_ANGLE]->sigValueChanged().connect([&](double value){ onBentAngleChanged(value); });
-    dspins[IN_DIA]->sigValueChanged().connect([&](double value){ onInnerDiameterChanged(value); });
-    dspins[OUT_DIA]->sigValueChanged().connect([&](double value){ onOuterDiameterChanged(value); });
+    spinBoxes[BENT_ANGLE]->sigValueChanged().connect([&](double value){ onBentAngleChanged(value); });
+    doubleSpinBoxes[IN_DIA]->sigValueChanged().connect([&](double value){ onInnerDiameterChanged(value); });
+    doubleSpinBoxes[OUT_DIA]->sigValueChanged().connect([&](double value){ onOuterDiameterChanged(value); });
 }
 
 
@@ -199,7 +199,7 @@ MappingPtr BentPipeGenerator::Impl::writeLink()
 {
     MappingPtr node = new Mapping;
 
-    double mass = dspins[MASS]->value();
+    double mass = doubleSpinBoxes[MASS]->value();
 
     node->write("name", "Root");
     node->write("joint_type", "fixed");
@@ -221,15 +221,15 @@ void BentPipeGenerator::Impl::writeLinkShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
-    double r_bent = dspins[BENT_RAD]->value();
-    double d_in = dspins[IN_DIA]->value();
-    double d_out = dspins[OUT_DIA]->value();
+    double r_bent = doubleSpinBoxes[BENT_RAD]->value();
+    double d_in = doubleSpinBoxes[IN_DIA]->value();
+    double d_out = doubleSpinBoxes[OUT_DIA]->value();
     double r_in = d_in / 2.0;
     double r_out = d_out / 2.0;
 
-    int bent_angle = spins[BENT_ANGLE]->value();
-    int bent_step = spins[BENT_STEP]->value();
-    int step = spins[STEP]->value();
+    int bent_angle = spinBoxes[BENT_ANGLE]->value();
+    int bent_step = spinBoxes[BENT_STEP]->value();
+    int step = spinBoxes[STEP]->value();
 
     double angle1 = bent_step * TO_RADIAN;
     double angle2 = step * TO_RADIAN;
@@ -326,28 +326,28 @@ void BentPipeGenerator::Impl::writeLinkShape(Listing* elementsNode)
 
 void BentPipeGenerator::Impl::onBentAngleChanged(double value)
 {
-    double bent_step = spins[BENT_STEP]->value();
+    double bent_step = spinBoxes[BENT_STEP]->value();
     if(value < bent_step) {
-        spins[BENT_ANGLE]->setValue(bent_step);
+        spinBoxes[BENT_ANGLE]->setValue(bent_step);
     }
 }
 
 
 void BentPipeGenerator::Impl::onInnerDiameterChanged(const double& diameter)
 {
-    double d_out = dspins[OUT_DIA]->value();
+    double d_out = doubleSpinBoxes[OUT_DIA]->value();
     if(diameter >= d_out) {
         double d_in = d_out - 0.01;
-        dspins[IN_DIA]->setValue(d_in);
+        doubleSpinBoxes[IN_DIA]->setValue(d_in);
     }
 }
 
 
 void BentPipeGenerator::Impl::onOuterDiameterChanged(const double& diameter)
 {
-    double d_in = dspins[IN_DIA]->value();
+    double d_in = doubleSpinBoxes[IN_DIA]->value();
     if(diameter <= d_in) {
         double d_out = d_in + 0.01;
-        dspins[OUT_DIA]->setValue(d_out);
+        doubleSpinBoxes[OUT_DIA]->setValue(d_out);
     }
 }

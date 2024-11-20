@@ -58,7 +58,7 @@ public:
         SPR_MAS, SPR_RAD,
         CLD_MAS, CLD_RAD, CLD_HGT,
         CON_MAS, CON_RAD, CON_HGT,
-        NUM_DSPINS
+        NumDoubleSpinBoxes
     };
     enum { Page_Box, Page_Sphere, Page_Cylinder, Page_Cone, NumPages };
     enum Axis { XAxis, YAxis, ZAxis };
@@ -66,7 +66,7 @@ public:
     QComboBox* shapeCombo;
     QComboBox* axisCombo;
     QComboBox* axisCombo2;
-    QDoubleSpinBox* dspins[NUM_DSPINS];
+    QDoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
 };
 
 }
@@ -139,9 +139,9 @@ InertiaCalculator::Impl::Impl()
         _("mass [kg]"), _("radius [m]"), _("height [m]")
     };
 
-    for(int i = 0; i < NUM_DSPINS; ++i) {
+    for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = dspinInfo[i];
-        info.spin = dspins[i] = new QDoubleSpinBox;
+        info.spin = doubleSpinBoxes[i] = new QDoubleSpinBox;
         info.spin->setDecimals(7);
         info.spin->setSingleStep(0.01);
         info.spin->setRange(0.0, 9999.999);
@@ -181,10 +181,10 @@ void InertiaCalculator::Impl::calc()
     double ix, iy, iz = 0.0;
     int index = shapeCombo->currentIndex();
     if(index == Page_Box) {
-        double m = dspins[BOX_MAS]->value();
-        double x = dspins[BOX_X]->value();
-        double y = dspins[BOX_Y]->value();
-        double z = dspins[BOX_Z]->value();
+        double m = doubleSpinBoxes[BOX_MAS]->value();
+        double x = doubleSpinBoxes[BOX_X]->value();
+        double y = doubleSpinBoxes[BOX_Y]->value();
+        double z = doubleSpinBoxes[BOX_Z]->value();
 
         ix = m / 12.0 * (y * y + z * z);
         iy = m / 12.0 * (z * z + x * x);
@@ -193,17 +193,17 @@ void InertiaCalculator::Impl::calc()
         mv->putln(formatR(_("shape: Box, mass: {0} [kg], x: {1} [m], y: {2} [m], z: {3} [m]"),
                                     m, x, y, z));
     } else if(index == Page_Sphere) {
-        double m = dspins[SPR_MAS]->value();
-        double r = dspins[SPR_RAD]->value();
+        double m = doubleSpinBoxes[SPR_MAS]->value();
+        double r = doubleSpinBoxes[SPR_RAD]->value();
 
         ix = iy = iz = m * r * r / 5.0 * 2.0;
 
         mv->putln(formatR(_("shape: Sphere, mass: {0} [kg], radius: {1} [m]"),
                                     m, r));
     } else if(index == Page_Cylinder) {
-        double m = dspins[CLD_MAS]->value();
-        double r = dspins[CLD_RAD]->value();
-        double h = dspins[CLD_HGT]->value();
+        double m = doubleSpinBoxes[CLD_MAS]->value();
+        double r = doubleSpinBoxes[CLD_RAD]->value();
+        double h = doubleSpinBoxes[CLD_HGT]->value();
         int index = axisCombo->currentIndex();
 
         double main_inertia = m * r * r / 2.0;
@@ -223,9 +223,9 @@ void InertiaCalculator::Impl::calc()
         mv->putln(formatR(_("shape: Cylinder, mass: {0} [kg], radius: {1} [m], height: {2} [m], axis: {3} [-]"),
                                     m, r, h, axisCombo->currentText().toStdString()));
     } else if(index == Page_Cone) {
-        double m = dspins[CON_MAS]->value();
-        double r = dspins[CON_RAD]->value();
-        double h = dspins[CON_HGT]->value();
+        double m = doubleSpinBoxes[CON_MAS]->value();
+        double r = doubleSpinBoxes[CON_RAD]->value();
+        double h = doubleSpinBoxes[CON_HGT]->value();
         int index = axisCombo2->currentIndex();
 
         double main_inertia = m * r * r * 3.0 / 10.0;

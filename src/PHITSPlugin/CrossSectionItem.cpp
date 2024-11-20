@@ -168,7 +168,7 @@ public:
     Impl(CrossSectionItem* self);
     Impl(CrossSectionItem* self, const Impl& org);
 
-    enum PlainID { XY, YZ, ZX };
+    enum PlainType { XY, YZ, ZX };
     enum ColorScaleType { LOG_SCALE, LINER_SCALE };
 
     SgPosTransformPtr scene;

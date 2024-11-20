@@ -31,7 +31,7 @@ class EnergyFilterDialog : public Dialog
 public:
     EnergyFilterDialog();
 
-    enum ItemID { CHECK, SPECIES, MIN, MAX, NUM_ITEMIDS };
+    enum ItemId { CHECK, SPECIES, MIN, MAX };
 
     RadioButton noFilterRadio;
     RadioButton rangeFilterRadio;

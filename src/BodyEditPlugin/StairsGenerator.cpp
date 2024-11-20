@@ -47,13 +47,13 @@ class StairsGenerator::Impl : public Dialog
 {
 public:
 
-    enum DoubleSpinId {
+    enum {
         TREAD, WIDTH, RISER,
         STRINGER, THICKNESS,
-        NUM_DSPINS
+        NumDoubleSpinBoxes
     };
 
-    DoubleSpinBox* dspins[NUM_DSPINS];
+    DoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
     SpinBox* stepsSpin;
     ColorButton* colorButton;
     GeneratorButtonBox* buttonBox;
@@ -105,9 +105,9 @@ StairsGenerator::Impl::Impl()
         _("Tread thickness [m]")
     };
 
-    for(int i = 0; i < NUM_DSPINS; ++i) {
+    for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
-        info.spin = dspins[i] = new DoubleSpinBox;
+        info.spin = doubleSpinBoxes[i] = new DoubleSpinBox;
         info.spin->setRange(info.min, info.max);
         info.spin->setSingleStep(info.step);
         info.spin->setDecimals(info.decimals);
@@ -204,10 +204,10 @@ MappingPtr StairsGenerator::Impl::writeLink()
 
 void StairsGenerator::Impl::writeLinkShape(Listing* elementsNode)
 {
-    double tread = dspins[TREAD]->value();
-    double width = dspins[WIDTH]->value();
-    double riser = dspins[RISER]->value();
-    double stringer = dspins[STRINGER]->value();
+    double tread = doubleSpinBoxes[TREAD]->value();
+    double width = doubleSpinBoxes[WIDTH]->value();
+    double riser = doubleSpinBoxes[RISER]->value();
+    double stringer = doubleSpinBoxes[STRINGER]->value();
     double steps = stepsSpin->value();
 
     double y = (width + stringer) / 2.0;
@@ -257,9 +257,9 @@ void StairsGenerator::Impl::writeStringerShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
-    double tread = dspins[TREAD]->value();
-    double riser = dspins[RISER]->value();
-    double stringer = dspins[STRINGER]->value();
+    double tread = doubleSpinBoxes[TREAD]->value();
+    double riser = doubleSpinBoxes[RISER]->value();
+    double stringer = doubleSpinBoxes[STRINGER]->value();
     double steps = stepsSpin->value();
 
     node->write("type", "Shape");
@@ -306,9 +306,9 @@ void StairsGenerator::Impl::writeStepShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
-    double tread = dspins[TREAD]->value();
-    double width = dspins[WIDTH]->value();
-    double thickness = dspins[THICKNESS]->value();
+    double tread = doubleSpinBoxes[TREAD]->value();
+    double width = doubleSpinBoxes[WIDTH]->value();
+    double thickness = doubleSpinBoxes[THICKNESS]->value();
 
     node->write("type", "Shape");
     write(node, "translation", Vector3(tread / 2.0, 0.0, -thickness / 2.0));

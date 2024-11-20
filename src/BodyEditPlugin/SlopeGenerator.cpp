@@ -46,12 +46,12 @@ class SlopeGenerator::Impl : public Dialog
 {
 public:
 
-    enum DoubleSpinId {
+    enum {
         MASS, WIDTH, HEIGHT,
-        LENGTH, NUM_DSPINS
+        LENGTH, NumDoubleSpinBoxes
     };
 
-    DoubleSpinBox* dspins[NUM_DSPINS];
+    DoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
     ColorButton* colorButton;
     GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
@@ -98,9 +98,9 @@ SlopeGenerator::Impl::Impl()
         _("Mass [kg]"), _("Width [m]"), _("Height [m]"), _("Length [m]")
     };
 
-    for(int i = 0; i < NUM_DSPINS; ++i) {
+    for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
-        info.spin = dspins[i] = new DoubleSpinBox;
+        info.spin = doubleSpinBoxes[i] = new DoubleSpinBox;
         info.spin->setRange(info.min, info.max);
         info.spin->setSingleStep(info.step);
         info.spin->setDecimals(info.decimals);
@@ -173,7 +173,7 @@ MappingPtr SlopeGenerator::Impl::writeLink()
 {
     MappingPtr node = new Mapping;
 
-    double mass = dspins[MASS]->value();
+    double mass = doubleSpinBoxes[MASS]->value();
 
     node->write("name", "Root");
     node->write("joint_type", "fixed");
@@ -195,9 +195,9 @@ void SlopeGenerator::Impl::writeLinkShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
-    double length = dspins[LENGTH]->value();
-    double width = dspins[WIDTH]->value();
-    double height = dspins[HEIGHT]->value();
+    double length = doubleSpinBoxes[LENGTH]->value();
+    double width = doubleSpinBoxes[WIDTH]->value();
+    double height = doubleSpinBoxes[HEIGHT]->value();
 
     node->write("type", "Shape");
 
@@ -242,10 +242,10 @@ VectorXd SlopeGenerator::Impl::calcInertia()
     inertia.resize(9);
     inertia << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-    double mass = dspins[MASS]->value();
-    double x = dspins[LENGTH]->value();
-    double y = dspins[WIDTH]->value();
-    double z = dspins[HEIGHT]->value();
+    double mass = doubleSpinBoxes[MASS]->value();
+    double x = doubleSpinBoxes[LENGTH]->value();
+    double y = doubleSpinBoxes[WIDTH]->value();
+    double z = doubleSpinBoxes[HEIGHT]->value();
 
     double ix = mass / 12.0 * (y * y + z * z);
     double iy = mass / 12.0 * (z * z + x * x);

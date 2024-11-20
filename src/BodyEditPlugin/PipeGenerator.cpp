@@ -80,11 +80,11 @@ class PipeGenerator::Impl : public Dialog
 {
 public:
 
-    enum DoubleSpinId { MASS, LENGTH, IN_DIA, OUT_DIA, NUM_DSPINS };
-    enum SpinId { ANGLE, IN_STEP, OUT_STEP, NUM_SPINS };
+    enum { MASS, LENGTH, IN_DIA, OUT_DIA, NumDoubleSpinBoxes };
+    enum { ANGLE, IN_STEP, OUT_STEP, NumSpinBoxes };
 
-    DoubleSpinBox* dspins[NUM_DSPINS];
-    SpinBox* spins[NUM_SPINS];
+    DoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
+    SpinBox* spinBoxes[NumSpinBoxes];
     ColorButton* colorButton;
     GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
@@ -138,9 +138,9 @@ PipeGenerator::Impl::Impl()
                               _("Inner diameter [m]"), _("Outer diameter [m]")
                             };
 
-    for(int i = 0; i < NUM_DSPINS; ++i) {
+    for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
-        info.spin = dspins[i] = new DoubleSpinBox;
+        info.spin = doubleSpinBoxes[i] = new DoubleSpinBox;
         info.spin->setRange(info.min, info.max);
         info.spin->setSingleStep(info.step);
         info.spin->setDecimals(info.decimals);
@@ -151,9 +151,9 @@ PipeGenerator::Impl::Impl()
 
     const QStringList list2 = { _("Opening angle [deg]"), _("Inner step angle [deg]"), _("Outer step angle [deg]") };
 
-    for(int i = 0; i < NUM_SPINS; ++i) {
+    for(int i = 0; i < NumSpinBoxes; ++i) {
         SpinInfo info = spinInfo[i];
-        info.spin = spins[i] = new SpinBox;
+        info.spin = spinBoxes[i] = new SpinBox;
         info.spin->setRange(info.min, info.max);
         info.spin->setValue(info.value);
         gridLayout->addWidget(new QLabel(list2[i]), info.row, info.column - 1);
@@ -178,8 +178,8 @@ PipeGenerator::Impl::Impl()
     vbox->addWidget(buttonBox);
     setLayout(vbox);
 
-    dspins[IN_DIA]->sigValueChanged().connect([&](double value){ onInnerDiameterChanged(value); });
-    dspins[OUT_DIA]->sigValueChanged().connect([&](double value){ onOuterDiameterChanged(value); });
+    doubleSpinBoxes[IN_DIA]->sigValueChanged().connect([&](double value){ onInnerDiameterChanged(value); });
+    doubleSpinBoxes[OUT_DIA]->sigValueChanged().connect([&](double value){ onOuterDiameterChanged(value); });
     buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
@@ -201,16 +201,16 @@ void PipeGenerator::Impl::contextMenuEvent(QContextMenuEvent* event)
 void PipeGenerator::Impl::configure()
 {
     SquarePipeGenerator dialog;
-    dialog.setWidth(dspins[OUT_DIA]->value() / qSqrt(2.0));
-    dialog.setRadius(dspins[IN_DIA]->value() / 2.0);
-    dialog.setLength(dspins[LENGTH]->value());
+    dialog.setWidth(doubleSpinBoxes[OUT_DIA]->value() / qSqrt(2.0));
+    dialog.setRadius(doubleSpinBoxes[IN_DIA]->value() / 2.0);
+    dialog.setLength(doubleSpinBoxes[LENGTH]->value());
 
     if(dialog.exec() == QDialog::Accepted) {
-        dspins[LENGTH]->setValue(dialog.length());
-        dspins[OUT_DIA]->setValue(dialog.width() * qSqrt(2.0));
-        dspins[IN_DIA]->setValue(dialog.radius() * 2.0);
-        spins[OUT_STEP]->setValue(90);
-        spins[IN_STEP]->setValue(90);
+        doubleSpinBoxes[LENGTH]->setValue(dialog.length());
+        doubleSpinBoxes[OUT_DIA]->setValue(dialog.width() * qSqrt(2.0));
+        doubleSpinBoxes[IN_DIA]->setValue(dialog.radius() * 2.0);
+        spinBoxes[OUT_STEP]->setValue(90);
+        spinBoxes[IN_STEP]->setValue(90);
     }
 }
 
@@ -231,20 +231,20 @@ bool PipeGenerator::Impl::save(const string& filename)
 
 void PipeGenerator::Impl::onInnerDiameterChanged(const double& diameter)
 {
-    double d_out = dspins[OUT_DIA]->value();
+    double d_out = doubleSpinBoxes[OUT_DIA]->value();
     if(diameter >= d_out) {
         double d_in = d_out - 0.01;
-        dspins[IN_DIA]->setValue(d_in);
+        doubleSpinBoxes[IN_DIA]->setValue(d_in);
     }
 }
 
 
 void PipeGenerator::Impl::onOuterDiameterChanged(const double& diameter)
 {
-    double d_in = dspins[IN_DIA]->value();
+    double d_in = doubleSpinBoxes[IN_DIA]->value();
     if(diameter <= d_in) {
         double d_out = d_in + 0.01;
-        dspins[OUT_DIA]->setValue(d_out);
+        doubleSpinBoxes[OUT_DIA]->setValue(d_out);
     }
 }
 
@@ -275,7 +275,7 @@ MappingPtr PipeGenerator::Impl::writeLink()
 {
     MappingPtr node = new Mapping;
 
-    double mass = dspins[MASS]->value();
+    double mass = doubleSpinBoxes[MASS]->value();
 
     node->write("name", "Root");
     node->write("joint_type", "free");
@@ -297,15 +297,15 @@ void PipeGenerator::Impl::writeLinkShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
-    double length = dspins[LENGTH]->value();
-    double d_in = dspins[IN_DIA]->value();
-    double d_out = dspins[OUT_DIA]->value();
+    double length = doubleSpinBoxes[LENGTH]->value();
+    double d_in = doubleSpinBoxes[IN_DIA]->value();
+    double d_out = doubleSpinBoxes[OUT_DIA]->value();
     double r_in = d_in / 2.0;
     double r_out = d_out / 2.0;
 
-    int angle = spins[ANGLE]->value();
-    int step_in = spins[IN_STEP]->value();
-    int step_out = spins[OUT_STEP]->value();
+    int angle = spinBoxes[ANGLE]->value();
+    int step_in = spinBoxes[IN_STEP]->value();
+    int step_out = spinBoxes[OUT_STEP]->value();
 
     node->write("type", "Shape");
 
@@ -360,9 +360,9 @@ VectorXd PipeGenerator::Impl::calcInertia()
     innerInertia.resize(9);
     outerInertia.resize(9);
 
-    double length = dspins[LENGTH]->value();
-    double d_in = dspins[IN_DIA]->value();
-    double d_out = dspins[OUT_DIA]->value();
+    double length = doubleSpinBoxes[LENGTH]->value();
+    double d_in = doubleSpinBoxes[IN_DIA]->value();
+    double d_out = doubleSpinBoxes[OUT_DIA]->value();
     double r_in = d_in / 2.0;
     double r_out = d_out / 2.0;
 
@@ -370,7 +370,7 @@ VectorXd PipeGenerator::Impl::calcInertia()
     double outerRate = 1.0 - innerRate;
 
     {
-        double mass = dspins[MASS]->value() * innerRate;
+        double mass = doubleSpinBoxes[MASS]->value() * innerRate;
         double radius = r_in;
         double mainInertia = mass * radius * radius / 2.0;
         double subInertia = mass * (3.0 * radius * radius + length * length) / 12.0;
@@ -381,7 +381,7 @@ VectorXd PipeGenerator::Impl::calcInertia()
     }
 
     {
-        double mass = dspins[MASS]->value() * outerRate;
+        double mass = doubleSpinBoxes[MASS]->value() * outerRate;
         double radius = r_out;
         double mainInertia = mass * radius * radius / 2.0;
         double subInertia = mass * (3.0 * radius * radius + length * length) / 12.0;
