@@ -43,8 +43,8 @@ public:
     void onTranslationButtonClicked(const int& id);
     void onRotationButtonClocked(const int& id);
 
-    DoubleSpinBox* distanceSpin;
-    DoubleSpinBox* angleSpin;
+    DoubleSpinBox* distanceSpinBox;
+    DoubleSpinBox* angleSpinBox;
     QDialogButtonBox* buttonBox;
 };
 
@@ -96,10 +96,10 @@ BodyLocator::Impl::Impl()
 {
     auto layout = new QHBoxLayout;
 
-    distanceSpin = new DoubleSpinBox;
-    distanceSpin->setRange(0.0, 9999.0);
-    distanceSpin->setValue(1.0);
-    layout->addWidget(distanceSpin);
+    distanceSpinBox = new DoubleSpinBox;
+    distanceSpinBox->setRange(0.0, 9999.0);
+    distanceSpinBox->setValue(1.0);
+    layout->addWidget(distanceSpinBox);
     layout->addWidget(new QLabel("[m]"));
     layout->addStretch();
 
@@ -113,10 +113,10 @@ BodyLocator::Impl::Impl()
 
     auto layout2 = new QHBoxLayout;
 
-    angleSpin = new DoubleSpinBox;
-    angleSpin->setRange(0.0, 9999.0);
-    angleSpin->setValue(10.0);
-    layout2->addWidget(angleSpin);
+    angleSpinBox = new DoubleSpinBox;
+    angleSpinBox->setRange(0.0, 9999.0);
+    angleSpinBox->setValue(10.0);
+    layout2->addWidget(angleSpinBox);
     layout2->addWidget(new QLabel("[deg]"));
     layout2->addStretch();
 
@@ -160,7 +160,7 @@ void BodyLocator::Impl::onTranslationButtonClicked(const int& id)
     auto rootItem = RootItem::instance();
     int index1 = id / 2;
     int index2 = id % 2;
-    double pos = distanceSpin->value();
+    double pos = distanceSpinBox->value();
     pos = index2 == 0 ? pos : pos * -1.0;
 
     ItemList<BodyItem> bodyItems = rootItem->selectedItems<BodyItem>();
@@ -182,7 +182,7 @@ void BodyLocator::Impl::onRotationButtonClocked(const int& id)
     auto rootItem = RootItem::instance();
     int index1 = id / 2;
     int index2 = id % 2;
-    double angle = angleSpin->value();
+    double angle = angleSpinBox->value();
     angle = index2 == 0 ? angle : angle * -1.0;
 
     ItemList<BodyItem> bodyItems = rootItem->selectedItems<BodyItem>();

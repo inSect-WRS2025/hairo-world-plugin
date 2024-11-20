@@ -54,7 +54,7 @@ public:
     };
 
     DoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
-    SpinBox* stepsSpin;
+    SpinBox* stepsSpinBox;
     ColorButton* colorButton;
     GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
@@ -116,11 +116,11 @@ StairsGenerator::Impl::Impl()
         gridLayout->addWidget(info.spin, info.row, info.column);
     }
 
-    stepsSpin = new SpinBox;
-    stepsSpin->setRange(1, 9999);
-    stepsSpin->setValue(10);
+    stepsSpinBox = new SpinBox;
+    stepsSpinBox->setRange(1, 9999);
+    stepsSpinBox->setValue(10);
     gridLayout->addWidget(new QLabel(_("Number of steps [-]")), 2, 2);
-    gridLayout->addWidget(stepsSpin, 2, 3);
+    gridLayout->addWidget(stepsSpinBox, 2, 3);
 
     colorButton = new ColorButton;
     colorButton->setColor(Vector3(0.5, 0.5, 0.5));
@@ -207,7 +207,7 @@ void StairsGenerator::Impl::writeLinkShape(Listing* elementsNode)
     double width = doubleSpinBoxes[WIDTH]->value();
     double riser = doubleSpinBoxes[RISER]->value();
     double stringer = doubleSpinBoxes[STRINGER]->value();
-    double steps = stepsSpin->value();
+    double steps = stepsSpinBox->value();
 
     double y = (width + stringer) / 2.0;
     ListingPtr elementsNode1 = new Listing;
@@ -259,7 +259,7 @@ void StairsGenerator::Impl::writeStringerShape(Listing* elementsNode)
     double tread = doubleSpinBoxes[TREAD]->value();
     double riser = doubleSpinBoxes[RISER]->value();
     double stringer = doubleSpinBoxes[STRINGER]->value();
-    double steps = stepsSpin->value();
+    double steps = stepsSpinBox->value();
 
     node->write("type", "Shape");
 

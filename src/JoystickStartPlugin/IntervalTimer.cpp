@@ -39,7 +39,7 @@ public:
     void onSimulationAboutToStart(SimulatorItem* simulatorItem);
     void onPlaybackStopped(double time, bool isStoppedManually);
 
-    SpinBox* intervalSpin;
+    SpinBox* intervalSpinBox;
 
     SimulationBar* sb;
     SimulatorItem* simulatorItem;
@@ -76,9 +76,9 @@ IntervalTimer::Impl::Impl()
     is_simulation_started = false;
     counter = 5;
 
-    intervalSpin = new SpinBox;
-    intervalSpin->setValue(counter);
-    intervalSpin->setToolTip(_("Interval time"));
+    intervalSpinBox = new SpinBox;
+    intervalSpinBox->setValue(counter);
+    intervalSpinBox->setToolTip(_("Interval time"));
 
     startTimer = new Timer(tb);
     startTimer->sigTimeout().connect([&](){ onCountdown(); });
@@ -86,7 +86,7 @@ IntervalTimer::Impl::Impl()
     intervalTimer = new Timer(tb);
     intervalTimer->sigTimeout().connect([&](){ onTimeout(); });
 
-    tb->addWidget(intervalSpin);
+    tb->addWidget(intervalSpinBox);
     tb->sigPlaybackStopped().connect(
         [&](double time, bool isStoppedManually){ onPlaybackStopped(time, isStoppedManually); });    
 
@@ -118,7 +118,7 @@ void IntervalTimer::Impl::onCountdown()
         --counter;
     } else {
         MessageView::instance()->putln(formatR(_("Start!!")));
-        counter = intervalSpin->value();
+        counter = intervalSpinBox->value();
         sb->startSimulation(true);
     }
 }
@@ -134,7 +134,7 @@ void IntervalTimer::Impl::onTimeout()
 void IntervalTimer::Impl::onButtonToggled(bool checked)
 {
     if(checked) {
-        counter = intervalSpin->value();
+        counter = intervalSpinBox->value();
         startTimer->start(1000);
     } else {
         if(startTimer->isActive()) {

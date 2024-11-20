@@ -127,13 +127,13 @@ class DoseConfigDialog : public Dialog
 public:
     DoseConfigDialog();
 
-    SpinBox* maxCasSpin;
-    SpinBox* maxBchSpin;
+    SpinBox* maxCasSpinBox;
+    SpinBox* maxBchSpinBox;
     SpinBox nSpin[MAX_PARAMETER];
     DoubleSpinBox minSpin[MAX_PARAMETER];
     DoubleSpinBox maxSpin[MAX_PARAMETER];
-    ComboBox* codeCombo;
-    CheckBox* messageCheck;
+    ComboBox* codeComboBox;
+    CheckBox* messageCheckBox;
 
     PHITSRunner phitsRunner;
     PHITSRunner qadRunners[MAX_PROCESS];
@@ -147,8 +147,8 @@ public:
     SignalProxy<void(double value)> sigValueChanged() { return sigValueChanged_; }
     SignalProxy<void(string filename)> sigReadPHITSData() { return sigReadPHITSData_; }
 
-    ComboBox* plainCombo;
-    DoubleSpinBox* zSpin;
+    ComboBox* plainComboBox;
+    DoubleSpinBox* zSpinBox;
     Slider* zSlider;
     Signal<void(double value)> sigValueChanged_;
     Signal<void(string filename)> sigReadPHITSData_;
@@ -281,7 +281,7 @@ SgNode* CrossSectionItem::getScene()
 void CrossSectionItem::Impl::initialize()
 {
     config->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    config->plainCombo->sigCurrentIndexChanged().connect([&](int index){ onValueChanged(); });
+    config->plainComboBox->sigCurrentIndexChanged().connect([&](int index){ onValueChanged(); });
     config->sigReadPHITSData().connect([&](string filename){ onReadPHITSData(filename); });
 }
 
@@ -299,7 +299,7 @@ void CrossSectionItem::Impl::createScene()
     scene->addChild(group);
 
     if(nodeData) {
-        int id = config->plainCombo->currentIndex();
+        int id = config->plainComboBox->currentIndex();
         static const int coordID[][3] = { { 0, 1, 2 }, { 1, 2, 0 }, { 2, 0, 1 } };
 
         const vector<double>& xcoord = nodeData->coordinates(coordID[id][0]);
@@ -314,8 +314,8 @@ void CrossSectionItem::Impl::createScene()
         int height = (int)ny;
 
         int index = -1;
-        config->zSpin->setRange(zcoord[0], zcoord[zcoord.size() - 1]);
-        double z = config->zSpin->value();
+        config->zSpinBox->setRange(zcoord[0], zcoord[zcoord.size() - 1]);
+        double z = config->zSpinBox->value();
         for(int i = 0; i < nz; ++i) {
             if((z >= zcoord[i]) && (z < zcoord[i + 1])) {
                 index = i;
@@ -370,7 +370,7 @@ void CrossSectionItem::Impl::createScene()
                 double y = -yside / 2.0 * (double)(height - 1) + (double)j * yside;
                 x = x + xcenter;
                 y = y + ycenter;
-                double z = config->zSpin->value();
+                double z = config->zSpinBox->value();
                 pos->setTranslation(Vector3(x, y, z));
                 group->addChild(pos);
             }
@@ -382,7 +382,7 @@ void CrossSectionItem::Impl::createScene()
 void CrossSectionItem::Impl::updateScenePosition()
 {
     if(scene) {
-        int index = config->plainCombo->currentIndex();
+        int index = config->plainComboBox->currentIndex();
         Vector3 rpy(0.0, 0.0, 0.0);
         if(index == XY) {
             rpy << 0.0, 0.0, 0.0;
@@ -525,7 +525,7 @@ DoseConfigDialog::DoseConfigDialog()
 {
     setWindowTitle(_("Configuration of PHITS"));
 
-    codeCombo = new ComboBox;
+    codeComboBox = new ComboBox;
     QStringList codes;
     string env = getenv("PATH");
     if(env.find("QADGP2R") != string::npos) {
@@ -533,16 +533,16 @@ DoseConfigDialog::DoseConfigDialog()
     } else {
         codes << "PHITS";
     }
-    codeCombo->addItems(codes);
-    codeCombo->setCurrentIndex(PHITS);
+    codeComboBox->addItems(codes);
+    codeComboBox->setCurrentIndex(PHITS);
 
-    maxCasSpin = new SpinBox;
-    maxCasSpin->setRange(1, INT_MAX);
-    maxCasSpin->setValue(1000);
+    maxCasSpinBox = new SpinBox;
+    maxCasSpinBox->setRange(1, INT_MAX);
+    maxCasSpinBox->setValue(1000);
 
-    maxBchSpin = new SpinBox;
-    maxBchSpin->setRange(1, 1000000);
-    maxBchSpin->setValue(2);
+    maxBchSpinBox = new SpinBox;
+    maxBchSpinBox->setRange(1, 1000000);
+    maxBchSpinBox->setValue(2);
 
     auto gridLayout = new QGridLayout;
     const QStringList list = { "X (n, min[m], max[m])", "Y (n, min[m], max[m])", "Z (n, min[m], max[m])", "Energy (n, min[m], max[m])" };
@@ -584,10 +584,10 @@ DoseConfigDialog::DoseConfigDialog()
         }
     }
 
-    messageCheck = new CheckBox;
-    messageCheck->setChecked(true);
-    messageCheck->setText(_("Put messages"));
-    messageCheck->sigToggled().connect([&](bool checked){ phitsRunner.putMessages(checked); });
+    messageCheckBox = new CheckBox;
+    messageCheckBox->setChecked(true);
+    messageCheckBox->setText(_("Put messages"));
+    messageCheckBox->sigToggled().connect([&](bool checked){ phitsRunner.putMessages(checked); });
 
     QGroupBox* rangeBox = new QGroupBox;
     rangeBox->setTitle(_("Dose Distribution Range"));
@@ -597,42 +597,42 @@ DoseConfigDialog::DoseConfigDialog()
     auto gridLayout2 = new QGridLayout;
     int index = 0;
     gridLayout2->addWidget(new QLabel(_("maxcas")), index, 0);
-    gridLayout2->addWidget(maxCasSpin, index, 1);
+    gridLayout2->addWidget(maxCasSpinBox, index, 1);
     gridLayout2->addWidget(new QLabel(_("maxbch")), index, 2);
-    gridLayout2->addWidget(maxBchSpin, index++, 3);
+    gridLayout2->addWidget(maxBchSpinBox, index++, 3);
     gridLayout2->addWidget(new QLabel(_("Code")), index, 0);
-    gridLayout2->addWidget(codeCombo, index, 1);
-    gridLayout2->addWidget(messageCheck, index++, 2, 1, 2);
+    gridLayout2->addWidget(codeComboBox, index, 1);
+    gridLayout2->addWidget(messageCheckBox, index++, 2, 1, 2);
 
     auto gridLayout3 = new QGridLayout;
     const QStringList list2 = { "XY", "YZ", "ZX" };
 
-    plainCombo = new ComboBox;
+    plainComboBox = new ComboBox;
     for(int i = 0; i < 3; ++i) {
-        plainCombo->addItem(list2[i]);
+        plainComboBox->addItem(list2[i]);
     }
-    zSpin = new DoubleSpinBox;
-    zSpin->setRange(0.0, 100.0);
-    zSpin->setDecimals(3);
-    zSpin->setSingleStep(0.01);
+    zSpinBox = new DoubleSpinBox;
+    zSpinBox->setRange(0.0, 100.0);
+    zSpinBox->setDecimals(3);
+    zSpinBox->setSingleStep(0.01);
     zSlider = new Slider(Qt::Horizontal);
     zSlider->setRange(0, 100);
-    gridLayout3->addWidget(plainCombo, 0, 0, 1, 1);
+    gridLayout3->addWidget(plainComboBox, 0, 0, 1, 1);
     gridLayout3->addWidget(zSlider, 0, 1, 1, 2);
-    gridLayout3->addWidget(zSpin, 0, 3, 1, 1);
+    gridLayout3->addWidget(zSpinBox, 0, 3, 1, 1);
 
-    zSpin->sigValueChanged().connect([&](double value){
+    zSpinBox->sigValueChanged().connect([&](double value){
         sigValueChanged_(value);
-        double min = zSpin->minimum();
-        double max = zSpin->maximum();
+        double min = zSpinBox->minimum();
+        double max = zSpinBox->maximum();
         double rate = (value - min) / (max - min) * 100.0;
         zSlider->setValue((int)rate);
     });
     zSlider->sigValueChanged().connect([&](int rate){
-        double min = zSpin->minimum();
-        double max = zSpin->maximum();
+        double min = zSpinBox->minimum();
+        double max = zSpinBox->maximum();
         double value = (max - min) * (double)rate / 100.0 + min;
-        zSpin->setValue(value);
+        zSpinBox->setValue(value);
     });
 
     auto buttonBox = new QDialogButtonBox(this);
@@ -670,7 +670,7 @@ bool DoseConfigDialog::readPHITSData(const string& filename)
     filesystem::path path(fromUTF8(filename));
     string gbin_file = toUTF8((path.parent_path() / path.stem()).string()) + ".gbin";
 
-    int index = codeCombo->currentIndex();
+    int index = codeComboBox->currentIndex();
     if(index == PHITS) {
         result = phitsData.readPHITS(filename, GammaData::DOSERATE);
         if(result) {
@@ -721,7 +721,7 @@ void DoseConfigDialog::start(bool checked)
             filesystem::create_directories(phitsDirPath);
         }
 
-        int index = codeCombo->currentIndex();
+        int index = codeComboBox->currentIndex();
         string filename;
         if(index == PHITS) {
             filename = toUTF8((phitsDirPath / "phits.inp").string());
@@ -732,8 +732,8 @@ void DoseConfigDialog::start(bool checked)
         bool result = false;
 
         string filename0;
-        calcInfo.maxcas = maxCasSpin->value();
-        calcInfo.maxbch = maxBchSpin->value();
+        calcInfo.maxcas = maxCasSpinBox->value();
+        calcInfo.maxbch = maxBchSpinBox->value();
         for(size_t i = 0; i < 4; ++i) {
             calcInfo.xyze[i].n = nSpin[i].value();
             calcInfo.xyze[i].min = minSpin[i].value();
@@ -766,7 +766,7 @@ void DoseConfigDialog::start(bool checked)
 
         if(result) {
             phitsRunner.setReadStandardOutput(filename0, GammaData::DOSERATE);
-            int index = codeCombo->currentIndex();
+            int index = codeComboBox->currentIndex();
             if(index == PHITS) {
                 phitsRunner.startPHITS(filename.c_str());
             } else if(index == QAD) {
@@ -788,9 +788,9 @@ void DoseConfigDialog::start(bool checked)
 
 void DoseConfigDialog::storeState(Archive& archive)
 {
-    archive.write("code", codeCombo->currentIndex());
-    archive.write("maxcas", maxCasSpin->value());
-    archive.write("maxbch", maxBchSpin->value());
+    archive.write("code", codeComboBox->currentIndex());
+    archive.write("maxcas", maxCasSpinBox->value());
+    archive.write("maxbch", maxBchSpinBox->value());
     archive.write("nx", nSpin[0].value());
     archive.write("ny", nSpin[1].value());
     archive.write("nz", nSpin[2].value());
@@ -803,9 +803,9 @@ void DoseConfigDialog::storeState(Archive& archive)
     archive.write("ymax", maxSpin[1].value());
     archive.write("zmax", maxSpin[2].value());
     archive.write("emax", maxSpin[3].value());
-    archive.write("z", zSpin->value());
-    archive.write("plain", plainCombo->currentIndex());
-    archive.write("put_messages", messageCheck->isChecked());
+    archive.write("z", zSpinBox->value());
+    archive.write("plain", plainComboBox->currentIndex());
+    archive.write("put_messages", messageCheckBox->isChecked());
     archive.writeRelocatablePath("default_nuclide_table_file", defaultNuclideTableFile);
     archive.writeRelocatablePath("default_element_table_file", defaultElementTableFile);
 }
@@ -813,9 +813,9 @@ void DoseConfigDialog::storeState(Archive& archive)
 
 void DoseConfigDialog::restoreState(const Archive& archive)
 {
-    codeCombo->setCurrentIndex(archive.get("code", 0));
-    maxCasSpin->setValue(archive.get("maxcas", 0));
-    maxBchSpin->setValue(archive.get("maxbch", 0));
+    codeComboBox->setCurrentIndex(archive.get("code", 0));
+    maxCasSpinBox->setValue(archive.get("maxcas", 0));
+    maxBchSpinBox->setValue(archive.get("maxbch", 0));
     nSpin[0].setValue(archive.get("nx", 0));
     nSpin[1].setValue(archive.get("ny", 0));
     nSpin[2].setValue(archive.get("nz", 0));
@@ -828,9 +828,9 @@ void DoseConfigDialog::restoreState(const Archive& archive)
     maxSpin[1].setValue(archive.get("ymax", 0.0));
     maxSpin[2].setValue(archive.get("zmax", 0.0));
     maxSpin[3].setValue(archive.get("emax", 0.0));
-    zSpin->setValue(archive.get("z", 0.0));
-    plainCombo->setCurrentIndex(archive.get("plain", 0));
-    messageCheck->setChecked(archive.get("put_messages", true));
+    zSpinBox->setValue(archive.get("z", 0.0));
+    plainComboBox->setCurrentIndex(archive.get("plain", 0));
+    messageCheckBox->setChecked(archive.get("put_messages", true));
     archive.readRelocatablePath("default_nuclide_table_file", defaultNuclideTableFile);
     archive.readRelocatablePath("default_element_table_file", defaultElementTableFile);
 }

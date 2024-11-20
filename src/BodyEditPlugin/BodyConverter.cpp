@@ -148,8 +148,8 @@ public:
     QString convert(const QString& line) const;
     void saveFile(const QString& fileName);
 
-    CheckBox* convertCheck;
-    ComboBox* formatCombo;
+    CheckBox* convertCheckBox;
+    ComboBox* formatComboBox;
     QDialogButtonBox* buttonBox;
 };
 
@@ -187,12 +187,12 @@ BodyConverter::BodyConverter()
 BodyConverter::Impl::Impl()
     : Dialog()
 {
-    convertCheck = new CheckBox;
-    convertCheck->setText(_("Format conversion"));
+    convertCheckBox = new CheckBox;
+    convertCheckBox->setText(_("Format conversion"));
 
-    formatCombo = new ComboBox;
-    formatCombo->addItems(QStringList() << _("1.0") << _("2.0"));
-    formatCombo->setCurrentIndex(1);
+    formatComboBox = new ComboBox;
+    formatComboBox->addItems(QStringList() << _("1.0") << _("2.0"));
+    formatComboBox->setCurrentIndex(1);
 
     auto dropWidget = new FileDroppableWidget;
     dropWidget->setFixedHeight(200);
@@ -208,8 +208,8 @@ BodyConverter::Impl::Impl()
     connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
 
     auto layout = new QHBoxLayout;
-    layout->addWidget(convertCheck);
-    layout->addWidget(formatCombo);
+    layout->addWidget(convertCheckBox);
+    layout->addWidget(formatComboBox);
     layout->addStretch();
 
     auto mainLayout = new QVBoxLayout;
@@ -236,7 +236,7 @@ void BodyConverter::Impl::onFileDropped(const string& filename)
     string ext = path.extension().string();
 
     if(ext == ".body") {
-        if(!convertCheck->isChecked()) {
+        if(!convertCheckBox->isChecked()) {
             auto bodyItem = new BodyItem;
             bodyItem->load(filename);
 
@@ -268,7 +268,7 @@ QString BodyConverter::Impl::convert(const QString& line) const
 
     for(int i = 0; i < 58; ++i) {
         KeyInfo info = keyInfo[i];
-        if(formatCombo->currentIndex() == 0) {
+        if(formatComboBox->currentIndex() == 0) {
             if(newLine.contains(info.newKey)) {
                 newLine.replace(info.newKey, info.oldKey);
             }

@@ -59,20 +59,20 @@ class SquarePipeGenerator : public Dialog
 public:
     SquarePipeGenerator(QWidget* parent = nullptr);
 
-    void setWidth(double width) { widthSpin->setValue(width); }
-    double width() const { return widthSpin->value(); }
+    void setWidth(double width) { widthSpinBox->setValue(width); }
+    double width() const { return widthSpinBox->value(); }
 
-    void setRadius(double radius) { radiusSpin->setValue(radius); }
-    double  radius() const { return radiusSpin->value(); }
+    void setRadius(double radius) { radiusSpinBox->setValue(radius); }
+    double  radius() const { return radiusSpinBox->value(); }
 
-    void setLength(double length) { lengthSpin->setValue(length); }
-    double length() const { return lengthSpin->value(); }
+    void setLength(double length) { lengthSpinBox->setValue(length); }
+    double length() const { return lengthSpinBox->value(); }
 
 private:
-    DoubleSpinBox* widthSpin;
-    DoubleSpinBox* heightSpin;
-    DoubleSpinBox* radiusSpin;
-    DoubleSpinBox* lengthSpin;
+    DoubleSpinBox* widthSpinBox;
+    DoubleSpinBox* heightSpinBox;
+    DoubleSpinBox* radiusSpinBox;
+    DoubleSpinBox* lengthSpinBox;
     QDialogButtonBox* buttonBox;
 };
 
@@ -400,33 +400,33 @@ SquarePipeGenerator::SquarePipeGenerator(QWidget* parent)
 {
     setWindowTitle(_("SquarePipe Generator"));
 
-    widthSpin = new DoubleSpinBox;
-    widthSpin->setRange(0.01, 1000.0);
-    widthSpin->setSingleStep(0.01);
-    widthSpin->setDecimals(3);
-    widthSpin->sigValueChanged().connect([&](double value){ heightSpin->setValue(value); });
+    widthSpinBox = new DoubleSpinBox;
+    widthSpinBox->setRange(0.01, 1000.0);
+    widthSpinBox->setSingleStep(0.01);
+    widthSpinBox->setDecimals(3);
+    widthSpinBox->sigValueChanged().connect([&](double value){ heightSpinBox->setValue(value); });
 
-    heightSpin = new DoubleSpinBox;
-    heightSpin->setRange(0.01, 1000.0);
-    heightSpin->setSingleStep(0.01);
-    heightSpin->setDecimals(3);
-    heightSpin->setEnabled(false);
+    heightSpinBox = new DoubleSpinBox;
+    heightSpinBox->setRange(0.01, 1000.0);
+    heightSpinBox->setSingleStep(0.01);
+    heightSpinBox->setDecimals(3);
+    heightSpinBox->setEnabled(false);
 
-    radiusSpin = new DoubleSpinBox;
-    radiusSpin->setRange(0.01, 1000.0);
-    radiusSpin->setSingleStep(0.01);
-    radiusSpin->setDecimals(3);
+    radiusSpinBox = new DoubleSpinBox;
+    radiusSpinBox->setRange(0.01, 1000.0);
+    radiusSpinBox->setSingleStep(0.01);
+    radiusSpinBox->setDecimals(3);
 
-    lengthSpin = new DoubleSpinBox;
-    lengthSpin->setRange(0.01, 1000.0);
-    lengthSpin->setSingleStep(0.01);
-    lengthSpin->setDecimals(3);
+    lengthSpinBox = new DoubleSpinBox;
+    lengthSpinBox->setRange(0.01, 1000.0);
+    lengthSpinBox->setSingleStep(0.01);
+    lengthSpinBox->setDecimals(3);
 
     auto formLayout = new QFormLayout;
-    formLayout->addRow(_("Width [m]"), widthSpin);
-    formLayout->addRow(_("Height [m]"), heightSpin);
-    formLayout->addRow(_("Radius [m]"), radiusSpin);
-    formLayout->addRow(_("Length [m]"), lengthSpin);
+    formLayout->addRow(_("Width [m]"), widthSpinBox);
+    formLayout->addRow(_("Height [m]"), heightSpinBox);
+    formLayout->addRow(_("Radius [m]"), radiusSpinBox);
+    formLayout->addRow(_("Length [m]"), lengthSpinBox);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
                                      | QDialogButtonBox::Cancel);

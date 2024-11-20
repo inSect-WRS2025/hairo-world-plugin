@@ -14,7 +14,7 @@
 #include <cnoid/HamburgerMenu>
 #include <QBoxLayout>
 #include <QDialogButtonBox>
-#include <QGridLayout>
+#include <QFormLayout>
 #include <QLabel>
 #include "gettext.h"
 #include "NetEm.h"
@@ -33,16 +33,19 @@ class NetworkEmulator::Impl : public Dialog
 {
 public:
 
-    NetEmPtr emulator;
-    ComboBox* interfaceCombo;
-    ComboBox* ifbdeviceCombo;
-    DoubleSpinBox* delaySpins[2];
-    DoubleSpinBox* rateSpins[2];
-    DoubleSpinBox* lossSpins[2];
-    PushButton* startButton;
-
     Impl();
+
     void onStartButtonToggled(bool checked);
+
+    enum { In, Out, NumInterfaces };
+
+    NetEmPtr emulator;
+    ComboBox* interfaceComboBox;
+    ComboBox* ifbdeviceComboBox;
+    DoubleSpinBox* delaySpinBoxes[NumInterfaces];
+    DoubleSpinBox* rateSpinBoxes[NumInterfaces];
+    DoubleSpinBox* lossSpinBoxes[NumInterfaces];
+    PushButton* startButton;
 };
 
 }
@@ -77,42 +80,33 @@ NetworkEmulator::Impl::Impl()
 
     emulator = new NetEm;
 
-    const QStringList list = {
-        _("Interface"), _("IFB Device"),
-        _("Inbound Delay [ms]"), _("Inbound Rate [kbit/s]"),_("Inbound Loss [%]"),
-        _("Outbound Delay [ms]"), _("Outbound Rate [kbit/s]"), _("Outbound Loss [%]")
-    };
-
-    auto gridLayout = new QGridLayout;
-    for(int i = 0; i < 8; ++i) {
-        gridLayout->addWidget(new QLabel(list[i]), i, 0);
-    }
-
-    interfaceCombo = new ComboBox;
+    interfaceComboBox = new ComboBox;
     for(int i = 0; i < emulator->interfaces().size(); ++i) {
-        interfaceCombo->addItem(emulator->interfaces()[i].c_str());
-    }
-    ifbdeviceCombo = new ComboBox;
-    ifbdeviceCombo->addItems(QStringList() << "ifb0" << "ifb1");
-    ifbdeviceCombo->setCurrentIndex(1);
-
-    for(int i = 0; i < 2; ++i) {
-        delaySpins[i] = new DoubleSpinBox;
-        delaySpins[i]->setRange(0.0, 100000.0);
-        rateSpins[i] = new DoubleSpinBox;
-        rateSpins[i]->setRange(0.0, 11000000.0);
-        lossSpins[i] = new DoubleSpinBox;
-        lossSpins[i]->setRange(0.0, 100.0);
+        interfaceComboBox->addItem(emulator->interfaces()[i].c_str());
     }
 
-    gridLayout->addWidget(interfaceCombo, 0, 1);
-    gridLayout->addWidget(ifbdeviceCombo, 1, 1);
-    gridLayout->addWidget(delaySpins[0], 2, 1);
-    gridLayout->addWidget(rateSpins[0], 3, 1);
-    gridLayout->addWidget(lossSpins[0], 4, 1);
-    gridLayout->addWidget(delaySpins[1], 5, 1);
-    gridLayout->addWidget(rateSpins[1], 6, 1);
-    gridLayout->addWidget(lossSpins[1], 7, 1);
+    ifbdeviceComboBox = new ComboBox;
+    ifbdeviceComboBox->addItems(QStringList() << "ifb0" << "ifb1");
+    ifbdeviceComboBox->setCurrentIndex(1);
+
+    for(int i = 0; i < NumInterfaces; ++i) {
+        delaySpinBoxes[i] = new DoubleSpinBox;
+        delaySpinBoxes[i]->setRange(0.0, 100000.0);
+        rateSpinBoxes[i] = new DoubleSpinBox;
+        rateSpinBoxes[i]->setRange(0.0, 11000000.0);
+        lossSpinBoxes[i] = new DoubleSpinBox;
+        lossSpinBoxes[i]->setRange(0.0, 100.0);
+    }
+
+    auto formLayout = new QFormLayout;
+    formLayout->addRow(_("Interface"), interfaceComboBox);
+    formLayout->addRow(_("IFB Device"), ifbdeviceComboBox);
+    formLayout->addRow(_("Inbound Delay [ms]"), delaySpinBoxes[In]);
+    formLayout->addRow(_("Inbound Rate [kbit/s]"), rateSpinBoxes[In]);
+    formLayout->addRow(_("Inbound Loss [%]"), lossSpinBoxes[In]);
+    formLayout->addRow(_("Outbound Delay [ms]"), delaySpinBoxes[Out]);
+    formLayout->addRow(_("Outbound Rate [kbit/s]"), rateSpinBoxes[Out]);
+    formLayout->addRow(_("Outbound Loss [%]"), lossSpinBoxes[Out]);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(this);
     startButton = new PushButton(_("&Start"));
@@ -121,7 +115,7 @@ NetworkEmulator::Impl::Impl()
     startButton->sigToggled().connect([&](bool checked){ onStartButtonToggled(checked); });
 
     auto vbox = new QVBoxLayout;
-    vbox->addLayout(gridLayout);
+    vbox->addLayout(formLayout);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
     vbox->addWidget(buttonBox);
@@ -139,11 +133,11 @@ void NetworkEmulator::Impl::onStartButtonToggled(bool checked)
 {
     if(checked) {
         startButton->setText(_("&Stop"));
-        emulator->start(interfaceCombo->currentIndex(), ifbdeviceCombo->currentIndex());
-        for(int i = 0; i < 2; ++i) {
-            emulator->setDelay(i, delaySpins[i]->value());
-            emulator->setRate(i, rateSpins[i]->value());
-            emulator->setLoss(i, lossSpins[i]->value());
+        emulator->start(interfaceComboBox->currentIndex(), ifbdeviceComboBox->currentIndex());
+        for(int i = 0; i < NumInterfaces; ++i) {
+            emulator->setDelay(i, delaySpinBoxes[i]->value());
+            emulator->setRate(i, rateSpinBoxes[i]->value());
+            emulator->setLoss(i, lossSpinBoxes[i]->value());
         }
         emulator->update();
     } else {
