@@ -148,8 +148,8 @@ public:
     SignalProxy<void(string filename)> sigReadPHITSData() { return sigReadPHITSData_; }
 
     ComboBox* plainCombo;
-    DoubleSpinBox* dspin;
-    Slider* slider;
+    DoubleSpinBox* zSpin;
+    Slider* zSlider;
     Signal<void(double value)> sigValueChanged_;
     Signal<void(string filename)> sigReadPHITSData_;
 
@@ -314,8 +314,8 @@ void CrossSectionItem::Impl::createScene()
         int height = (int)ny;
 
         int index = -1;
-        config->dspin->setRange(zcoord[0], zcoord[zcoord.size() - 1]);
-        double z = config->dspin->value();
+        config->zSpin->setRange(zcoord[0], zcoord[zcoord.size() - 1]);
+        double z = config->zSpin->value();
         for(int i = 0; i < nz; ++i) {
             if((z >= zcoord[i]) && (z < zcoord[i + 1])) {
                 index = i;
@@ -370,7 +370,7 @@ void CrossSectionItem::Impl::createScene()
                 double y = -yside / 2.0 * (double)(height - 1) + (double)j * yside;
                 x = x + xcenter;
                 y = y + ycenter;
-                double z = config->dspin->value();
+                double z = config->zSpin->value();
                 pos->setTranslation(Vector3(x, y, z));
                 group->addChild(pos);
             }
@@ -611,28 +611,28 @@ DoseConfigDialog::DoseConfigDialog()
     for(int i = 0; i < 3; ++i) {
         plainCombo->addItem(list2[i]);
     }
-    dspin = new DoubleSpinBox;
-    dspin->setRange(0.0, 100.0);
-    dspin->setDecimals(3);
-    dspin->setSingleStep(0.01);
-    slider = new Slider(Qt::Horizontal);
-    slider->setRange(0, 100);
+    zSpin = new DoubleSpinBox;
+    zSpin->setRange(0.0, 100.0);
+    zSpin->setDecimals(3);
+    zSpin->setSingleStep(0.01);
+    zSlider = new Slider(Qt::Horizontal);
+    zSlider->setRange(0, 100);
     gridLayout3->addWidget(plainCombo, 0, 0, 1, 1);
-    gridLayout3->addWidget(slider, 0, 1, 1, 2);
-    gridLayout3->addWidget(dspin, 0, 3, 1, 1);
+    gridLayout3->addWidget(zSlider, 0, 1, 1, 2);
+    gridLayout3->addWidget(zSpin, 0, 3, 1, 1);
 
-    dspin->sigValueChanged().connect([&](double value){
+    zSpin->sigValueChanged().connect([&](double value){
         sigValueChanged_(value);
-        double min = dspin->minimum();
-        double max = dspin->maximum();
+        double min = zSpin->minimum();
+        double max = zSpin->maximum();
         double rate = (value - min) / (max - min) * 100.0;
-        slider->setValue((int)rate);
+        zSlider->setValue((int)rate);
     });
-    slider->sigValueChanged().connect([&](int rate){
-        double min = dspin->minimum();
-        double max = dspin->maximum();
+    zSlider->sigValueChanged().connect([&](int rate){
+        double min = zSpin->minimum();
+        double max = zSpin->maximum();
         double value = (max - min) * (double)rate / 100.0 + min;
-        dspin->setValue(value);
+        zSpin->setValue(value);
     });
 
     auto buttonBox = new QDialogButtonBox(this);
@@ -803,7 +803,7 @@ void DoseConfigDialog::storeState(Archive& archive)
     archive.write("ymax", maxSpin[1].value());
     archive.write("zmax", maxSpin[2].value());
     archive.write("emax", maxSpin[3].value());
-    archive.write("z", dspin->value());
+    archive.write("z", zSpin->value());
     archive.write("plain", plainCombo->currentIndex());
     archive.write("put_messages", messageCheck->isChecked());
     archive.writeRelocatablePath("default_nuclide_table_file", defaultNuclideTableFile);
@@ -828,7 +828,7 @@ void DoseConfigDialog::restoreState(const Archive& archive)
     maxSpin[1].setValue(archive.get("ymax", 0.0));
     maxSpin[2].setValue(archive.get("zmax", 0.0));
     maxSpin[3].setValue(archive.get("emax", 0.0));
-    dspin->setValue(archive.get("z", 0.0));
+    zSpin->setValue(archive.get("z", 0.0));
     plainCombo->setCurrentIndex(archive.get("plain", 0));
     messageCheck->setChecked(archive.get("put_messages", true));
     archive.readRelocatablePath("default_nuclide_table_file", defaultNuclideTableFile);

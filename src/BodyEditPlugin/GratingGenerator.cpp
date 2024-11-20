@@ -144,6 +144,7 @@ GratingGenerator::Impl::Impl()
     gridLayout->addWidget(sizeLabel, 5, 1, 1, 3);
 
     buttonBox = new GeneratorButtonBox;
+    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 
     auto vbox = new QVBoxLayout;
     vbox->addLayout(gridLayout);
@@ -161,7 +162,6 @@ GratingGenerator::Impl::Impl()
     spinBoxes[H_GRID]->sigValueChanged().connect([&](double value){ onValueChanged(); });
     spinBoxes[V_GRID]->sigValueChanged().connect([&](double value){ onValueChanged(); });
     doubleSpinBoxes[HEIGHT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

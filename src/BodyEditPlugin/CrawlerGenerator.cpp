@@ -440,6 +440,7 @@ CrawlerGenerator::Impl::Impl()
     }
 
     buttonBox = new GeneratorButtonBox;
+    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 
     initialize();
 
@@ -478,7 +479,6 @@ CrawlerGenerator::Impl::Impl()
     toolButtons[IMPORT]->sigClicked().connect([&](){ onImportButtonClicked(); });
     toolButtons[EXPORT]->sigClicked().connect([&](){ onExportButtonClicked(); });
     checkBoxes[AGX_CHK]->sigToggled().connect([&](bool checked){ onEnableAGXCheckToggled(checked); });
-    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

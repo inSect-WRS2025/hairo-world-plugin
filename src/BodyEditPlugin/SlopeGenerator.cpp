@@ -115,6 +115,7 @@ SlopeGenerator::Impl::Impl()
     gridLayout->addWidget(colorButton, 2, 1);
 
     buttonBox = new GeneratorButtonBox;
+    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 
     auto vbox = new QVBoxLayout;
     vbox->addLayout(gridLayout);
@@ -122,8 +123,6 @@ SlopeGenerator::Impl::Impl()
     vbox->addWidget(new HSeparator);
     vbox->addWidget(buttonBox);
     setLayout(vbox);
-
-    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

@@ -3,22 +3,20 @@
 */
 
 #include "TerrainGenerator.h"
-#include <cnoid/Button>
 #include <cnoid/Dialog>
 #include <cnoid/EigenArchive>
 #include <cnoid/EigenTypes>
 #include <cnoid/ExtensionManager>
 #include <cnoid/ItemManager>
-#include <cnoid/LineEdit>
 #include <cnoid/MenuManager>
 #include <cnoid/Separator>
-#include <cnoid/SpinBox>
 #include <cnoid/UTF8>
 #include <cnoid/YAMLWriter>
 #include <cnoid/stdx/filesystem>
 #include <QBoxLayout>
-#include <QGridLayout>
-#include <QLabel>
+#include <QDoubleSpinBox>
+#include <QFormLayout>
+#include <QPushButton>
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
@@ -69,20 +67,22 @@ class TerrainGenerator::Impl : public Dialog
 {
 public:
 
-    LineEdit* inputFileLine;
-    TerrainData* data;
-    GeneratorButtonBox* buttonBox;
-    DoubleSpinBox* scaleSpin;
-    YAMLWriter yamlWriter;
-
     Impl();
 
     bool save(const string& filename);
-    void onLoadButtonClicked();
+    void load();
+
     MappingPtr writeBody(const string& filename);
     MappingPtr writeLink();
     void writeLinkShape(Listing* elementsNode);
     void writeLinkShape2(Listing* elementsNode);
+
+    QString fileName;
+    QDoubleSpinBox* scaleSpinBox;
+
+    TerrainData* data;
+    GeneratorButtonBox* buttonBox;
+    YAMLWriter yamlWriter;
 };
 
 }
@@ -113,43 +113,33 @@ TerrainGenerator::Impl::Impl()
     setWindowTitle(_("BoxTerrain Generator"));
     yamlWriter.setKeyOrderPreservationMode(true);
 
-    scaleSpin = new DoubleSpinBox;
-    scaleSpin->setDecimals(1);
-    scaleSpin->setSingleStep(0.1);
-    scaleSpin->setValue(1.0);
-    scaleSpin->setRange(0.1, 10.0);
-    scaleSpin->sigValueChanged().connect([&](double value){ scale = value; });
-
-    inputFileLine = new LineEdit;
-    inputFileLine->setEnabled(false);
     data = nullptr;
-    PushButton* loadButton = new PushButton;
-    const QIcon openIcon = QIcon::fromTheme("document-open");
-    if(openIcon.isNull()) {
-        loadButton->setText(_("&Load"));
-    } else {
-        loadButton->setIcon(openIcon);
-    }
 
-    auto gridLayout = new QGridLayout;
-    int index = 0;
-    gridLayout->addWidget(new QLabel(_("Input File (.csv)")), index, 0);
-    gridLayout->addWidget(inputFileLine, index, 1, 1, 2);
-    gridLayout->addWidget(loadButton, index++, 3);
-    gridLayout->addWidget(new QLabel(_("scale[0.1-10.0]")), index, 0);
-    gridLayout->addWidget(scaleSpin, index++, 1);
+    const QIcon openIcon = QIcon::fromTheme("document-open");
+    QPushButton* openButton = new QPushButton(openIcon, _("&Open"), this);
+    connect(openButton, &QPushButton::clicked, [&](){ load(); });
+
+    scaleSpinBox = new QDoubleSpinBox;
+    scaleSpinBox->setDecimals(1);
+    scaleSpinBox->setSingleStep(0.1);
+    scaleSpinBox->setValue(1.0);
+    scaleSpinBox->setRange(0.1, 10.0);
+    connect(scaleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+        [&](double d){ scale = d; });
+
+    auto formLayout = new QFormLayout;
+    formLayout->addRow(_("Input File (.csv)"), openButton);
+    formLayout->addRow(_("scale[0.1-10.0]"), scaleSpinBox);
 
     buttonBox = new GeneratorButtonBox;
+    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 
     auto vbox = new QVBoxLayout;
-    vbox->addLayout(gridLayout);
+    vbox->addLayout(formLayout);
     vbox->addStretch();
     vbox->addWidget(new HSeparator);
     vbox->addWidget(buttonBox);
     setLayout(vbox);
-
-    loadButton->sigClicked().connect([&](){ onLoadButtonClicked(); });
-    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 
@@ -161,7 +151,7 @@ TerrainGenerator::~TerrainGenerator()
 
 bool TerrainGenerator::Impl::save(const string& filename)
 {
-    string inputFile = inputFileLine->text().toStdString();
+    string inputFile = fileName.toStdString();
     if(inputFile.empty()) {
         return false;
     }
@@ -183,11 +173,11 @@ bool TerrainGenerator::Impl::save(const string& filename)
 }
 
 
-void TerrainGenerator::Impl::onLoadButtonClicked()
+void TerrainGenerator::Impl::load()
 {
     string filename = getOpenFileName(_("Load a CSV file"), "csv");
     if(!filename.empty()) {
-        inputFileLine->setText(filename);
+        fileName = filename.c_str();
     }
 }
 

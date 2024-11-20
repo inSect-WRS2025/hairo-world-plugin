@@ -166,6 +166,7 @@ PipeGenerator::Impl::Impl()
     gridLayout->addWidget(colorButton, 3, 1);
 
     buttonBox = new GeneratorButtonBox;
+    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 
     configureAct = new Action;
     configureAct->setText(_("Advanced settings"));
@@ -180,7 +181,6 @@ PipeGenerator::Impl::Impl()
 
     doubleSpinBoxes[IN_DIA]->sigValueChanged().connect([&](double value){ onInnerDiameterChanged(value); });
     doubleSpinBoxes[OUT_DIA]->sigValueChanged().connect([&](double value){ onOuterDiameterChanged(value); });
-    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 

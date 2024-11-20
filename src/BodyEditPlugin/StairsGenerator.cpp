@@ -128,6 +128,7 @@ StairsGenerator::Impl::Impl()
     gridLayout->addWidget(colorButton, 3, 1);
 
     buttonBox = new GeneratorButtonBox;
+    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 
     auto vbox = new QVBoxLayout;
     vbox->addLayout(gridLayout);
@@ -135,8 +136,6 @@ StairsGenerator::Impl::Impl()
     vbox->addWidget(new HSeparator);
     vbox->addWidget(buttonBox);
     setLayout(vbox);
-
-    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
 }
 
 
