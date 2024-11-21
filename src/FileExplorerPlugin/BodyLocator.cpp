@@ -1,6 +1,6 @@
 /**
     @author Kenta Suzuki
- */
+*/
 
 #include "BodyLocator.h"
 #include <cnoid/BodyItem>

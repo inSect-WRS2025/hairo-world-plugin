@@ -34,7 +34,7 @@ struct DoubleSpinInfo {
     QDoubleSpinBox* spin;
 };
 
-DoubleSpinInfo dspinInfo[] = {
+DoubleSpinInfo doubleSpinInfo[] = {
     { 0, nullptr }, { 0, nullptr }, { 0, nullptr }, { 0, nullptr },
     { 1, nullptr }, { 1, nullptr },
     { 2, nullptr }, { 2, nullptr }, { 2, nullptr },
@@ -140,7 +140,7 @@ InertiaCalculator::Impl::Impl()
     };
 
     for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
-        DoubleSpinInfo info = dspinInfo[i];
+        DoubleSpinInfo info = doubleSpinInfo[i];
         info.spin = doubleSpinBoxes[i] = new QDoubleSpinBox;
         info.spin->setDecimals(7);
         info.spin->setSingleStep(0.01);

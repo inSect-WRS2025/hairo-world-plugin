@@ -1,6 +1,6 @@
 /**
     @author Kenta Suzuki
- */
+*/
 
 #ifndef CNOID_FILE_EXPLORE_PLUGIN_BODY_LOCATOR_H
 #define CNOID_FILE_EXPLORE_PLUGIN_BODY_LOCATOR_H

@@ -26,6 +26,7 @@
 #include <QBoxLayout>
 #include <QLabel>
 #include <QStackedWidget>
+#include <QWidget>
 #include "ColorButton.h"
 #include "GeneratorButtonBox.h"
 #include "gettext.h"
@@ -331,27 +332,26 @@ CrawlerGenerator::Impl::Impl()
 
     for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
-        DoubleSpinBox* dspin = doubleSpinBoxes[i] = new DoubleSpinBox;
-        gridLayout[info.page]->addWidget(dspin, info.row, info.column);
+        doubleSpinBoxes[i] = new DoubleSpinBox;
+        gridLayout[info.page]->addWidget(doubleSpinBoxes[i], info.row, info.column);
     }
 
     for(int i = 0; i < NumAGXDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = agxdoubleSpinInfo[i];
-        DoubleSpinBox* agxdspin = agxDoubleSpinBoxes[i] = new DoubleSpinBox;
-        gridLayout2->addWidget(agxdspin, info.row, info.column);
+        agxDoubleSpinBoxes[i] = new DoubleSpinBox;
+        gridLayout2->addWidget(agxDoubleSpinBoxes[i], info.row, info.column);
     }
 
     for(int i = 0; i < NumSpinBoxes; ++i) {
         SpinInfo info = agxspinInfo[i];
-        SpinBox* spin = agxSpinBoxes[i] = new SpinBox;
-        gridLayout2->addWidget(spin, info.row, info.column);
+        agxSpinBoxes[i] = new SpinBox;
+        gridLayout2->addWidget(agxSpinBoxes[i], info.row, info.column);
     }
 
     for(int i = 0; i < NumColorButtons; ++i) {
         ButtonInfo info = buttonInfo[i];
         colorButtons[i] = new ColorButton;
-        PushButton* button = colorButtons[i];
-        gridLayout[info.page]->addWidget(button, info.row, info.column);
+        gridLayout[info.page]->addWidget(colorButtons[i], info.row, info.column);
     }
 
     const QStringList list = {
@@ -440,20 +440,20 @@ CrawlerGenerator::Impl::Impl()
 
     initialize();
 
-    Widget* page1Widget = new Widget;
+    QWidget* page1Widget = new QWidget;
     auto vbox1 = new QVBoxLayout;
     vbox1->addLayout(gridLayout[0]);
     vbox1->addStretch();
     page1Widget->setLayout(vbox1);
 
-    Widget* page2Widget = new Widget;
+    QWidget* page2Widget = new QWidget;
     auto vbox2 = new QVBoxLayout;
     vbox2->addLayout(hbox1);
     vbox2->addLayout(gridLayout[1]);
     vbox2->addStretch();
     page2Widget->setLayout(vbox2);
 
-    Widget* page3Widget = new Widget;
+    QWidget* page3Widget = new QWidget;
     auto vbox3 = new QVBoxLayout;
     vbox3->addLayout(gridLayout2);
     vbox3->addStretch();
@@ -511,20 +511,20 @@ void CrawlerGenerator::Impl::initialize()
 {
     for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
-        DoubleSpinBox* dspin = doubleSpinBoxes[i];
-        dspin->setDecimals(info.decimals);
-        dspin->setRange(info.min, info.max);
-        dspin->setValue(info.value);
-        dspin->setEnabled(info.enabled);
+        DoubleSpinBox* spin = doubleSpinBoxes[i];
+        spin->setDecimals(info.decimals);
+        spin->setRange(info.min, info.max);
+        spin->setValue(info.value);
+        spin->setEnabled(info.enabled);
     }
 
     for(int i = 0; i < NumAGXDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = agxdoubleSpinInfo[i];
-        DoubleSpinBox* agxdspin = agxDoubleSpinBoxes[i];
-        agxdspin->setDecimals(info.decimals);
-        agxdspin->setRange(info.min, info.max);
-        agxdspin->setValue(info.value);
-        agxdspin->setEnabled(info.enabled);
+        DoubleSpinBox* spin = agxDoubleSpinBoxes[i];
+        spin->setDecimals(info.decimals);
+        spin->setRange(info.min, info.max);
+        spin->setValue(info.value);
+        spin->setEnabled(info.enabled);
     }
 
     for(int i = 0; i < NumSpinBoxes; ++i) {

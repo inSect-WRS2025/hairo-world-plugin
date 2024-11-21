@@ -1,7 +1,7 @@
 /**
     Joint Map Controller
     Kenta Suzuki
- */
+*/
 
  #include <cnoid/SimpleController>
 #include <cnoid/SharedJoystick>
