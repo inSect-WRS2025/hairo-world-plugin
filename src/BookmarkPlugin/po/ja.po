@@ -65,8 +65,8 @@ msgstr "ブックマークのクリア"
 msgid "Autoplay"
 msgstr "自動再生"
 
-msgid "Open a project"
-msgstr "プロジェクトを開く"
+msgid "CNOID File"
+msgstr "プロジェクト"
 
 msgid "Save a project"
 msgstr "プロジェクトの保存"
@@ -91,9 +91,3 @@ msgstr "保存"
 
 msgid "Cancel"
 msgstr "キャンセル"
-
-msgid "Open a layout"
-msgstr "レイアウトを開く"
-
-msgid "Save a layout"
-msgstr "レイアウトの保存"

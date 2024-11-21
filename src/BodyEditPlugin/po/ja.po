@@ -182,20 +182,11 @@ msgstr "エクスポート(&E)"
 msgid "&Ok"
 msgstr "Ｏｋ(&O)"
 
-msgid "Load a configuration file"
-msgstr "設定ファイルの読み込み"
+msgid "YAML File"
+msgstr "YAMLファイル"
 
 msgid "Cancel"
 msgstr "キャンセル"
-
-msgid "YAML files (*.yaml *.yml)"
-msgstr "YAMLファイル(*.yaml *.yml)"
-
-msgid "Any files (*)"
-msgstr "全てのファイル (*)"
-
-msgid "Save a configuration file"
-msgstr "設定ファイルの保存"
 
 msgid "Save"
 msgstr "保存"
@@ -206,6 +197,9 @@ msgstr "色の選択"
 msgid "File"
 msgstr "ファイル"
 
+msgid "&Reset"
+msgstr "リセット(&R)"
+
 msgid "&Save"
 msgstr "上書き保存(&S)"
 
@@ -214,9 +208,6 @@ msgstr "名前を付けて保存(&A)"
 
 msgid "Body"
 msgstr "ボディ"
-
-msgid "Body files (*.body)"
-msgstr "ボディファイル (*.body)"
 
 msgid "Grating Generator"
 msgstr "グレーチング生成"
@@ -302,14 +293,11 @@ msgstr "ボックステレイン生成"
 msgid "&Load"
 msgstr "読み込み(&L)"
 
-msgid "Input File (.csv)"
-msgstr "入力ファイル (.csv)"
-
 msgid "scale[0.1-10.0]"
 msgstr "スケール[0.1-10.0]"
 
-msgid "Load a CSV file"
-msgstr "CSVファイルの読み込み"
+msgid "CSV File"
+msgstr "CSVファイル"
 
 msgid "Setting 1"
 msgstr "設定1"

@@ -25,6 +25,7 @@ public:
 
     Impl(GeneratorButtonBox* self);
 
+    void reset();
     void save();
     void saveAs();
 
@@ -33,10 +34,8 @@ public:
 
     QString fileName;
 
-    Signal<void(string)> sigSaveTriggered_;
-    SignalProxy<void(string)> sigSaveTriggered() {
-        return sigSaveTriggered_;
-    }
+    Signal<void()> sigResetRequested_;
+    Signal<void(string)> sigSaveRequested_;
 };
 
 }
@@ -52,6 +51,10 @@ GeneratorButtonBox::GeneratorButtonBox(QWidget* parent)
 GeneratorButtonBox::Impl::Impl(GeneratorButtonBox* self)
     : self(self)
 {
+    const QIcon resetIcon = QIcon::fromTheme("document-new");
+    QPushButton* resetButton = new QPushButton(resetIcon, _("&Reset"), self);
+    self->connect(resetButton, &QPushButton::clicked, [&](){ reset(); });
+
     const QIcon saveIcon = QIcon::fromTheme("document-save");
     QPushButton* saveButton = new QPushButton(saveIcon, _("&Save"), self);
     self->connect(saveButton, &QPushButton::clicked, [&](){ save(); });
@@ -60,6 +63,7 @@ GeneratorButtonBox::Impl::Impl(GeneratorButtonBox* self)
     QPushButton* saveAsButton = new QPushButton(saveAsIcon, _("Save &As..."), self);
     self->connect(saveAsButton, &QPushButton::clicked, [&](){ saveAs(); });
 
+    self->addButton(resetButton, QDialogButtonBox::ResetRole);
     self->addButton(saveButton, QDialogButtonBox::ActionRole);
     self->addButton(saveAsButton, QDialogButtonBox::ActionRole);
 }
@@ -71,9 +75,21 @@ GeneratorButtonBox::~GeneratorButtonBox()
 }
 
 
-SignalProxy<void(string)> GeneratorButtonBox::sigSaveTriggered()
+SignalProxy<void()> GeneratorButtonBox::sigResetRequested()
 {
-    return impl->sigSaveTriggered();
+    return impl->sigResetRequested_;
+}
+
+
+SignalProxy<void(string)> GeneratorButtonBox::sigSaveRequested()
+{
+    return impl->sigSaveRequested_;
+}
+
+
+void GeneratorButtonBox::Impl::reset()
+{
+    sigResetRequested_();
 }
 
 
@@ -105,7 +121,7 @@ void GeneratorButtonBox::Impl::saveFile(const QString& fileName)
            filename += ".body";
         }
         this->fileName = filename.c_str();
-        sigSaveTriggered_(filename);
+        sigSaveRequested_(filename);
     }
 
     reloadItem();

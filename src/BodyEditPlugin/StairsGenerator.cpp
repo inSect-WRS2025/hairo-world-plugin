@@ -61,7 +61,9 @@ public:
 
     Impl();
 
+    void reset();
     bool save(const string& filename);
+
     void onColorButtonClicked();
     MappingPtr writeBody(const string& filename);
     MappingPtr writeLink();
@@ -128,7 +130,8 @@ StairsGenerator::Impl::Impl()
     gridLayout->addWidget(colorButton, 3, 1);
 
     buttonBox = new GeneratorButtonBox;
-    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
+    buttonBox->sigResetRequested().connect([&](){ reset(); });
+    buttonBox->sigSaveRequested().connect([&](string filename){ save(filename); });
 
     auto vbox = new QVBoxLayout;
     vbox->addLayout(gridLayout);
@@ -142,6 +145,20 @@ StairsGenerator::Impl::Impl()
 StairsGenerator::~StairsGenerator()
 {
     delete impl;
+}
+
+
+void StairsGenerator::Impl::reset()
+{
+    for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
+        DoubleSpinInfo info = doubleSpinInfo[i];
+        info.spin = doubleSpinBoxes[i];
+        info.spin->setValue(info.value);
+    }
+
+    stepsSpinBox->setValue(10);
+
+    colorButton->setColor(Vector3(0.5, 0.5, 0.5));
 }
 
 

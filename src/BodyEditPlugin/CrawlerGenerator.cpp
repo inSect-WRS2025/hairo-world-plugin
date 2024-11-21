@@ -235,7 +235,7 @@ public:
         RFL_CLR, SPC_CLR, NumColorButtons
     };
     enum { FFL_CHK, RFL_CHK, AGX_CHK, NumCheckBoxes };
-    enum { RESET, IMPORT, EXPORT, NumToolButtons };
+    enum { IMPORT, EXPORT, NumToolButtons };
 
     CheckBox* checkBoxes[NumCheckBoxes];
     ColorButton* colorButtons[NumColorButtons];
@@ -257,7 +257,6 @@ public:
     bool save2(const string& filename);
 
     void initialize();
-    void onResetButtonClicked();
     void onExportButtonClicked();
     void onImportButtonClicked();
 
@@ -355,16 +354,16 @@ CrawlerGenerator::Impl::Impl()
         gridLayout[info.page]->addWidget(button, info.row, info.column);
     }
 
-    static const char* label0[] = {
+    const QStringList list = {
         _("Chassis"), _("Track"), _("Front SubTrack"), _("Rear SubTrack"), _("Spacer")
     };
 
     for(int i = 0; i < 5; ++i) {
         Info info = separatorInfo[i];
-        gridLayout[info.page]->addLayout(new HSeparatorBox(new QLabel(label0[i])), info.row, info.column, 1, 4);
+        gridLayout[info.page]->addLayout(new HSeparatorBox(new QLabel(list[i])), info.row, info.column, 1, 4);
     }
 
-    static const char* label1[] = {
+    const QStringList list2 = {
         _("mass [kg]"), _("color"), _("size(x-y-z) [m, m, m]"),
         _("mass [kg]"), _("color"), _("radius [m]"), _("width [m]"), _("wheelbase [m]"),
         _("mass [kg]"), _("color"), _("radius(forward-backward) [m]"), _("width [m]"), _("wheelbase [m]"),
@@ -374,17 +373,17 @@ CrawlerGenerator::Impl::Impl()
 
     for(int i = 0; i < 22; ++i) {
         LabelInfo info = labelInfo[i];
-        gridLayout[info.page]->addWidget(new QLabel(label1[i]), info.row, info.column);
+        gridLayout[info.page]->addWidget(new QLabel(list2[i]), info.row, info.column);
     }
 
-    static const char* label2[] = { _("Track Belt"), _("SubTrack Belt") };
+    const QStringList list3 = { _("Track Belt"), _("SubTrack Belt") };
 
     for(int i = 0; i < 2; ++i) {
         Info info = agxseparatorInfo[i];
-        gridLayout2->addLayout(new HSeparatorBox(new QLabel(label2[i])), info.row, info.column, 1, 6);
+        gridLayout2->addLayout(new HSeparatorBox(new QLabel(list3[i])), info.row, info.column, 1, 6);
     }
 
-    static const char* label3[] = {
+    const QStringList list4 = {
         _("number of nodes [-]"), _("node thickness [m]"),
         _("node width [m]"), _("node thickerthickness [m]"),
         _("use thicker node every [-]"), _("node distance tension [m, e-]"),
@@ -395,19 +394,21 @@ CrawlerGenerator::Impl::Impl()
 
     for(int i = 0; i < 24; ++i) {
         LabelInfo info = agxlabelInfo[i];
-        gridLayout2->addWidget(new QLabel(label3[i % 12]), info.row, info.column);
+        gridLayout2->addWidget(new QLabel(list4[i % 12]), info.row, info.column);
     }
 
-    static const char* label4[] = { _("Front SubTrack"), _("Rear SubTrack"), _("AGX") };
+    const QStringList list5 = { _("Front SubTrack"), _("Rear SubTrack"), _("AGX") };
 
     auto hbox1 = new QHBoxLayout;
     for(int i = 0; i < NumCheckBoxes; ++i) {
         CheckInfo info = checkInfo[i];
         checkBoxes[i] = new CheckBox;
         CheckBox* check = checkBoxes[i];
-        check->setText(label4[i]);
+        check->setText(list5[i]);
         hbox1->addWidget(check);
     }
+    checkBoxes[AGX_CHK]->sigToggled().connect([&](bool checked){ onEnableAGXCheckToggled(checked); });
+
     hbox1->addStretch();
 
     auto hbox = new QHBoxLayout;
@@ -425,22 +426,17 @@ CrawlerGenerator::Impl::Impl()
         [&](int id, bool checked){ onButtonToggled(id, checked); });
 
     hbox->addStretch();
-    static const char* tlabel[] = { _("&New"), _("&Import"), _("&Export") };
-    static const char* name[] = { "document-new", "document-open", "document-save" };
+
     for(int i = 0; i < NumToolButtons; ++i) {
-        toolButtons[i] = new PushButton;
-        PushButton* button = toolButtons[i];
-        const QIcon icon = QIcon::fromTheme(name[i]);
-        if(icon.isNull()) {
-            button->setText(tlabel[i]);
-        } else {
-            button->setIcon(icon);
-        }
+        const QIcon icon = QIcon::fromTheme(i == 0 ? "document-open" : "document-save");
+        PushButton* button = toolButtons[i] = new PushButton(icon, i == 0 ? _("&Import") : _("&Export"), this);
+        button->sigClicked().connect([&, i](){ i == 0 ? onImportButtonClicked() : onExportButtonClicked(); });
         hbox->addWidget(button);
     }
 
     buttonBox = new GeneratorButtonBox;
-    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
+    buttonBox->sigResetRequested().connect([&](){ initialize(); });
+    buttonBox->sigSaveRequested().connect([&](string filename){ save(filename); });
 
     initialize();
 
@@ -474,11 +470,6 @@ CrawlerGenerator::Impl::Impl()
     vbox->addWidget(new HSeparator);
     vbox->addWidget(buttonBox);
     setLayout(vbox);
-
-    toolButtons[RESET]->sigClicked().connect([&](){ onResetButtonClicked(); });
-    toolButtons[IMPORT]->sigClicked().connect([&](){ onImportButtonClicked(); });
-    toolButtons[EXPORT]->sigClicked().connect([&](){ onExportButtonClicked(); });
-    checkBoxes[AGX_CHK]->sigToggled().connect([&](bool checked){ onEnableAGXCheckToggled(checked); });
 }
 
 
@@ -557,15 +548,9 @@ void CrawlerGenerator::Impl::initialize()
 }
 
 
-void CrawlerGenerator::Impl::onResetButtonClicked()
-{
-    initialize();
-}
-
-
 void CrawlerGenerator::Impl::onImportButtonClicked()
 {
-    string filename = getOpenFileName(_("Load a configuration file"), "yaml;yml");
+    string filename = getOpenFileName(_("YAML File"), "yaml");
 
     if(!filename.empty()) {
         load2(filename);
@@ -635,7 +620,7 @@ bool CrawlerGenerator::Impl::load2(const string& filename, std::ostream& os)
 
 void CrawlerGenerator::Impl::onExportButtonClicked()
 {
-    string filename = getSaveFileName(_("Save a configuration file"), "yaml;yml");
+    string filename = getSaveFileName(_("YAML File"), "yaml");
 
     if(!filename.empty()) {
        filesystem::path path(fromUTF8(filename));

@@ -94,9 +94,10 @@ public:
 
     virtual void contextMenuEvent(QContextMenuEvent* event) override;
 
+    void reset();
     void configure();
-
     bool save(const string& filename);
+
     void onInnerDiameterChanged(const double& diameter);
     void onOuterDiameterChanged(const double& diameter);
     MappingPtr writeBody(const string& filename);
@@ -148,6 +149,8 @@ PipeGenerator::Impl::Impl()
         gridLayout->addWidget(new QLabel(list[i]), info.row, info.column - 1);
         gridLayout->addWidget(info.spin, info.row, info.column);
     }
+    doubleSpinBoxes[IN_DIA]->sigValueChanged().connect([&](double value){ onInnerDiameterChanged(value); });
+    doubleSpinBoxes[OUT_DIA]->sigValueChanged().connect([&](double value){ onOuterDiameterChanged(value); });
 
     const QStringList list2 = { _("Opening angle [deg]"), _("Inner step angle [deg]"), _("Outer step angle [deg]") };
 
@@ -166,7 +169,8 @@ PipeGenerator::Impl::Impl()
     gridLayout->addWidget(colorButton, 3, 1);
 
     buttonBox = new GeneratorButtonBox;
-    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
+    buttonBox->sigResetRequested().connect([&](){ reset(); });
+    buttonBox->sigSaveRequested().connect([&](string filename){ save(filename); });
 
     configureAct = new Action;
     configureAct->setText(_("Advanced settings"));
@@ -178,9 +182,6 @@ PipeGenerator::Impl::Impl()
     vbox->addWidget(new HSeparator);
     vbox->addWidget(buttonBox);
     setLayout(vbox);
-
-    doubleSpinBoxes[IN_DIA]->sigValueChanged().connect([&](double value){ onInnerDiameterChanged(value); });
-    doubleSpinBoxes[OUT_DIA]->sigValueChanged().connect([&](double value){ onOuterDiameterChanged(value); });
 }
 
 
@@ -195,6 +196,24 @@ void PipeGenerator::Impl::contextMenuEvent(QContextMenuEvent* event)
     Menu menu(this);
     menu.addAction(configureAct);
     menu.exec(event->globalPos());
+}
+
+
+void PipeGenerator::Impl::reset()
+{
+    for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
+        DoubleSpinInfo info = doubleSpinInfo[i];
+        info.spin = doubleSpinBoxes[i];
+        info.spin->setValue(info.value);
+    }
+
+    for(int i = 0; i < NumSpinBoxes; ++i) {
+        SpinInfo info = spinInfo[i];
+        info.spin = spinBoxes[i];
+        info.spin->setValue(info.value);
+    }
+
+    colorButton->setColor(Vector3(0.5, 0.5, 0.5));
 }
 
 

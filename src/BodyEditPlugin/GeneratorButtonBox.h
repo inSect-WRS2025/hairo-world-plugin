@@ -16,7 +16,8 @@ public:
     GeneratorButtonBox(QWidget* parent = nullptr);
     virtual ~GeneratorButtonBox();
 
-    SignalProxy<void(std::string)> sigSaveTriggered();
+    SignalProxy<void()> sigResetRequested();
+    SignalProxy<void(std::string)> sigSaveRequested();
 
 private:
     class Impl;

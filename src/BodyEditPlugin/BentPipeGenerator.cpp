@@ -63,11 +63,12 @@ public:
 
     Impl();
 
+    void reset();
     bool save(const string& filename);
+
     MappingPtr writeBody(const string& filename);
     MappingPtr writeLink();
     void writeLinkShape(Listing* elementsNode);
-
     void onBentAngleChanged(double value);
     void onInnerDiameterChanged(const double& diameter);
     void onOuterDiameterChanged(const double& diameter);
@@ -117,6 +118,8 @@ BentPipeGenerator::Impl::Impl()
         gridLayout->addWidget(new QLabel(list[i]), info.row, info.column - 1);
         gridLayout->addWidget(info.spin, info.row, info.column);
     }
+    doubleSpinBoxes[IN_DIA]->sigValueChanged().connect([&](double value){ onInnerDiameterChanged(value); });
+    doubleSpinBoxes[OUT_DIA]->sigValueChanged().connect([&](double value){ onOuterDiameterChanged(value); });
 
     const QStringList list2 = {
         _("Bent angle [deg]"), _("Bent step angle [deg]"),
@@ -131,6 +134,7 @@ BentPipeGenerator::Impl::Impl()
         gridLayout->addWidget(new QLabel(list2[i]), info.row, info.column - 1);
         gridLayout->addWidget(info.spin, info.row, info.column);
     }
+    spinBoxes[BENT_ANGLE]->sigValueChanged().connect([&](double value){ onBentAngleChanged(value); });
 
     colorButton = new ColorButton;
     colorButton->setColor(Vector3(0.5, 0.5, 0.5));
@@ -138,7 +142,8 @@ BentPipeGenerator::Impl::Impl()
     gridLayout->addWidget(colorButton, 3, 1);
 
     buttonBox = new GeneratorButtonBox;
-    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
+    buttonBox->sigResetRequested().connect([&](){ reset(); });
+    buttonBox->sigSaveRequested().connect([&](string filename){ save(filename); });
 
     auto vbox = new QVBoxLayout;
     vbox->addLayout(gridLayout);
@@ -146,16 +151,30 @@ BentPipeGenerator::Impl::Impl()
     vbox->addWidget(new HSeparator);
     vbox->addWidget(buttonBox);
     setLayout(vbox);
-
-    spinBoxes[BENT_ANGLE]->sigValueChanged().connect([&](double value){ onBentAngleChanged(value); });
-    doubleSpinBoxes[IN_DIA]->sigValueChanged().connect([&](double value){ onInnerDiameterChanged(value); });
-    doubleSpinBoxes[OUT_DIA]->sigValueChanged().connect([&](double value){ onOuterDiameterChanged(value); });
 }
 
 
 BentPipeGenerator::~BentPipeGenerator()
 {
     delete impl;
+}
+
+
+void BentPipeGenerator::Impl::reset()
+{
+    for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
+        DoubleSpinInfo info = doubleSpinInfo[i];
+        info.spin = doubleSpinBoxes[i];
+        info.spin->setValue(info.value);
+    }
+
+    for(int i = 0; i < NumSpinBoxes; ++i) {
+        SpinInfo info = spinInfo[i];
+        info.spin = spinBoxes[i];
+        info.spin->setValue(info.value);
+    }
+
+    colorButton->setColor(Vector3(0.5, 0.5, 0.5));
 }
 
 

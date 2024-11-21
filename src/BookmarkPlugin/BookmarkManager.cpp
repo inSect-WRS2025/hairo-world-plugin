@@ -109,7 +109,7 @@ void BookmarkManager::onAddButtonClicked()
 
 void BookmarkManager::onOpenButtonClicked()
 {
-    vector<string> filenames = getOpenFileNames(_("Open a project"), "cnoid");
+    vector<string> filenames = getOpenFileNames(_("CNOID File"), "cnoid");
     for(auto& filename : filenames) {
         addItem(filename.c_str());
         removeDuplicates();

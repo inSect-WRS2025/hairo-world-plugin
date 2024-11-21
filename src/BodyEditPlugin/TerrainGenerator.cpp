@@ -69,6 +69,7 @@ public:
 
     Impl();
 
+    void reset();
     bool save(const string& filename);
     void load();
 
@@ -108,7 +109,8 @@ TerrainGenerator::TerrainGenerator()
 
 
 TerrainGenerator::Impl::Impl()
-    : Dialog()
+    : Dialog(),
+      fileName("")
 {
     setWindowTitle(_("BoxTerrain Generator"));
     yamlWriter.setKeyOrderPreservationMode(true);
@@ -128,11 +130,12 @@ TerrainGenerator::Impl::Impl()
         [&](double d){ scale = d; });
 
     auto formLayout = new QFormLayout;
-    formLayout->addRow(_("Input File (.csv)"), openButton);
+    formLayout->addRow(_("CSV File"), openButton);
     formLayout->addRow(_("scale[0.1-10.0]"), scaleSpinBox);
 
     buttonBox = new GeneratorButtonBox;
-    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
+    buttonBox->sigResetRequested().connect([&](){ reset(); });
+    buttonBox->sigSaveRequested().connect([&](string filename){ save(filename); });
 
     auto vbox = new QVBoxLayout;
     vbox->addLayout(formLayout);
@@ -146,6 +149,14 @@ TerrainGenerator::Impl::Impl()
 TerrainGenerator::~TerrainGenerator()
 {
     delete impl;
+}
+
+
+void TerrainGenerator::Impl::reset()
+{
+    fileName.clear();
+
+    scaleSpinBox->setValue(1.0);
 }
 
 
@@ -175,7 +186,7 @@ bool TerrainGenerator::Impl::save(const string& filename)
 
 void TerrainGenerator::Impl::load()
 {
-    string filename = getOpenFileName(_("Load a CSV file"), "csv");
+    string filename = getOpenFileName(_("CSV File"), "csv");
     if(!filename.empty()) {
         fileName = filename.c_str();
     }

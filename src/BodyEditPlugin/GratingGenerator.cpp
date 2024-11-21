@@ -69,7 +69,9 @@ public:
 
     Impl();
 
+    void reset();
     bool save(const string& filename);
+
     void onColorButtonClicked();
     void onValueChanged();
     MappingPtr writeBody(const string& filename);
@@ -122,6 +124,11 @@ GratingGenerator::Impl::Impl()
         gridLayout->addWidget(new QLabel(list[i]), info.row, info.column - 1);
         gridLayout->addWidget(info.spin, info.row, info.column);
     }
+    doubleSpinBoxes[HEIGHT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
+    doubleSpinBoxes[FRAME_WDT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
+    doubleSpinBoxes[FRAME_HGT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
+    doubleSpinBoxes[GRID_WDT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
+    doubleSpinBoxes[GRID_HGT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
 
     const QStringList list2 = { _("Horizontal grid [-]"), _("Vertical grid [-]") };
 
@@ -133,6 +140,8 @@ GratingGenerator::Impl::Impl()
         gridLayout->addWidget(new QLabel(list2[i]), info.row, info.column - 1);
         gridLayout->addWidget(info.spin, info.row, info.column);
     }
+    spinBoxes[H_GRID]->sigValueChanged().connect([&](double value){ onValueChanged(); });
+    spinBoxes[V_GRID]->sigValueChanged().connect([&](double value){ onValueChanged(); });
 
     sizeLabel = new QLabel(_(" "));
     colorButton = new ColorButton;
@@ -143,8 +152,11 @@ GratingGenerator::Impl::Impl()
     gridLayout->addWidget(new QLabel(_("Size [m, m, m]")), 5, 0);
     gridLayout->addWidget(sizeLabel, 5, 1, 1, 3);
 
+    onValueChanged();
+
     buttonBox = new GeneratorButtonBox;
-    buttonBox->sigSaveTriggered().connect([&](string filename){ save(filename); });
+    buttonBox->sigResetRequested().connect([&](){ reset(); });
+    buttonBox->sigSaveRequested().connect([&](string filename){ save(filename); });
 
     auto vbox = new QVBoxLayout;
     vbox->addLayout(gridLayout);
@@ -152,22 +164,30 @@ GratingGenerator::Impl::Impl()
     vbox->addWidget(new HSeparator);
     vbox->addWidget(buttonBox);
     setLayout(vbox);
-
-    onValueChanged();
-
-    doubleSpinBoxes[FRAME_WDT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    doubleSpinBoxes[FRAME_HGT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    doubleSpinBoxes[GRID_WDT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    doubleSpinBoxes[GRID_HGT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    spinBoxes[H_GRID]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    spinBoxes[V_GRID]->sigValueChanged().connect([&](double value){ onValueChanged(); });
-    doubleSpinBoxes[HEIGHT]->sigValueChanged().connect([&](double value){ onValueChanged(); });
 }
 
 
 GratingGenerator::~GratingGenerator()
 {
     delete impl;
+}
+
+
+void GratingGenerator::Impl::reset()
+{
+    for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
+        DoubleSpinInfo info = doubleSpinInfo[i];
+        info.spin = doubleSpinBoxes[i];
+        info.spin->setValue(info.value);
+    }
+
+    for(int i = 0; i < NumSpinBoxes; ++i) {
+        SpinInfo info = spinInfo[i];
+        info.spin = spinBoxes[i];        
+        info.spin->setValue(info.value);
+    }
+
+    colorButton->setColor(Vector3(0.5, 0.5, 0.5));
 }
 
 
