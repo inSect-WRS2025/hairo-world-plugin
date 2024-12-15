@@ -16,10 +16,11 @@
 #include <cnoid/WorldItem>
 #include <cnoid/MultiColliderItem>
 #include <vector>
+#include "FlightEventReader.h"
 #include "Rotor.h"
 #include "Thruster.h"
 #include "gettext.h"
-#include <iostream>
+
 using namespace std;
 using namespace cnoid;
 
@@ -91,9 +92,10 @@ public:
     Vector3 gravity;
     ItemList<MultiColliderItem> colliders;
     vector<BatteryInfo> batteryInfo;
+    string flight_event_file_path;
+    vector<FlightEvent> events;
 
     double world_time_step;
-    bool is_wrs_regulation_enabled;
 
     bool initializeSimulation(SimulatorItem* simulatorItem);
     void addBody(CFDBody* cfdBody);
@@ -234,13 +236,14 @@ CFDSimulatorItem::CFDSimulatorItem()
 CFDSimulatorItemImpl::CFDSimulatorItemImpl(CFDSimulatorItem* self)
     : self(self),
       world_time_step(0.0),
-      is_wrs_regulation_enabled(false)
+      flight_event_file_path("")
 {
     cfdBodies.clear();
     thrusters.clear();
     rotors.clear();
     colliders.clear();
     batteryInfo.clear();
+    events.clear();
 
     gravity << 0.0, 0.0, -DEFAULT_GRAVITY_ACCELERATION;
 }
@@ -258,6 +261,7 @@ CFDSimulatorItemImpl::CFDSimulatorItemImpl(CFDSimulatorItem* self, const CFDSimu
     : self(self)
 {
     gravity = org.gravity;
+    flight_event_file_path = org.flight_event_file_path;
 }
 
 
@@ -280,8 +284,16 @@ bool CFDSimulatorItemImpl::initializeSimulation(SimulatorItem* simulatorItem)
     rotors.clear();
     colliders.clear();
     batteryInfo.clear();
+    events.clear();
     gravity = simulatorItem->getGravity();
     world_time_step = simulatorItem->worldTimeStep();
+
+    if(!flight_event_file_path.empty()) {
+        FlightEventReader reader;
+        if(reader.load(flight_event_file_path)) {
+            events = reader.events();
+        }
+    }
 
     const vector<SimulationBody*>& simBodies = simulatorItem->simulationBodies();
     for(auto& simBody : simBodies) {
@@ -299,12 +311,15 @@ bool CFDSimulatorItemImpl::initializeSimulation(SimulatorItem* simulatorItem)
         Body* body = link->body();
         double mass = body->mass();
         double duration = 0.0;
-        if(mass < 1.0) {
-            duration = 60.0 * 8.0;
-        } else {
-            duration = 60.0 * 16.0;
+
+        for(auto& event : events) {
+            if(mass < event.mass()) {
+                duration = event.duration();
+            }
         }
-        batteryInfo.push_back({ rotor, duration });
+        if(duration > 0.0) {
+            batteryInfo.push_back({ rotor, duration });
+        }
     }
 
     WorldItem* worldItem = simulatorItem->findOwnerItem<WorldItem>();
@@ -448,11 +463,13 @@ void CFDSimulatorItemImpl::onPreDynamics()
         }
 
         bool is_battery_empty = false;
-        for(auto& info : batteryInfo) {
-            if(info.rotor == rotor) {
-                info.duration -= world_time_step;
-                if(info.duration < 0.0) {
-                    is_battery_empty = true;
+        if(events.size()) {
+            for(auto& info : batteryInfo) {
+                if(info.rotor == rotor) {
+                    info.duration -= world_time_step;
+                    if(info.duration < 0.0) {
+                        is_battery_empty = true;
+                    }
                 }
             }
         }
@@ -482,8 +499,6 @@ void CFDSimulatorItemImpl::onPreDynamics()
                 const Vector3 f = R * (direction * (rotor->force() + rotor->forceOffset() + staticForce));
                 const Vector3 p = link->T() * rotor->p_local();
                 Vector3 tau_ext = R * (direction * (rotor->torque() + rotor->torqueOffset()));
-
-                is_battery_empty = is_wrs_regulation_enabled ? is_battery_empty : false;
                 if(rotor->on() && !is_battery_empty) {
                     link->f_ext() += f;
                     link->tau_ext() += p.cross(f) + tau_ext;
@@ -503,8 +518,11 @@ Item* CFDSimulatorItem::doCloneItem(CloneMap* cloneMap) const
 void CFDSimulatorItem::doPutProperties(PutPropertyFunction& putProperty)
 {
     SubSimulatorItem::doPutProperties(putProperty);
-    putProperty(_("WRS regulation"), impl->is_wrs_regulation_enabled,
-                changeProperty(impl->is_wrs_regulation_enabled));
+    putProperty(_("Flight event file"), FilePathProperty(impl->flight_event_file_path),
+                [this](const std::string& value){
+                    impl->flight_event_file_path = value;
+                    return true;
+                });
 }
 
 
@@ -513,6 +531,7 @@ bool CFDSimulatorItem::store(Archive& archive)
     if(!SubSimulatorItem::store(archive)) {
         return false;
     }
+    archive.writeRelocatablePath("flight_event_file_path", impl->flight_event_file_path);
     return true;
 }
 
@@ -521,6 +540,13 @@ bool CFDSimulatorItem::restore(const Archive& archive)
 {
     if(!SubSimulatorItem::restore(archive)) {
         return false;
+    }
+    string symbol;
+    if(archive.read("flight_event_file_path", symbol)) {
+        symbol = archive.resolveRelocatablePath(symbol);
+        if(!symbol.empty()) {
+            impl->flight_event_file_path = symbol;
+        }
     }
     return true;
 }

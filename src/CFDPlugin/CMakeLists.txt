@@ -1,6 +1,7 @@
 set(sources
   CFDPlugin.cpp
   CFDSimulatorItem.cpp
+  FlightEventReader.cpp
   Rotor.cpp
   Thruster.cpp
   WingDevice.cpp
@@ -8,6 +9,7 @@ set(sources
 
 set(headers
   CFDSimulatorItem.h
+  FlightEventReader.h
   Rotor.h
   Thruster.h
   WingDevice.h
