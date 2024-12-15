@@ -19,3 +19,6 @@ msgstr ""
 
 msgid "CFDSimulatorItem"
 msgstr "CFDシミュレータアイテム"
+
+msgid "WRS regulation"
+msgstr "WRS レギュレーション"
