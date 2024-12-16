@@ -16,6 +16,7 @@ namespace cnoid {
 
 FlightEvent::FlightEvent()
 {
+    name_  = "";
     mass_ = 0.0;
     duration_ = 0.0;
 }
@@ -23,6 +24,7 @@ FlightEvent::FlightEvent()
 
 FlightEvent::FlightEvent(const FlightEvent& org)
 {
+    name_ = org.name_;
     mass_ = org.mass_;
     duration_ = org.duration_;
 }
