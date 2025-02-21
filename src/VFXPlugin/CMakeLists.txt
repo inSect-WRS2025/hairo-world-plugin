@@ -24,7 +24,7 @@ choreonoid_make_header_public(VFXVisionSimulatorItem.h)
 set(target CnoidVFXPlugin)
 choreonoid_make_gettext_mo_files(${target} mofiles)
 choreonoid_add_plugin(${target} ${sources} ${mofiles} HEADERS ${headers})
-target_link_libraries(${target} PUBLIC CnoidBodyPlugin CnoidSimpleColliderPlugin)
+target_link_libraries(${target} PUBLIC CnoidBodyPlugin CnoidGLVisionSimulatorPlugin CnoidSimpleColliderPlugin)
 
 include(ChoreonoidVFXPluginBuildFunctions.cmake)
 if(CHOREONOID_INSTALL_SDK)
