@@ -1,7 +1,7 @@
 format: ChoreonoidBody
 formatVersion: 1.0
 angleUnit: radian
-name: Gen3liteNG
+name: Gen3lite
 
 links:
   -
@@ -17,7 +17,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts2/base_link.STL" }
+        geometry: { type: Resource, uri: "parts/base_link.STL" }
         appearance: &BodyAppearance { material: { diffuseColor: [ 0.803, 0.824, 0.820 ] } }
   -
     name: joint_1
@@ -37,7 +37,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts2/shoulder_link.STL" }
+        geometry: { type: Resource, uri: "parts/shoulder_link.STL" }
         appearance: *BodyAppearance
   -
     name: joint_2
@@ -58,7 +58,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts2/arm_link.STL" }
+        geometry: { type: Resource, uri: "parts/arm_link.STL" }
         appearance: *BodyAppearance
   -
     name: joint_3
@@ -79,7 +79,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts2/forearm_link.STL" }
+        geometry: { type: Resource, uri: "parts/forearm_link.STL" }
         appearance: *BodyAppearance
   -
     name: joint_4
@@ -100,7 +100,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts2/lower_wrist_link.STL" }
+        geometry: { type: Resource, uri: "parts/lower_wrist_link.STL" }
         appearance: *BodyAppearance
   -
     name: joint_5
@@ -121,7 +121,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts2/upper_wrist_link.STL" }
+        geometry: { type: Resource, uri: "parts/upper_wrist_link.STL" }
         appearance: *BodyAppearance
   -
     name: joint_6
@@ -138,3 +138,100 @@ links:
     parent: joint_6
     jointType: fixed
     jointAxis: [ 0, 0, 1 ]
+  -
+    name: gripper_base_joint
+    parent: joint_6
+    jointType: fixed
+    centerOfMass: [ 4.03E-06, 1.08E-05, 0.041397 ]
+    mass: 0.1395
+    inertia: [
+      0.00011614, 1E-08, 4E-08,
+      0, 0.00010327, 0,
+      0, 0, 9.707E-05 ]
+    elements:
+      -
+        type: Shape
+        geometry: { type: Resource, uri: "parts/gripper_base_link.STL" }
+        appearance: *BodyAppearance
+  -
+    name: right_finger_bottom_joint
+    parent: gripper_base_joint
+    translation: [ 0, -0.030501, 0.070003 ]
+    rotation: [ 0, 1, 0, 1.5708 ]
+    jointType: revolute
+    jointAxis: [ 0, 0, 1 ]
+    jointRange: [ -0.09, 0.96 ]
+    maxJointVelocity: 0.6
+    jointId: 6
+    centerOfMass: [ 0.020257, 0.0063483, 6.991E-05 ]
+    mass: 0.018385
+    inertia: [
+      2.29E-06, 1.43E-06, 0,
+      0, 4.56E-06, 0,
+      0, 0, 4.77E-06 ]
+    elements:
+      -
+        type: Shape
+        geometry: { type: Resource, uri: "parts/right_finger_prox_link.STL" }
+        appearance: *BodyAppearance
+  -
+    name: right_finger_tip_joint
+    parent: right_finger_bottom_joint
+    translation: [ -0.045636, 0.020423, 0 ]
+    jointType: revolute
+    jointAxis: [ 0, 0, 1 ]
+    jointRange: [ -0.50, 0.21 ]
+    maxJointVelocity: 1000
+    jointId: 7
+    centerOfMass: [ 0.018488, 0.0011091, 0 ]
+    mass: 0.010748
+    inertia: [
+      6.3E-07, 3.2E-07, 0,
+      0, 1.83E-06, 0,
+      0, 0, 1.61E-06 ]
+    elements:
+      -
+        type: Shape
+        geometry: { type: Resource, uri: "parts/right_finger_dist_link.STL" }
+        appearance: &FingerAppearance { material: { diffuseColor: [ 0, 0.055 0.525, 1 ] } }
+  -
+    name: left_finger_bottom_joint
+    parent: gripper_base_joint
+    translation: [ 0, 0.0305, 0.070003 ]
+    rotation: [ 0, 1, 0, 1.5708 ]
+    jointType: revolute
+    jointAxis: [ 0, 0, 1 ]
+    jointRange: [ -0.96, 0.09 ]
+    maxJointVelocity: 0.6
+    jointId: 8
+    centerOfMass: [ 0.020257, 0.0063483, 6.99E-05 ]
+    mass: 0.018385
+    inertia: [
+      2.29E-06, 1.43E-06, 0,
+      0, 4.56E-06, 0,
+      0, 0, 4.77E-06 ]
+    elements:
+      -
+        type: Shape
+        geometry: { type: Resource, uri: "parts/left_finger_prox_link.STL" }
+        appearance: *BodyAppearance
+  -
+    name: left_finger_tip_joint
+    parent: left_finger_bottom_joint
+    translation: [ -0.045636, -0.020423, 6.9901E-05 ]
+    jointType: revolute
+    jointAxis: [ 0, 0, -1 ]
+    jointRange: [ -0.50, 0.21 ]
+    maxJointVelocity: 1000
+    jointId: 9
+    centerOfMass: [ -0.018488, 0.0011091, 0 ]
+    mass: 0.010748
+    inertia: [
+      6.3E-07, 3.2E-07, 0,
+      0, 1.83E-06, 0,
+      0, 0, 1.61E-06 ]
+    elements:
+      -
+        type: Shape
+        geometry: { type: Resource, uri: "parts/left_finger_dist_link.STL" }
+        appearance: *FingerAppearance

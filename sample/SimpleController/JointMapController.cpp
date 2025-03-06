@@ -140,17 +140,17 @@ public:
                 armJoints[6] = body->link("joint_7");
                 break;
             case GEN3LITE:
-                armJoints[0] = body->link("J0");
-                armJoints[1] = body->link("J1");
-                armJoints[2] = body->link("J2");
-                armJoints[3] = body->link("J3");
-                armJoints[4] = body->link("J4");
-                armJoints[5] = body->link("GRIPPER_FRAME");
+                armJoints[0] = body->link("joint_1");
+                armJoints[1] = body->link("joint_2");
+                armJoints[2] = body->link("joint_3");
+                armJoints[3] = body->link("joint_4");
+                armJoints[4] = body->link("joint_5");
+                armJoints[5] = body->link("joint_6");
 
-                fingerJoints[0] = body->link("RIGHT_FINGER_PROX");
-                fingerJoints[1] = body->link("RIGHT_FINGER_DIST");
-                fingerJoints[2] = body->link("LEFT_FINGER_PROX");
-                fingerJoints[3] = body->link("LEFT_FINGER_DIST");
+                fingerJoints[0] = body->link("right_finger_bottom_joint");
+                fingerJoints[1] = body->link("right_finger_tip_joint");
+                fingerJoints[2] = body->link("left_finger_bottom_joint");
+                fingerJoints[3] = body->link("left_finger_tip_joint");
                 break;
             default:
                 break;
