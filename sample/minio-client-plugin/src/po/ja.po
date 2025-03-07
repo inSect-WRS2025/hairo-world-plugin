@@ -34,3 +34,6 @@ msgstr "オブジェクト"
 
 msgid "Alias"
 msgstr "エイリアス"
+
+msgid "{0} has been uploaded."
+msgstr "{0} がアップロードされました．"

@@ -7,8 +7,10 @@
 #include <cnoid/ComboBox>
 #include <cnoid/Dialog>
 #include <cnoid/ExtensionManager>
+#include <cnoid/Format>
 #include <cnoid/LineEdit>
 #include <cnoid/MainMenu>
+#include <cnoid/MessageView>
 #include <cnoid/Separator>
 #include <cnoid/TreeWidget>
 #include <cnoid/UTF8>
@@ -52,9 +54,9 @@ public:
 
     Signal<void(const string& object_name)> sigObjectDownloaded_;
 
+    QHBoxLayout* elementLayout;
     QDialogButtonBox* buttonBox;
 
-    MinIOClientPtr mc0;
     MinIOClientPtr mc1;
     vector<MinIOClientPtr> clients;
 };
@@ -112,12 +114,15 @@ ObjectBrowser::Impl::Impl()
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
 
+    elementLayout = new QHBoxLayout;
+
     auto layout = new QHBoxLayout;
     layout->addWidget(new QLabel(_("Alias")));
     layout->addWidget(aliasLineEdit);
     layout->addWidget(bucketComboBox);
     layout->addWidget(button1);
     layout->addWidget(button2);
+    layout->addLayout(elementLayout);
     // layout->addStretch();
 
     auto mainLayout = new QVBoxLayout;
@@ -143,6 +148,28 @@ ObjectBrowser::Impl::~Impl()
 }
 
 
+void ObjectBrowser::addWidget(QWidget* widget)
+{
+    impl->elementLayout->addWidget(widget);
+}
+
+
+void ObjectBrowser::putObject(const QString& fileName, const QString& newPath)
+{
+    QString aliasName = impl->aliasLineEdit->text();
+    QString bucketName = impl->bucketComboBox->currentText();
+
+    if(!bucketName.isEmpty()) {
+        auto mc = new MinIOClient;
+        mc->setAlias(aliasName);
+        mc->setBucket(bucketName);
+        mc->sigObjectUploaded().connect([&](string object_name){
+            MessageView::instance()->putln(formatR(_("{0} has been uploaded."), object_name)); });
+        mc->putObject(fileName, newPath);
+    }
+}
+
+
 SignalProxy<void(const string& object_name)> ObjectBrowser::sigObjectDownloaded()
 {
     return impl->sigObjectDownloaded_;
@@ -153,11 +180,11 @@ void ObjectBrowser::Impl::onTextEdited(const QString& text)
 {
     bucketComboBox->clear();
 
-    mc0 = new MinIOClient;
-    mc0->setAlias(text);
+    auto mc = new MinIOClient;
+    mc->setAlias(text);
     if(!text.isEmpty()) {
-        mc0->sigBucketListed().connect([&](vector<string> bucket_names){ onBucketListed(bucket_names); });
-        mc0->listBuckets();
+        mc->sigBucketListed().connect([&](vector<string> bucket_names){ onBucketListed(bucket_names); });
+        mc->listBuckets();
     }
 }
 
