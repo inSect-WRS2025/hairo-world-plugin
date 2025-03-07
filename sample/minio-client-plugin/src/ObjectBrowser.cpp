@@ -18,6 +18,8 @@
 #include <cnoid/MinIOClient>
 #include <QBoxLayout>
 #include <QDialogButtonBox>
+#include <QDir>
+#include <QInputDialog>
 #include <QLabel>
 #include <QTreeWidgetItem>
 #include <vector>
@@ -44,6 +46,7 @@ public:
 
     void onTextEdited(const QString& text);
     void onBucketListed(vector<string> bucket_names);
+    void onNewButtonClicked();
     void onUpdateButtonClicked();
     void onDownloadButtonClicked();
     void onObjectListed(vector<string> object_names);
@@ -98,15 +101,20 @@ ObjectBrowser::Impl::Impl()
     bucketComboBox = new ComboBox;
     bucketComboBox->sigCurrentIndexChanged().connect([&](int index){ onUpdateButtonClicked(); });;
 
-    const QIcon icon1 = QIcon::fromTheme("view-refresh");
+    const QIcon newIcon = QIcon::fromTheme("folder-new");
     auto button1 = new PushButton;
-    button1->setIcon(icon1);
-    button1->sigClicked().connect([&](){ onUpdateButtonClicked(); });
+    button1->setIcon(newIcon);
+    button1->sigClicked().connect([&](){ onNewButtonClicked(); });
 
-    const QIcon icon2 = QIcon::fromTheme("emblem-downloads");
+    const QIcon updateIcon = QIcon::fromTheme("view-refresh");
     auto button2 = new PushButton;
-    button2->setIcon(icon2);
-    button2->sigClicked().connect([&](){ onDownloadButtonClicked(); });
+    button2->setIcon(updateIcon);
+    button2->sigClicked().connect([&](){ onUpdateButtonClicked(); });
+
+    const QIcon downloadIcon = QIcon::fromTheme("emblem-downloads");
+    auto button3 = new PushButton;
+    button3->setIcon(downloadIcon);
+    button3->sigClicked().connect([&](){ onDownloadButtonClicked(); });
 
     treeWidget = new TreeWidget(this);
     treeWidget->setHeaderLabels(QStringList() << _("Download") << _("Object"));
@@ -122,6 +130,7 @@ ObjectBrowser::Impl::Impl()
     layout->addWidget(bucketComboBox);
     layout->addWidget(button1);
     layout->addWidget(button2);
+    layout->addWidget(button3);
     layout->addLayout(elementLayout);
     // layout->addStretch();
 
@@ -180,10 +189,10 @@ void ObjectBrowser::Impl::onTextEdited(const QString& text)
 {
     bucketComboBox->clear();
 
-    auto mc = new MinIOClient;
-    mc->setAlias(text);
     if(!text.isEmpty()) {
+        auto mc = new MinIOClient;
         mc->sigBucketListed().connect([&](vector<string> bucket_names){ onBucketListed(bucket_names); });
+        mc->setAlias(text);
         mc->listBuckets();
     }
 }
@@ -193,6 +202,26 @@ void ObjectBrowser::Impl::onBucketListed(vector<string> bucket_names)
 {
     for(auto& bucket_name : bucket_names) {
         bucketComboBox->addItem(bucket_name.c_str());
+    }
+}
+
+
+void ObjectBrowser::Impl::onNewButtonClicked()
+{
+    QString aliasName = aliasLineEdit->text();
+    if(aliasName.isEmpty()) {
+        return;
+    }
+
+    bool ok;
+    QString text = QInputDialog::getText(this, _("Create Bucket"),
+        _("Bucket name:"), QLineEdit::Normal, QDir::home().dirName(), &ok);
+
+    if(ok && !text.isEmpty()) {
+        auto mc = new MinIOClient;
+        mc->setAlias(aliasName);
+        mc->createBucket(text);
+        onTextEdited(aliasName);
     }
 }
 

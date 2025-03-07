@@ -37,3 +37,9 @@ msgstr "エイリアス"
 
 msgid "{0} has been uploaded."
 msgstr "{0} がアップロードされました．"
+
+msgid "Create Bucket"
+msgstr "バケットの作成"
+
+msgid "Bucket name:"
+msgstr "バケット名:"

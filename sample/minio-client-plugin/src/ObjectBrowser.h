@@ -19,13 +19,13 @@ public:
     static void initializeClass(ExtensionManager* ext);
     static ObjectBrowser* instance();
 
+    ObjectBrowser();
+    virtual ~ObjectBrowser();
+
     void addWidget(QWidget* widget);
     void putObject(const QString& fileName, const QString& newPath);
 
     SignalProxy<void(const std::string& object_name)> sigObjectDownloaded();
-
-    ObjectBrowser();
-    virtual ~ObjectBrowser();
 
 private:
     class Impl;
