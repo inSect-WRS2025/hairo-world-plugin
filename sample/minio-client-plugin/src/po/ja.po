@@ -22,3 +22,15 @@ msgstr "MinIO Clientが見つかりました．"
 
 msgid "MinIO Client not found."
 msgstr "MinIO Clientが見つかりませんでした．"
+
+msgid "Object Browser"
+msgstr "オブジェクトブラウザ"
+
+msgid "Download"
+msgstr "ダウンロード"
+
+msgid "Object"
+msgstr "オブジェクト"
+
+msgid "Alias"
+msgstr "エイリアス"

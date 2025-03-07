@@ -10,14 +10,17 @@ endif()
 set(sources
   MinIOClient.cpp
   MinIOClientPlugin.cpp
+  ObjectBrowser.cpp
 )
 
 set(headers
   MinIOClient.h
+  ObjectBrowser.h
   exportdecl.h
 )
 
 choreonoid_make_header_public(MinIOClient.h)
+choreonoid_make_header_public(ObjectBrowser.h)
 
 set(target CnoidMinIOClientPlugin)
 choreonoid_make_gettext_mo_files(${target} mofiles)

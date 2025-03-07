@@ -5,6 +5,7 @@
 #include <cnoid/Format>
 #include <cnoid/Plugin>
 #include "MinIOClient.h"
+#include "ObjectBrowser.h"
 
 using namespace cnoid;
 
@@ -20,6 +21,7 @@ public:
     virtual bool initialize() override
     {
         MinIOClient::initializeClass(this);
+        ObjectBrowser::initializeClass(this);
         return true;
     }
 
