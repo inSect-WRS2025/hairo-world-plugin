@@ -40,7 +40,7 @@ public:
     double joy[2];
     int radius;
 
-    Signal<void(double h_position, double v_position)> sigAxis;
+    Signal<void(const double& h_position, const double& v_position)> sigAxis;
 
     void paintEvent(QPaintEvent* event);
     void mousePressEvent(QMouseEvent* event);
@@ -99,7 +99,7 @@ void AxisWidget::setValue(const int& id, const double& value)
 }
 
 
-SignalProxy<void(double h_position, double v_position)> AxisWidget::sigAxis()
+SignalProxy<void(const double& h_position, const double& v_position)> AxisWidget::sigAxis()
 {
     return impl->sigAxis;
 }

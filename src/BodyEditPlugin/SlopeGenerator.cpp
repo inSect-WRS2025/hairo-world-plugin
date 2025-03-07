@@ -118,7 +118,7 @@ SlopeGenerator::Impl::Impl()
 
     buttonBox = new GeneratorButtonBox;
     buttonBox->sigResetRequested().connect([&](){ reset(); });
-    buttonBox->sigSaveRequested().connect([&](string filename){ save(filename); });
+    buttonBox->sigSaveRequested().connect([&](const string& filename){ save(filename); });
 
     auto vbox = new QVBoxLayout;
     vbox->addLayout(gridLayout);

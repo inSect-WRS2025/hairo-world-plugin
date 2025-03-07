@@ -144,14 +144,14 @@ public:
 
     enum CodeType { PHITS, QAD };
 
-    SignalProxy<void(double value)> sigValueChanged() { return sigValueChanged_; }
-    SignalProxy<void(string filename)> sigReadPHITSData() { return sigReadPHITSData_; }
+    SignalProxy<void(const double& value)> sigValueChanged() { return sigValueChanged_; }
+    SignalProxy<void(const string& filename)> sigReadPHITSData() { return sigReadPHITSData_; }
 
     ComboBox* plainComboBox;
     DoubleSpinBox* zSpinBox;
     Slider* zSlider;
-    Signal<void(double value)> sigValueChanged_;
-    Signal<void(string filename)> sigReadPHITSData_;
+    Signal<void(const double& value)> sigValueChanged_;
+    Signal<void(const string& filename)> sigReadPHITSData_;
 
     bool readPHITSData(const string& filename);
     void start(bool checked);
@@ -282,7 +282,7 @@ void CrossSectionItem::Impl::initialize()
 {
     config->sigValueChanged().connect([&](double value){ onValueChanged(); });
     config->plainComboBox->sigCurrentIndexChanged().connect([&](int index){ onValueChanged(); });
-    config->sigReadPHITSData().connect([&](string filename){ onReadPHITSData(filename); });
+    config->sigReadPHITSData().connect([&](const string& filename){ onReadPHITSData(filename); });
 }
 
 
@@ -651,9 +651,9 @@ DoseConfigDialog::DoseConfigDialog()
     vbox->addWidget(buttonBox);
     setLayout(vbox);
 
-    phitsRunner.sigReadPHITSData().connect([&](string filename){ readPHITSData(filename); });
+    phitsRunner.sigReadPHITSData().connect([&](const string& filename){ readPHITSData(filename); });
     for(int i = 0; i < MAX_PROCESS; ++i) {
-        qadRunners[i].sigReadPHITSData().connect([&](string filename){ readPHITSData(filename); });
+        qadRunners[i].sigReadPHITSData().connect([&](const string& filename){ readPHITSData(filename); });
     }
 
     defaultNuclideTableFile = toUTF8((shareDirPath() / "default" / "nuclides.yaml").string());

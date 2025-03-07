@@ -17,7 +17,7 @@ public:
     FileDroppableWidget(QWidget* parent = nullptr);
     virtual ~FileDroppableWidget();
 
-    SignalProxy<void(std::string& filename)> sigFileDropped() { return sigFileDropped_; }
+    SignalProxy<void(const std::string& filename)> sigFileDropped() { return sigFileDropped_; }
 
 protected:
     virtual void dragEnterEvent(QDragEnterEvent* event) override;
@@ -28,7 +28,7 @@ protected:
 private:
     bool load(const std::string& filename);
 
-    Signal<void(std::string& filename)> sigFileDropped_;
+    Signal<void(const std::string& filename)> sigFileDropped_;
 };
 
 }

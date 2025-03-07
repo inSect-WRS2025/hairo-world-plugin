@@ -34,7 +34,7 @@ void ColorButton::setColor(const QColor& color)
 }
 
 
-SignalProxy<void(Vector3)> ColorButton::sigColorSelected()
+SignalProxy<void(const Vector3& color)> ColorButton::sigColorSelected()
 {
     return sigColorSelected_;
 }

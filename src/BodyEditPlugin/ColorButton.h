@@ -19,10 +19,10 @@ public:
     void setColor(const Vector3& color);
     Vector3 color() const { return color_; }
 
-    SignalProxy<void(Vector3)> sigColorSelected();
+    SignalProxy<void(const Vector3& color)> sigColorSelected();
 
 private:
-    Signal<void(Vector3)> sigColorSelected_;
+    Signal<void(const Vector3& color)> sigColorSelected_;
     Vector3 color_;
 
     void setColor(const QColor& color);

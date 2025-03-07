@@ -37,11 +37,11 @@ public:
     Process process4;
     Process process5;
 
-    Signal<void(string bucket_name)> sigBucketCreated_;
-    Signal<void(string bucket_name)> sigBucketDeleted_;
-    Signal<void(string object_name)> sigObjectUploaded_;
-    Signal<void(string object_name)> sigObjectDownloaded_;
-    Signal<void(string object_name)> sigObjectDeleted_;
+    Signal<void(const string& bucket_name)> sigBucketCreated_;
+    Signal<void(const string& bucket_name)> sigBucketDeleted_;
+    Signal<void(const string& object_name)> sigObjectUploaded_;
+    Signal<void(const string& object_name)> sigObjectDownloaded_;
+    Signal<void(const string& object_name)> sigObjectDeleted_;
     Signal<void(vector<string> object_names)> sigObjectListed_;
 
     QString aliasName;
@@ -178,31 +178,31 @@ void MinIOClient::listObjects()
 }
 
 
-SignalProxy<void(string bucket_name)> MinIOClient::sigBucketCreated()
+SignalProxy<void(const string& bucket_name)> MinIOClient::sigBucketCreated()
 {
     return impl->sigBucketCreated_;
 }
 
 
-SignalProxy<void(string bucket_name)> MinIOClient::sigBucketDeleted()
+SignalProxy<void(const string& bucket_name)> MinIOClient::sigBucketDeleted()
 {
     return impl->sigBucketDeleted_;
 }
 
 
-SignalProxy<void(string filename)> MinIOClient::sigObjectUploaded()
+SignalProxy<void(const string& filename)> MinIOClient::sigObjectUploaded()
 {
     return impl->sigObjectUploaded_;
 }
 
 
-SignalProxy<void(string filename)> MinIOClient::sigObjectDownloaded()
+SignalProxy<void(const string& filename)> MinIOClient::sigObjectDownloaded()
 {
     return impl->sigObjectDownloaded_;
 }
 
 
-SignalProxy<void(string filename)> MinIOClient::sigObjectDeleted()
+SignalProxy<void(const string& filename)> MinIOClient::sigObjectDeleted()
 {
     return impl->sigObjectDeleted_;
 }

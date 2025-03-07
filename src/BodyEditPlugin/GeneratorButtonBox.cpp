@@ -35,7 +35,7 @@ public:
     QString fileName;
 
     Signal<void()> sigResetRequested_;
-    Signal<void(string)> sigSaveRequested_;
+    Signal<void(const string& filename)> sigSaveRequested_;
 };
 
 }
@@ -81,7 +81,7 @@ SignalProxy<void()> GeneratorButtonBox::sigResetRequested()
 }
 
 
-SignalProxy<void(string)> GeneratorButtonBox::sigSaveRequested()
+SignalProxy<void(const string& filename)> GeneratorButtonBox::sigSaveRequested()
 {
     return impl->sigSaveRequested_;
 }

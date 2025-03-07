@@ -36,11 +36,11 @@ public:
     void deleteObject(const QString& objectKey);
     void listObjects();
 
-    SignalProxy<void(std::string bucket_name)> sigBucketCreated();
-    SignalProxy<void(std::string bucket_name)> sigBucketDeleted();
-    SignalProxy<void(std::string object_name)> sigObjectUploaded();
-    SignalProxy<void(std::string object_name)> sigObjectDownloaded();
-    SignalProxy<void(std::string object_name)> sigObjectDeleted();
+    SignalProxy<void(const std::string& bucket_name)> sigBucketCreated();
+    SignalProxy<void(const std::string& bucket_name)> sigBucketDeleted();
+    SignalProxy<void(const std::string& object_name)> sigObjectUploaded();
+    SignalProxy<void(const std::string& object_name)> sigObjectDownloaded();
+    SignalProxy<void(const std::string& object_name)> sigObjectDeleted();
     SignalProxy<void(std::vector<std::string> object_names)> sigObjectListed();
 
 private:

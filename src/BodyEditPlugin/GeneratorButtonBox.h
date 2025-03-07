@@ -17,7 +17,7 @@ public:
     virtual ~GeneratorButtonBox();
 
     SignalProxy<void()> sigResetRequested();
-    SignalProxy<void(std::string)> sigSaveRequested();
+    SignalProxy<void(const std::string& filename)> sigSaveRequested();
 
 private:
     class Impl;

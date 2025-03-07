@@ -436,7 +436,7 @@ CrawlerGenerator::Impl::Impl()
 
     buttonBox = new GeneratorButtonBox;
     buttonBox->sigResetRequested().connect([&](){ initialize(); });
-    buttonBox->sigSaveRequested().connect([&](string filename){ save(filename); });
+    buttonBox->sigSaveRequested().connect([&](const string& filename){ save(filename); });
 
     initialize();
 
