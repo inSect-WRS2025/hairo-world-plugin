@@ -179,7 +179,9 @@ void MinIOClient::getObject(const QString& fileName, const QString& objectKey)
 
 void MinIOClient::deleteObject(const QString& objectKey)
 {
-    impl->process5.start("mc", QStringList() << "rm" << objectKey);
+    QString str = QString("%1/%2/%3")
+        .arg(impl->aliasName).arg(impl->bucketName).arg(objectKey);
+    impl->process5.start("mc", QStringList() << "rm" << str);
 }
 
 

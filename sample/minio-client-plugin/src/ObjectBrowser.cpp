@@ -49,7 +49,9 @@ public:
     void onNewButtonClicked();
     void onUpdateButtonClicked();
     void onDownloadButtonClicked();
+    void onDeleteButtonClicked();
     void onObjectListed(vector<string> object_names);
+    QStringList checkedObjects() const;
 
     LineEdit* aliasLineEdit;
     ComboBox* bucketComboBox;
@@ -61,7 +63,7 @@ public:
     QDialogButtonBox* buttonBox;
 
     MinIOClientPtr mc1;
-    vector<MinIOClientPtr> clients;
+    vector<MinIOClientPtr> downloaders;
 };
 
 }
@@ -93,7 +95,7 @@ ObjectBrowser::ObjectBrowser()
 ObjectBrowser::Impl::Impl()
     : Dialog()
 {
-    clients.clear();
+    downloaders.clear();
 
     aliasLineEdit = new LineEdit;
     aliasLineEdit->sigTextEdited().connect([&](const QString& text){ onTextEdited(text); });
@@ -116,6 +118,11 @@ ObjectBrowser::Impl::Impl()
     button3->setIcon(downloadIcon);
     button3->sigClicked().connect([&](){ onDownloadButtonClicked(); });
 
+    const QIcon deleteIcon = QIcon::fromTheme("user-trash");
+    auto button4 = new PushButton;
+    button4->setIcon(deleteIcon);
+    button4->sigClicked().connect([&](){ onDeleteButtonClicked(); });
+
     treeWidget = new TreeWidget(this);
     treeWidget->setHeaderLabels(QStringList() << _("Download") << _("Object"));
 
@@ -131,6 +138,7 @@ ObjectBrowser::Impl::Impl()
     layout->addWidget(button1);
     layout->addWidget(button2);
     layout->addWidget(button3);
+    layout->addWidget(button4);
     layout->addLayout(elementLayout);
     // layout->addStretch();
 
@@ -245,18 +253,12 @@ void ObjectBrowser::Impl::onUpdateButtonClicked()
 
 void ObjectBrowser::Impl::onDownloadButtonClicked()
 {
-    clients.clear();
+    downloaders.clear();
 
     QString aliasName = aliasLineEdit->text();
     QString bucketName = bucketComboBox->currentText();
 
-    QStringList items;
-    for(int i = 0; i < treeWidget->topLevelItemCount(); ++i) {
-        auto item = treeWidget->topLevelItem(i);
-        if(item->checkState(0) == Qt::Checked) {
-            items << item->text(1);
-        }
-    }
+    QStringList items = checkedObjects();
 
     for(auto& objectName : items) {
         filesystem::path objectPath(fromUTF8(aliasName.toStdString() + "/" + bucketName.toStdString()));
@@ -264,10 +266,24 @@ void ObjectBrowser::Impl::onDownloadButtonClicked()
         QString fileName = QString("./minio_ws/%1")
             .arg(objectName);
 
-        auto client = new MinIOClient(aliasName, bucketName);
-        client->sigObjectDownloaded().connect([&](string object_name){ sigObjectDownloaded_(object_name); });
-        clients.push_back(client);
-        client->getObject(fileName, object_key.c_str());
+        auto mc = new MinIOClient(aliasName, bucketName);
+        mc->sigObjectDownloaded().connect([&](string object_name){ sigObjectDownloaded_(object_name); });
+        downloaders.push_back(mc);
+        mc->getObject(fileName, object_key.c_str());
+    }
+}
+
+
+void ObjectBrowser::Impl::onDeleteButtonClicked()
+{
+    QString aliasName = aliasLineEdit->text();
+    QString bucketName = bucketComboBox->currentText();
+
+    QStringList items = checkedObjects();
+
+    for(auto& objectName : items) {
+        auto mc = new MinIOClient(aliasName, bucketName);
+        mc->deleteObject(objectName);
     }
 }
 
@@ -284,4 +300,17 @@ void ObjectBrowser::Impl::onObjectListed(vector<string> object_names)
         auto item = treeWidget->topLevelItem(0);
         treeWidget->setCurrentItem(item);
     }
+}
+
+
+QStringList ObjectBrowser::Impl::checkedObjects() const
+{
+    QStringList items;
+    for(int i = 0; i < treeWidget->topLevelItemCount(); ++i) {
+        auto item = treeWidget->topLevelItem(i);
+        if(item->checkState(0) == Qt::Checked) {
+            items << item->text(1);
+        }
+    }
+    return items;
 }
