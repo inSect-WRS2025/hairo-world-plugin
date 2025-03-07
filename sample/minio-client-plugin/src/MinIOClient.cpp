@@ -29,6 +29,7 @@ public:
     void onProcess3Finished(int exitCode, QProcess::ExitStatus exitStatus);
     void onProcess4Finished(int exitCode, QProcess::ExitStatus exitStatus);
     void onProcess5Finished(int exitCode, QProcess::ExitStatus exitStatus);
+    void onProcess6Finished(int exitCode, QProcess::ExitStatus exitStatus);
 
     Process process0;
     Process process1;
@@ -36,9 +37,11 @@ public:
     Process process3;
     Process process4;
     Process process5;
+    Process process6;
 
     Signal<void(const string& bucket_name)> sigBucketCreated_;
     Signal<void(const string& bucket_name)> sigBucketDeleted_;
+    Signal<void(vector<string> bucket_names)> sigBucketListed_;
     Signal<void(const string& object_name)> sigObjectUploaded_;
     Signal<void(const string& object_name)> sigObjectDownloaded_;
     Signal<void(const string& object_name)> sigObjectDeleted_;
@@ -93,6 +96,8 @@ MinIOClient::Impl::Impl()
         [this](int exitCode, QProcess::ExitStatus exitStatus){ onProcess4Finished(exitCode, exitStatus); });
     QObject::connect(&process5, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         [this](int exitCode, QProcess::ExitStatus exitStatus){ onProcess5Finished(exitCode, exitStatus); });
+    QObject::connect(&process6, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+        [this](int exitCode, QProcess::ExitStatus exitStatus){ onProcess6Finished(exitCode, exitStatus); });
 }
 
 
@@ -148,25 +153,33 @@ void MinIOClient::deleteBucket(const QString& bucketName)
 }
 
 
+void MinIOClient::listBuckets()
+{
+    QString str = QString("%1/")
+        .arg(impl->aliasName);
+        impl->process2.start("mc", QStringList() << "ls" << str);
+}
+
+
 void MinIOClient::putObject(const QString& fileName, const QString& newPath)
 {
     filesystem::path filePath(fileName.toStdString());
     string filename = filePath.filename().string();
     QString str = QString("%1/%2/%3/%4")
         .arg(impl->aliasName).arg(impl->bucketName).arg(newPath).arg(filename.c_str());
-    impl->process2.start("mc", QStringList() << "cp" << fileName << str);
+    impl->process3.start("mc", QStringList() << "cp" << fileName << str);
 }
 
 
 void MinIOClient::getObject(const QString& fileName, const QString& objectKey)
 {
-    impl->process3.start("mc", QStringList() << "get" << objectKey << fileName);
+    impl->process4.start("mc", QStringList() << "get" << objectKey << fileName);
 }
 
 
 void MinIOClient::deleteObject(const QString& objectKey)
 {
-    impl->process4.start("mc", QStringList() << "rm" << objectKey);
+    impl->process5.start("mc", QStringList() << "rm" << objectKey);
 }
 
 
@@ -174,7 +187,7 @@ void MinIOClient::listObjects()
 {
     QString str = QString("%1/%2")
         .arg(impl->aliasName).arg(impl->bucketName);
-    impl->process5.start("mc", QStringList() << "ls" << "--recursive" << str);
+    impl->process6.start("mc", QStringList() << "ls" << "--recursive" << str);
 }
 
 
@@ -187,6 +200,12 @@ SignalProxy<void(const string& bucket_name)> MinIOClient::sigBucketCreated()
 SignalProxy<void(const string& bucket_name)> MinIOClient::sigBucketDeleted()
 {
     return impl->sigBucketDeleted_;
+}
+
+
+SignalProxy<void(vector<string> bucket_names)> MinIOClient::sigBucketListed()
+{
+    return impl->sigBucketListed_;
 }
 
 
@@ -250,12 +269,20 @@ void MinIOClient::Impl::onProcess2Finished(int exitCode, QProcess::ExitStatus ex
     if(exitStatus != QProcess::NormalExit || exitCode != 0) {
 
     } else {
-        // put object
+        // list buckets
+        QStringList items;
+        vector<string> buckets;
         QString text(process2.readAllStandardOutput());
-        QStringList list = text.split("`");
-        if(!text.contains("ERROR") && list.size() != 1) {
-            sigObjectUploaded_(list[3].toStdString());
+        QStringList list = text.split("\n");
+        for(int i = 0; i < list.size(); ++i) {
+            QStringList list2 = list[i].split(" ");
+            QString bucketName = list2[list2.size() - 1];
+            if(!bucketName.isEmpty()) {
+                items << bucketName;
+                buckets.push_back(bucketName.toStdString());
+            }
         }
+        sigBucketListed_(buckets);
     }
 }
 
@@ -265,11 +292,11 @@ void MinIOClient::Impl::onProcess3Finished(int exitCode, QProcess::ExitStatus ex
     if(exitStatus != QProcess::NormalExit || exitCode != 0) {
 
     } else {
-        // get object
+        // put object
         QString text(process3.readAllStandardOutput());
         QStringList list = text.split("`");
         if(!text.contains("ERROR") && list.size() != 1) {
-            sigObjectDownloaded_(list[3].toStdString());
+            sigObjectUploaded_(list[3].toStdString());
         }
     }
 }
@@ -280,11 +307,11 @@ void MinIOClient::Impl::onProcess4Finished(int exitCode, QProcess::ExitStatus ex
     if(exitStatus != QProcess::NormalExit || exitCode != 0) {
 
     } else {
-        // delete object
+        // get object
         QString text(process4.readAllStandardOutput());
         QStringList list = text.split("`");
-        if(!text.contains("ERROR")) {
-            sigObjectDeleted_(list[1].toStdString());
+        if(!text.contains("ERROR") && list.size() != 1) {
+            sigObjectDownloaded_(list[3].toStdString());
         }
     }
 }
@@ -295,10 +322,25 @@ void MinIOClient::Impl::onProcess5Finished(int exitCode, QProcess::ExitStatus ex
     if(exitStatus != QProcess::NormalExit || exitCode != 0) {
 
     } else {
+        // delete object
+        QString text(process5.readAllStandardOutput());
+        QStringList list = text.split("`");
+        if(!text.contains("ERROR")) {
+            sigObjectDeleted_(list[1].toStdString());
+        }
+    }
+}
+
+
+void MinIOClient::Impl::onProcess6Finished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    if(exitStatus != QProcess::NormalExit || exitCode != 0) {
+
+    } else {
         // list objects
         QStringList items;
         vector<string> objects;
-        QString text(process5.readAllStandardOutput());
+        QString text(process6.readAllStandardOutput());
         QStringList list = text.split("\n");
         for(int i = 0; i < list.size(); ++i) {
             QStringList list2 = list[i].split(" ");

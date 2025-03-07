@@ -31,6 +31,7 @@ public:
 
     void createBucket(const QString& bucketName);
     void deleteBucket(const QString& bucketName);
+    void listBuckets();
     void putObject(const QString& fileName, const QString& newPath);
     void getObject(const QString& fileName, const QString& objectKey);
     void deleteObject(const QString& objectKey);
@@ -38,6 +39,7 @@ public:
 
     SignalProxy<void(const std::string& bucket_name)> sigBucketCreated();
     SignalProxy<void(const std::string& bucket_name)> sigBucketDeleted();
+    SignalProxy<void(std::vector<std::string> bucket_names)> sigBucketListed();
     SignalProxy<void(const std::string& object_name)> sigObjectUploaded();
     SignalProxy<void(const std::string& object_name)> sigObjectDownloaded();
     SignalProxy<void(const std::string& object_name)> sigObjectDeleted();
