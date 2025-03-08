@@ -50,6 +50,7 @@ public:
     void onUpdateButtonClicked();
     void onDownloadButtonClicked();
     void onDeleteButtonClicked();
+    void onObjectUploaded(const QString& objectName);
     void onObjectListed(vector<string> object_names);
     QStringList checkedObjects() const;
 
@@ -180,8 +181,8 @@ void ObjectBrowser::putObject(const QString& fileName, const QString& newPath)
         auto mc = new MinIOClient;
         mc->setAlias(aliasName);
         mc->setBucket(bucketName);
-        mc->sigObjectUploaded().connect([&](string object_name){
-            MessageView::instance()->putln(formatR(_("{0} has been uploaded."), object_name)); });
+        mc->sigObjectUploaded().connect(
+            [&](const string& object_name){ impl->onObjectUploaded(object_name.c_str()); });
         mc->putObject(fileName, newPath);
     }
 }
@@ -199,7 +200,8 @@ void ObjectBrowser::Impl::onTextEdited(const QString& text)
 
     if(!text.isEmpty()) {
         auto mc = new MinIOClient;
-        mc->sigBucketListed().connect([&](vector<string> bucket_names){ onBucketListed(bucket_names); });
+        mc->sigBucketListed().connect(
+            [&](vector<string> bucket_names){ onBucketListed(bucket_names); });
         mc->setAlias(text);
         mc->listBuckets();
     }
@@ -217,19 +219,18 @@ void ObjectBrowser::Impl::onBucketListed(vector<string> bucket_names)
 void ObjectBrowser::Impl::onNewButtonClicked()
 {
     QString aliasName = aliasLineEdit->text();
-    if(aliasName.isEmpty()) {
-        return;
-    }
 
-    bool ok;
-    QString text = QInputDialog::getText(this, _("Create Bucket"),
-        _("Bucket name:"), QLineEdit::Normal, QDir::home().dirName(), &ok);
+    if(!aliasName.isEmpty()) {
+        bool ok;
+        QString text = QInputDialog::getText(this, _("Create Bucket"),
+            _("Bucket name:"), QLineEdit::Normal, QDir::home().dirName(), &ok);
 
-    if(ok && !text.isEmpty()) {
-        auto mc = new MinIOClient;
-        mc->setAlias(aliasName);
-        mc->createBucket(text);
-        onTextEdited(aliasName);
+        if(ok && !text.isEmpty()) {
+            auto mc = new MinIOClient;
+            mc->setAlias(aliasName);
+            mc->createBucket(text);
+            onTextEdited(aliasName);
+        }
     }
 }
 
@@ -267,7 +268,7 @@ void ObjectBrowser::Impl::onDownloadButtonClicked()
             .arg(objectName);
 
         auto mc = new MinIOClient(aliasName, bucketName);
-        mc->sigObjectDownloaded().connect([&](string object_name){ sigObjectDownloaded_(object_name); });
+        mc->sigObjectDownloaded().connect([&](const string& object_name){ sigObjectDownloaded_(object_name); });
         downloaders.push_back(mc);
         mc->getObject(fileName, object_key.c_str());
     }
@@ -283,8 +284,16 @@ void ObjectBrowser::Impl::onDeleteButtonClicked()
 
     for(auto& objectName : items) {
         auto mc = new MinIOClient(aliasName, bucketName);
+        mc->sigObjectDeleted().connect([&](const string& object_name){ onUpdateButtonClicked(); });
         mc->deleteObject(objectName);
     }
+}
+
+
+void ObjectBrowser::Impl::onObjectUploaded(const QString& objectName)
+{
+    MessageView::instance()->putln(formatR(_("{0} has been uploaded."), objectName.toStdString()));
+    onUpdateButtonClicked();
 }
 
 
