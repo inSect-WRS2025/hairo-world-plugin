@@ -34,7 +34,7 @@ public:
     QListWidget* listWidget;
     QDialogButtonBox* buttonBox;
     std::string archive_key;
-    QHBoxLayout* hbox;
+    QHBoxLayout* elementLayout;
 
     void removeDuplicates();
     void onItemDoubleClicked(QListWidgetItem* item);
@@ -60,20 +60,10 @@ ArchiveListDialog::Impl::Impl(ArchiveListDialog* self)
 
     contextMenu = new Menu;
 
-    auto vbox = new QVBoxLayout;
-    self->setLayout(vbox);
-
-    auto hbox1 = new QHBoxLayout;
-    hbox = new QHBoxLayout;
     auto button1 = new PushButton(_("C"));
     button1->sigClicked().connect([&](){ onClearButtonClicked(); });
     auto button2 = new PushButton(_("AC"));
     button2->sigClicked().connect([&](){ clearList(); });
-    hbox1->addLayout(hbox);
-    hbox1->addStretch();
-    hbox1->addWidget(button1);
-    hbox1->addWidget(button2);
-    vbox->addLayout(hbox1);
 
     listWidget = new QListWidget;
     listWidget->setDragDropMode(QAbstractItemView::InternalMove);
@@ -83,9 +73,20 @@ ArchiveListDialog::Impl::Impl(ArchiveListDialog* self)
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     self->connect(buttonBox, &QDialogButtonBox::accepted, self, &QDialog::accept);
 
-    vbox->addWidget(listWidget);
-    vbox->addWidget(new HSeparator);
-    vbox->addWidget(buttonBox);
+    elementLayout = new QHBoxLayout;
+
+    auto layout = new QHBoxLayout;
+    layout->addLayout(elementLayout);
+    layout->addStretch();
+    layout->addWidget(button1);
+    layout->addWidget(button2);
+
+    auto mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(layout);
+    mainLayout->addWidget(listWidget);
+    mainLayout->addWidget(new HSeparator);
+    mainLayout->addWidget(buttonBox);
+    self->setLayout(mainLayout);
 }
 
 
@@ -145,7 +146,7 @@ void ArchiveListDialog::addItems(const QStringList& texts)
 void ArchiveListDialog::addWidget(QWidget* widget)
 {
     if(widget) {
-        impl->hbox->addWidget(widget);
+        impl->elementLayout->addWidget(widget);
     }
 }
 

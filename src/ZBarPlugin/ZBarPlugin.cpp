@@ -15,6 +15,7 @@ public:
     ZBarPlugin() : Plugin("ZBar")
     {
         require("Body");
+        require("Google");
     }
 
     virtual bool initialize() override

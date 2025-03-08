@@ -20,6 +20,9 @@ public:
     JoystickStartPlugin() : Plugin("JoystickStart")
     {
         require("Body");
+        require("MotionCapture");
+        require("Bookmark");
+        require("Google");
     }
 
     virtual bool initialize() override

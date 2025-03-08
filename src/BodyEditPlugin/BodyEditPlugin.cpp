@@ -23,6 +23,7 @@ public:
     BodyEditPlugin() : Plugin("BodyEdit")
     {
         require("Body");
+        require("Bookmark");
     }
 
     virtual bool initialize() override

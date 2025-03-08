@@ -20,6 +20,8 @@ public:
     BookmarkPlugin() : Plugin("Bookmark")
     {
         require("Body");
+        require("MotionCapture");
+        require("Google");
     }
 
     virtual bool initialize() override
