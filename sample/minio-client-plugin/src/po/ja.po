@@ -43,3 +43,24 @@ msgstr "バケットの作成"
 
 msgid "Bucket name:"
 msgstr "バケット名:"
+
+msgid "Create a new bucket"
+msgstr "新しいバケットの作成"
+
+msgid "Update the object list"
+msgstr "オブジェクトリストの更新"
+
+msgid "Download objects"
+msgstr "オブジェクトのダウンロード"
+
+msgid "Delete objects"
+msgstr "オブジェクトの削除"
+
+msgid "The objects are checked."
+msgstr "オブジェクトがチェックされています．"
+
+msgid "Do you want to delete objects?"
+msgstr "オブジェクトを削除しますか？"
+
+msgid "Delete Objects"
+msgstr "オブジェクトの削除"

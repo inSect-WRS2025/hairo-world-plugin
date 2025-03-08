@@ -20,6 +20,7 @@
 #include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QLabel>
+#include <QMessageBox>
 #include <QTreeWidgetItem>
 #include <vector>
 #include "gettext.h"
@@ -106,21 +107,25 @@ ObjectBrowser::Impl::Impl()
     const QIcon newIcon = QIcon::fromTheme("folder-new");
     auto button1 = new PushButton;
     button1->setIcon(newIcon);
+    button1->setToolTip(_("Create a new bucket"));
     button1->sigClicked().connect([&](){ onNewButtonClicked(); });
 
     const QIcon updateIcon = QIcon::fromTheme("view-refresh");
     auto button2 = new PushButton;
     button2->setIcon(updateIcon);
+    button2->setToolTip(_("Update the object list"));
     button2->sigClicked().connect([&](){ onUpdateButtonClicked(); });
 
     const QIcon downloadIcon = QIcon::fromTheme("emblem-downloads");
     auto button3 = new PushButton;
     button3->setIcon(downloadIcon);
+    button3->setToolTip(_("Download objects"));
     button3->sigClicked().connect([&](){ onDownloadButtonClicked(); });
 
     const QIcon deleteIcon = QIcon::fromTheme("user-trash");
     auto button4 = new PushButton;
     button4->setIcon(deleteIcon);
+    button4->setToolTip(_("Delete objects"));
     button4->sigClicked().connect([&](){ onDeleteButtonClicked(); });
 
     treeWidget = new TreeWidget(this);
@@ -281,10 +286,32 @@ void ObjectBrowser::Impl::onDeleteButtonClicked()
 
     QStringList items = checkedObjects();
 
-    for(auto& objectName : items) {
-        auto mc = new MinIOClient(aliasName, bucketName);
-        mc->sigObjectDeleted().connect([&](const string& object_name){ onUpdateButtonClicked(); });
-        mc->deleteObject(objectName);
+    if(items.size() > 0) {
+        QMessageBox msgBox;
+        msgBox.setText(_("The objects are checked."));
+        msgBox.setInformativeText(_("Do you want to delete objects?"));
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        msgBox.setWindowTitle(_("Delete Objects"));
+        msgBox.setIcon(QMessageBox::Warning);
+        int ret = msgBox.exec();
+
+        switch(ret) {
+            case QMessageBox::Yes:
+                // Yes was clicked
+                for(auto& objectName : items) {
+                    auto mc = new MinIOClient(aliasName, bucketName);
+                    mc->sigObjectDeleted().connect([&](const string& object_name){ onUpdateButtonClicked(); });
+                    mc->deleteObject(objectName);
+                }
+                break;
+            case QMessageBox::Discard:
+                // No was clicked
+                break;
+            default:
+                // should never be reached
+                break;
+        }
     }
 }
 
