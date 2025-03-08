@@ -18,7 +18,6 @@
 #include <cnoid/MinIOClient>
 #include <QBoxLayout>
 #include <QDialogButtonBox>
-#include <QDir>
 #include <QInputDialog>
 #include <QLabel>
 #include <QTreeWidgetItem>
@@ -223,7 +222,7 @@ void ObjectBrowser::Impl::onNewButtonClicked()
     if(!aliasName.isEmpty()) {
         bool ok;
         QString text = QInputDialog::getText(this, _("Create Bucket"),
-            _("Bucket name:"), QLineEdit::Normal, QDir::home().dirName(), &ok);
+            _("Bucket name:"), QLineEdit::Normal, "mybucket", &ok);
 
         if(ok && !text.isEmpty()) {
             auto mc = new MinIOClient;
