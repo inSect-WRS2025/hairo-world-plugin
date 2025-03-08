@@ -63,8 +63,8 @@ public:
     QHBoxLayout* elementLayout;
     QDialogButtonBox* buttonBox;
 
-    MinIOClientPtr mc1;
-    vector<MinIOClientPtr> downloaders;
+    MinIOClient* client;
+    vector<MinIOClient*> downloaders;
 };
 
 }
@@ -247,11 +247,11 @@ void ObjectBrowser::Impl::onUpdateButtonClicked()
     QString bucketName = bucketComboBox->currentText();
 
     if(!bucketName.isEmpty()) {
-        mc1 = new MinIOClient;
-        mc1->setAlias(aliasName);
-        mc1->setBucket(bucketName);
-        mc1->sigObjectListed().connect([&](vector<string> object_names){ onObjectListed(object_names); });
-        mc1->listObjects();
+        client = new MinIOClient;
+        client->setAlias(aliasName);
+        client->setBucket(bucketName);
+        client->sigObjectListed().connect([&](vector<string> object_names){ onObjectListed(object_names); });
+        client->listObjects();
     }
 }
 
@@ -301,7 +301,6 @@ void ObjectBrowser::Impl::onDeleteButtonClicked()
                 // Yes was clicked
                 for(auto& objectName : items) {
                     auto mc = new MinIOClient(aliasName, bucketName);
-                    mc->sigObjectDeleted().connect([&](const string& object_name){ onUpdateButtonClicked(); });
                     mc->deleteObject(objectName);
                 }
                 break;

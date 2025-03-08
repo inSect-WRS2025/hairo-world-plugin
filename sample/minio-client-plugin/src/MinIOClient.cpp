@@ -19,8 +19,9 @@ namespace cnoid {
 class MinIOClient::Impl
 {
 public:
+    MinIOClient* self;
 
-    Impl();
+    Impl(MinIOClient* self);
     ~Impl();
 
     void onProcess0Finished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -66,37 +67,39 @@ void MinIOClient::initializeClass(ExtensionManager* ext)
 }
 
 
-MinIOClient::MinIOClient()
+MinIOClient::MinIOClient(QObject* parent)
+    : QObject(parent)
 {
-    impl = new Impl;
+    impl = new Impl(this);
 }
 
 
-MinIOClient::MinIOClient(const QString& aliasName, const QString& bucketName)
-    : impl(new Impl)
+MinIOClient::MinIOClient(const QString& aliasName, const QString& bucketName, QObject* parent)
+    : impl(new Impl(this))
 {
     setAlias(aliasName);
     setBucket(bucketName);
 }
 
 
-MinIOClient::Impl::Impl()
-    : aliasName(""),
+MinIOClient::Impl::Impl(MinIOClient* self)
+    : self(self),
+      aliasName(""),
       bucketName("")
 {
-    QObject::connect(&process0, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    self->connect(&process0, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         [this](int exitCode, QProcess::ExitStatus exitStatus){ onProcess0Finished(exitCode, exitStatus); });
-    QObject::connect(&process1, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    self->connect(&process1, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         [this](int exitCode, QProcess::ExitStatus exitStatus){ onProcess1Finished(exitCode, exitStatus); });
-    QObject::connect(&process2, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    self->connect(&process2, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         [this](int exitCode, QProcess::ExitStatus exitStatus){ onProcess2Finished(exitCode, exitStatus); });
-    QObject::connect(&process3, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    self->connect(&process3, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         [this](int exitCode, QProcess::ExitStatus exitStatus){ onProcess3Finished(exitCode, exitStatus); });
-    QObject::connect(&process4, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    self->connect(&process4, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         [this](int exitCode, QProcess::ExitStatus exitStatus){ onProcess4Finished(exitCode, exitStatus); });
-    QObject::connect(&process5, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    self->connect(&process5, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         [this](int exitCode, QProcess::ExitStatus exitStatus){ onProcess5Finished(exitCode, exitStatus); });
-    QObject::connect(&process6, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    self->connect(&process6, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         [this](int exitCode, QProcess::ExitStatus exitStatus){ onProcess6Finished(exitCode, exitStatus); });
 }
 

@@ -5,8 +5,8 @@
 #ifndef CNOID_MINIO_CLIENT_PLUGIN_MINIO_CLIENT_H
 #define CNOID_MINIO_CLIENT_PLUGIN_MINIO_CLIENT_H
 
-#include <cnoid/Referenced>
 #include <cnoid/Signal>
+#include <QObject>
 #include <QStringList>
 #include <vector>
 #include "exportdecl.h"
@@ -15,13 +15,13 @@ namespace cnoid {
 
 class ExtensionManager;
 
-class CNOID_EXPORT MinIOClient : public Referenced
+class CNOID_EXPORT MinIOClient : public QObject
 {
 public:
     static void initializeClass(ExtensionManager* ext);
 
-    MinIOClient();
-    MinIOClient(const QString& aliasName, const QString& bucketName);
+    MinIOClient(QObject* parent = nullptr);
+    MinIOClient(const QString& aliasName, const QString& bucketName, QObject* parent = nullptr);
     virtual ~MinIOClient();
 
     QString alias() const;
@@ -49,8 +49,6 @@ private:
     class Impl;
     Impl* impl;
 };
-
-typedef ref_ptr<MinIOClient> MinIOClientPtr;
 
 }
 
