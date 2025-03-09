@@ -70,6 +70,3 @@ msgstr "インターバルタイマをセット"
 
 msgid "Digital Clock"
 msgstr "デジタルクロック"
-
-msgid "Show the digital clock"
-msgstr "デジタルクロックの表示"

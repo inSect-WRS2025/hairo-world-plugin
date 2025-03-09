@@ -3,33 +3,31 @@
 */
 
 #include "DigitalClock.h"
-#include <cnoid/Action>
+#include <cnoid/Dialog>
 #include <cnoid/ExtensionManager>
-#include <cnoid/HamburgerMenu>
+#include <cnoid/MainMenu>
+#include <cnoid/Separator>
 #include <cnoid/TimeBar>
+#include <QBoxLayout>
+#include <QDialogButtonBox>
+#include <QLCDNumber>
 #include <QTime>
 #include "gettext.h"
 
-using namespace std;
 using namespace cnoid;
 
 namespace {
 
-DigitalClock* clockInstance = nullptr;
-
-}
-
-namespace cnoid {
-
-class DigitalClock::Impl
+class ClockDialog : public QDialog
 {
 public:
-    DigitalClock* self;
+    ClockDialog(QWidget* parent = nullptr);
 
-    Impl(DigitalClock* self);
-    ~Impl();
+private:
+    void onTimeChanged(double time);
 
-    void showTime(const double& time);
+    QLCDNumber* lcdNumber;
+    QDialogButtonBox* buttonBox;
 };
 
 }
@@ -37,56 +35,59 @@ public:
 
 void DigitalClock::initializeClass(ExtensionManager* ext)
 {
-    if(!clockInstance) {
-        clockInstance = ext->manage(new DigitalClock);
+    static ClockDialog* dialog = nullptr;
 
-        const QIcon icon = QIcon(":/GoogleMaterialSymbols/icon/alarm_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        auto action = new Action;
-        action->setText(_("Digital Clock"));
-        action->setIcon(icon);
-        action->setToolTip(_("Show the digital clock"));
-        action->sigTriggered().connect([&](){ clockInstance->show(); });
-        HamburgerMenu::instance()->addAction(action);
+    if(!dialog) {
+        dialog = ext->manage(new ClockDialog);
+
+        MainMenu::instance()->add_Tools_Item(
+            _("Digital Clock"), [](){ dialog->show(); });
     }
 }
 
 
-DigitalClock::DigitalClock(QWidget* parent)
-    : QLCDNumber(parent)
+DigitalClock::DigitalClock()
 {
-    impl = new Impl(this);
-}
 
-
-DigitalClock::Impl::Impl(DigitalClock* self)
-    : self(self)
-{
-    self->setSegmentStyle(Filled);
-    self->setWindowFlags(Qt::WindowStaysOnTopHint);
-
-    TimeBar::instance()->sigTimeChanged().connect(
-        [&](double time){ showTime(time); return true; });
-
-    showTime(0.0);
-
-    self->setWindowTitle(_("Digital Clock"));
-    self->resize(150, 60);
 }
 
 
 DigitalClock::~DigitalClock()
 {
-    delete impl;
+
 }
 
 
-DigitalClock::Impl::~Impl()
+ClockDialog::ClockDialog(QWidget* parent)
+    : QDialog(parent)
 {
+    lcdNumber = new QLCDNumber(this);
+    lcdNumber->setSegmentStyle(QLCDNumber::Filled);
+    lcdNumber->setWindowFlags(Qt::WindowStaysOnTopHint);
+    lcdNumber->resize(150, 60);
 
+    TimeBar::instance()->sigTimeChanged().connect(
+        [&](double time){ onTimeChanged(time); return true; });
+
+    onTimeChanged(0.0);
+
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
+
+    auto layout = new QHBoxLayout;
+
+    auto mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(layout);
+    mainLayout->addWidget(lcdNumber);
+    mainLayout->addWidget(new HSeparator);
+    mainLayout->addWidget(buttonBox);
+    setLayout(mainLayout);
+
+    setWindowTitle(_("Digital Clock"));
 }
 
 
-void DigitalClock::Impl::showTime(const double& time)
+void ClockDialog::onTimeChanged(double time)
 {
     int minute = time / 60.0;
     int second = time - minute * 60.0;
@@ -95,5 +96,5 @@ void DigitalClock::Impl::showTime(const double& time)
     // if((currentTime.second() % 2) == 0) {
     //     text[2] = ' ';
     // }
-    self->display(text);
+    lcdNumber->display(text);
 }

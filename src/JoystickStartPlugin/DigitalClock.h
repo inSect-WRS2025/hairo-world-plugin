@@ -5,23 +5,17 @@
 #ifndef CNOID_JOYSTICKSTART_PLUGIN_DIGITAL_CLOCK_H
 #define CNOID_JOYSTICKSTART_PLUGIN_DIGITAL_CLOCK_H
 
-#include <QLCDNumber>
-
 namespace cnoid {
 
 class ExtensionManager;
 
-class DigitalClock : public QLCDNumber
+class DigitalClock
 {
 public:
     static void initializeClass(ExtensionManager* ext);
 
-    DigitalClock(QWidget* parent = nullptr);
+    DigitalClock();
     virtual ~DigitalClock();
-
-private:
-    class Impl;
-    Impl* impl;
 };
 
 }
