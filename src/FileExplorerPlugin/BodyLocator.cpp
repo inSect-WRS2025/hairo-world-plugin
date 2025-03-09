@@ -10,20 +10,15 @@
 #include <cnoid/ExtensionManager>
 #include <cnoid/ItemTreeView>
 #include <cnoid/MenuManager>
-#include <cnoid/Process>
 #include <cnoid/RootItem>
 #include <cnoid/Separator>
 #include <cnoid/SpinBox>
-#include <cnoid/UTF8>
-#include <cnoid/stdx/filesystem>
 #include <QBoxLayout>
 #include <QDialogButtonBox>
 #include <QLabel>
 #include "gettext.h"
 
-using namespace std;
 using namespace cnoid;
-namespace filesystem = cnoid::stdx::filesystem;
 
 namespace {
 
@@ -59,16 +54,6 @@ void BodyLocator::initializeClass(ExtensionManager* ext)
 
     ItemTreeView::customizeContextMenu<BodyItem>(
         [&](BodyItem* item, MenuManager& menuManager, ItemFunctionDispatcher menuFunction) {
-            menuManager.setPath("/").setPath(_("Open"));
-            menuManager.addItem(_("gedit"))->sigTriggered().connect(
-                [&, item](){
-                    QProcess::startDetached("gedit",
-                        QStringList() << item->filePath().c_str()); });
-            menuManager.addItem(_("Nautilus"))->sigTriggered().connect(
-                [&, item](){
-                    filesystem::path path(fromUTF8(item->filePath()));
-                    QProcess::startDetached("nautilus",
-                        QStringList() << path.parent_path().string().c_str()); });
             menuManager.setPath("/");
             menuManager.addItem(_("Body Locator"))->sigTriggered().connect(
                 [&, item](){ locatorInstance->impl->show(); });

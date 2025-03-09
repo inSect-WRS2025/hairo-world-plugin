@@ -1,10 +1,12 @@
 set(sources
   BodyLocator.cpp
+  FileExplorer.cpp
   FileExplorerPlugin.cpp
 )
 
 set(headers
   BodyLocator.h
+  FileExplorer.h
   exportdecl.h
 )
 
