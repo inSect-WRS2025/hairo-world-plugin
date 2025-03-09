@@ -17,11 +17,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-msgid "Body Loader"
-msgstr "ボディローダ"
-
-msgid "Show the body loader"
-msgstr "ボディローダの表示"
+msgid "Format Converter"
+msgstr "フォーマットの変換"
 
 msgid "Format conversion"
 msgstr "フォーマットの変換"

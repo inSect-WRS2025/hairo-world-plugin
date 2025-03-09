@@ -16,7 +16,7 @@ using namespace std;
 using namespace cnoid;
 
 FileDroppableWidget::FileDroppableWidget(QWidget* parent)
-    : Widget(parent)
+    : QWidget(parent)
 {
     setAcceptDrops(true);
 }

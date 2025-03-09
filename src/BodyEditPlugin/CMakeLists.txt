@@ -1,5 +1,5 @@
 set(sources
-  BodyConverter.cpp
+  FormatConverter.cpp
   ColorButton.cpp
   CrawlerGenerator.cpp
   GeneratorButtonBox.cpp
@@ -16,7 +16,7 @@ set(sources
 )
 
 set(headers
-  BodyConverter.h
+  FormatConverter.h
   ColorButton.h
   CrawlerGenerator.h
   GeneratorButtonBox.h

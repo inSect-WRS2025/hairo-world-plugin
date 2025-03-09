@@ -5,7 +5,7 @@
 #include <cnoid/Format>
 #include <cnoid/Plugin>
 #include "BentPipeGenerator.h"
-#include "BodyConverter.h"
+#include "FormatConverter.h"
 #include "CrawlerGenerator.h"
 #include "GratingGenerator.h"
 #include "InertiaCalculator.h"
@@ -28,7 +28,7 @@ public:
 
     virtual bool initialize() override
     {
-        BodyConverter::initializeClass(this);
+        FormatConverter::initializeClass(this);
         CrawlerGenerator::initializeClass(this);
         GratingGenerator::initializeClass(this);
         InertiaCalculator::initializeClass(this);

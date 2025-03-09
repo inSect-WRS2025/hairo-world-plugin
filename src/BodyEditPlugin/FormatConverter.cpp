@@ -2,7 +2,7 @@
    @author Kenta Suzuki
 */
 
-#include "BodyConverter.h"
+#include "FormatConverter.h"
 #include <cnoid/Action>
 #include <cnoid/BodyItem>
 #include <cnoid/Buttons>
@@ -12,6 +12,7 @@
 #include <cnoid/ExtensionManager>
 #include <cnoid/Format>
 #include <cnoid/ItemManager>
+#include <cnoid/MainMenu>
 #include <cnoid/MessageView>
 #include <cnoid/ProjectManager>
 #include <cnoid/RootItem>
@@ -20,7 +21,6 @@
 #include <cnoid/WorldItem>
 #include <cnoid/stdx/filesystem>
 #include <cnoid/HamburgerMenu>
-#include <QAction>
 #include <QBoxLayout>
 #include <QDialogButtonBox>
 #include <QFile>
@@ -34,8 +34,6 @@ using namespace cnoid;
 namespace filesystem = cnoid::stdx::filesystem;
 
 namespace {
-
-BodyConverter* converterInstance = nullptr;
 
 struct KeyInfo {
     QString oldKey;
@@ -134,63 +132,56 @@ KeyInfo keyInfo[] = {
     { "jointType:",          "joint_type:"           }
 };
 
-}
-
-namespace cnoid {
-
-class BodyConverter::Impl : public Dialog
+class ConverterDialog : public QDialog
 {
 public:
+    ConverterDialog(QWidget* parent = nullptr);
 
-    Impl();
-
+private:
     void onFileDropped(const string& filename);
     QString convert(const QString& line) const;
     void saveFile(const QString& fileName);
 
-    CheckBox* convertCheckBox;
-    ComboBox* formatComboBox;
+    QCheckBox* convertCheckBox;
+    QComboBox* formatComboBox;
     QDialogButtonBox* buttonBox;
 };
 
 }
 
 
-void BodyConverter::initializeClass(ExtensionManager* ext)
+void FormatConverter::initializeClass(ExtensionManager* ext)
 {
-    if(!converterInstance) {
-        converterInstance = ext->manage(new BodyConverter);
+    static ConverterDialog* dialog = nullptr;
 
-        const QIcon icon = QIcon(":/GoogleMaterialSymbols/icon/upload_file_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        auto action = new Action;
-        action->setText(_("Body Loader"));
-        action->setIcon(icon);
-        action->setToolTip(_("Show the body loader"));
-        action->sigTriggered().connect([&](){ converterInstance->impl->show(); });
-        HamburgerMenu::instance()->addAction(action);
+    if(!dialog) {
+        dialog = ext->manage(new ConverterDialog);
+
+        MainMenu::instance()->add_Tools_Item(
+            _("Format Converter"), [](){ dialog->show(); });
     }
 }
 
 
-BodyConverter* BodyConverter::instance()
+FormatConverter::FormatConverter()
 {
-    return converterInstance;
+
 }
 
 
-BodyConverter::BodyConverter()
+FormatConverter::~FormatConverter()
 {
-    impl = new Impl;
+
 }
 
 
-BodyConverter::Impl::Impl()
-    : Dialog()
+ConverterDialog::ConverterDialog(QWidget* parent)
+    : QDialog(parent)
 {
-    convertCheckBox = new CheckBox;
+    convertCheckBox = new QCheckBox;
     convertCheckBox->setText(_("Format conversion"));
 
-    formatComboBox = new ComboBox;
+    formatComboBox = new QComboBox;
     formatComboBox->addItems(QStringList() << _("1.0") << _("2.0"));
     formatComboBox->setCurrentIndex(1);
 
@@ -202,7 +193,8 @@ BodyConverter::Impl::Impl()
     label->setAlignment(Qt::AlignCenter);
     vbox->addWidget(label);
     dropWidget->setLayout(vbox);
-    dropWidget->sigFileDropped().connect([this](const string& filename){ onFileDropped(filename); });
+    dropWidget->sigFileDropped().connect(
+        [this](const string& filename){ onFileDropped(filename); });
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
@@ -220,17 +212,11 @@ BodyConverter::Impl::Impl()
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    setWindowTitle(_("Body Loader"));
+    setWindowTitle(_("Format Converter"));
 }
 
 
-BodyConverter::~BodyConverter()
-{
-    delete impl;
-}
-
-
-void BodyConverter::Impl::onFileDropped(const string& filename)
+void ConverterDialog::onFileDropped(const string& filename)
 {
     filesystem::path path(fromUTF8(filename));
     string ext = path.extension().string();
@@ -262,7 +248,7 @@ void BodyConverter::Impl::onFileDropped(const string& filename)
 }
 
 
-QString BodyConverter::Impl::convert(const QString& line) const
+QString ConverterDialog::convert(const QString& line) const
 {
     QString newLine(line);
 
@@ -283,7 +269,7 @@ QString BodyConverter::Impl::convert(const QString& line) const
 }
 
 
-void BodyConverter::Impl::saveFile(const QString& fileName)
+void ConverterDialog::saveFile(const QString& fileName)
 {
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {

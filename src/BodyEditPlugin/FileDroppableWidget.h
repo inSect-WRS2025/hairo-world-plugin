@@ -6,12 +6,12 @@
 #define CNOID_BOOKMARK_PLUGIN_FILE_DROPPABLE_WIDGET_H
 
 #include <cnoid/Signal>
-#include <cnoid/Widget>
+#include <QWidget>
 #include "exportdecl.h"
 
 namespace cnoid {
 
-class CNOID_EXPORT FileDroppableWidget : public Widget
+class CNOID_EXPORT FileDroppableWidget : public QWidget
 {
 public:
     FileDroppableWidget(QWidget* parent = nullptr);
