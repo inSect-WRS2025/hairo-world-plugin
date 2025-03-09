@@ -16,10 +16,6 @@ public:
 
     InertiaCalculator();
     virtual ~InertiaCalculator();
-
-private:
-    class Impl;
-    Impl* impl;
 };
 
 }

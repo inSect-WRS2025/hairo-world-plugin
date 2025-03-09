@@ -305,12 +305,6 @@ msgstr "設定2"
 msgid "Inertia Calculator"
 msgstr "慣性モーメントの計算"
 
-msgid "Calculate Inertia"
-msgstr "慣性モーメントの計算"
-
-msgid "Show the inertia calculator"
-msgstr "慣性モーメントの計算"
-
 msgid "Box"
 msgstr ""
 

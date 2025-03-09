@@ -4,6 +4,8 @@
 
 #include "InertiaCalculator.h"
 #include <cnoid/Action>
+#include <cnoid/Buttons>
+#include <cnoid/ComboBox>
 #include <cnoid/Dialog>
 #include <cnoid/EigenTypes>
 #include <cnoid/ExtensionManager>
@@ -11,14 +13,11 @@
 #include <cnoid/MainMenu>
 #include <cnoid/MessageView>
 #include <cnoid/Separator>
-#include <cnoid/HamburgerMenu>
+#include <cnoid/SpinBox>
 #include <QBoxLayout>
-#include <QComboBox>
 #include <QDialogButtonBox>
-#include <QDoubleSpinBox>
 #include <QFormLayout>
 #include <QLabel>
-#include <QPushButton>
 #include <QStackedLayout>
 #include "gettext.h"
 
@@ -26,8 +25,6 @@ using namespace std;
 using namespace cnoid;
 
 namespace {
-
-InertiaCalculator* calculatorInstance = nullptr;
 
 struct DoubleSpinInfo {
     int page;
@@ -41,16 +38,12 @@ DoubleSpinInfo doubleSpinInfo[] = {
     { 3, nullptr }, { 3, nullptr }, { 3, nullptr }
 };
 
-}
-
-namespace cnoid {
-
-class InertiaCalculator::Impl : public Dialog
+class CalculatorDialog : public QDialog
 {
 public:
+    CalculatorDialog(QWidget* parent = nullptr);
 
-    Impl();
-
+private:
     void calc();
 
     enum {
@@ -67,6 +60,7 @@ public:
     QComboBox* axisComboBox;
     QComboBox* axisComboBox2;
     QDoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
+    QDialogButtonBox* buttonBox;
 };
 
 }
@@ -74,34 +68,32 @@ public:
 
 void InertiaCalculator::initializeClass(ExtensionManager* ext)
 {
-    if(!calculatorInstance) {
-        calculatorInstance = ext->manage(new InertiaCalculator);
+    static CalculatorDialog* dialog = nullptr;
+
+    if(!dialog) {
+        dialog = ext->manage(new CalculatorDialog);
 
         MainMenu::instance()->add_Tools_Item(
-            _("Calculate Inertia"), [](){ calculatorInstance->impl->show(); });
-
-        // const QIcon icon = QIcon(":/GoogleMaterialSymbols/icon/calculate_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        // auto action = new Action;
-        // action->setText(_("Inertia Calculator"));
-        // action->setIcon(icon);
-        // action->setToolTip(_("Show the inertia calculator"));
-        // action->sigTriggered().connect([&](){ calculatorInstance->impl->show(); });
-        // HamburgerMenu::instance()->addAction(action);
+            _("Inertia Calculator"), [](){ dialog->show(); });
     }
 }
 
 
 InertiaCalculator::InertiaCalculator()
 {
-    impl = new Impl;
+
 }
 
 
-InertiaCalculator::Impl::Impl()
-    : Dialog()
+InertiaCalculator::~InertiaCalculator()
 {
-    setWindowTitle(_("Inertia Calculator"));
 
+}
+
+
+CalculatorDialog::CalculatorDialog(QWidget* parent)
+    : QDialog(parent)
+{
     auto stackedLayout = new QStackedLayout;
 
     const QStringList texts = { _("Box"), _("Sphere"), _("Cylinder"), _("Cone") };
@@ -117,18 +109,14 @@ InertiaCalculator::Impl::Impl()
     axisComboBox2 = new QComboBox;
     axisComboBox2->addItems(texts2);
 
-    auto hbox = new QHBoxLayout;
-    hbox->addWidget(new QLabel(_("Shape")));
-    hbox->addWidget(shapeComboBox);
-
     QFormLayout* formLayout[NumPages];
     for(int i = 0; i < NumPages; ++i) {
         QWidget* pageWidget = new QWidget;
         formLayout[i] = new QFormLayout;
-        auto vbox = new QVBoxLayout;
-        vbox->addLayout(formLayout[i]);
-        vbox->addStretch();
-        pageWidget->setLayout(vbox);
+        auto layout = new QVBoxLayout;
+        layout->addLayout(formLayout[i]);
+        layout->addStretch();
+        pageWidget->setLayout(layout);
         stackedLayout->addWidget(pageWidget);
     }
 
@@ -155,26 +143,26 @@ InertiaCalculator::Impl::Impl()
     QPushButton* calcButton = new QPushButton(calcIcon, _("&Calc"), this);
     connect(calcButton, &QPushButton::clicked, [&](){ calc(); });
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(this);
+    buttonBox = new QDialogButtonBox(this);
     buttonBox->addButton(calcButton, QDialogButtonBox::ActionRole);
 
-    auto vbox = new QVBoxLayout;
-    vbox->addLayout(hbox);
-    vbox->addLayout(stackedLayout);
-    vbox->addStretch();
-    vbox->addWidget(new HSeparator);
-    vbox->addWidget(buttonBox);
-    setLayout(vbox);
+    auto layout = new QHBoxLayout;
+    layout->addWidget(new QLabel(_("Shape")));
+    layout->addWidget(shapeComboBox);
+
+    auto mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(layout);
+    mainLayout->addLayout(stackedLayout);
+    mainLayout->addStretch();
+    mainLayout->addWidget(new HSeparator);
+    mainLayout->addWidget(buttonBox);
+    setLayout(mainLayout);
+
+    setWindowTitle(_("Inertia Calculator"));
 }
 
 
-InertiaCalculator::~InertiaCalculator()
-{
-    delete impl;
-}
-
-
-void InertiaCalculator::Impl::calc()
+void CalculatorDialog::calc()
 {
     MessageView* mv = MessageView::instance();
 
