@@ -13,14 +13,9 @@ class BodyLocator
 {
 public:
     static void initializeClass(ExtensionManager* ext);
-    static BodyLocator* instance();
 
     BodyLocator();
     virtual ~BodyLocator();
-
-private:
-    class Impl;
-    Impl* impl;
 };
 
 }

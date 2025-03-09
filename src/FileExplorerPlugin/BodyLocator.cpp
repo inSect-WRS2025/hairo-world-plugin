@@ -8,8 +8,7 @@
 #include <cnoid/Dialog>
 #include <cnoid/EigenUtil>
 #include <cnoid/ExtensionManager>
-#include <cnoid/ItemTreeView>
-#include <cnoid/MenuManager>
+#include <cnoid/MainMenu>
 #include <cnoid/RootItem>
 #include <cnoid/Separator>
 #include <cnoid/SpinBox>
@@ -22,21 +21,14 @@ using namespace cnoid;
 
 namespace {
 
-BodyLocator* locatorInstance = nullptr;
-
-}
-
-namespace cnoid {
-
-class BodyLocator::Impl : public Dialog
+class LocatorDialog : public QDialog
 {
 public:
+    LocatorDialog(QWidget* parent = nullptr);
 
-    Impl();
-    ~Impl();
-
-    void onTranslationButtonClicked(const int& id);
-    void onRotationButtonClocked(const int& id);
+private:
+    void on_xyzButton_clicked(const int& id);
+    void on_rpyButton_clicked(const int& id);
 
     DoubleSpinBox* distanceSpinBox;
     DoubleSpinBox* angleSpinBox;
@@ -48,36 +40,31 @@ public:
 
 void BodyLocator::initializeClass(ExtensionManager* ext)
 {
-    if(!locatorInstance) {
-        locatorInstance = ext->manage(new BodyLocator);
+    static LocatorDialog* dialog = nullptr;
+
+    if(!dialog) {
+        dialog = ext->manage(new LocatorDialog);
+
+        MainMenu::instance()->add_Tools_Item(
+            _("Body Locator"), [](){ dialog->show(); });
     }
-
-    ItemTreeView::customizeContextMenu<BodyItem>(
-        [&](BodyItem* item, MenuManager& menuManager, ItemFunctionDispatcher menuFunction) {
-            menuManager.setPath("/");
-            menuManager.addItem(_("Body Locator"))->sigTriggered().connect(
-                [&, item](){ locatorInstance->impl->show(); });
-            menuManager.setPath("/");
-            menuManager.addSeparator();
-            menuFunction.dispatchAs<Item>(item);
-        });
-}
-
-
-BodyLocator* BodyLocator::instance()
-{
-    return locatorInstance;
 }
 
 
 BodyLocator::BodyLocator()
 {
-    impl = new Impl;
+
 }
 
 
-BodyLocator::Impl::Impl()
-    : Dialog()
+BodyLocator::~BodyLocator()
+{
+
+}
+
+
+LocatorDialog::LocatorDialog(QWidget* parent)
+    : QDialog(parent)
 {
     auto layout = new QHBoxLayout;
 
@@ -90,10 +77,10 @@ BodyLocator::Impl::Impl()
 
     const QStringList list = { "x+", "x-", "y+", "y-", "z+", "z-" };
     for(int i = 0; i < 6; ++i) {
-        ToolButton* button = new ToolButton;
-        button->setText(list.at(i));
-        button->sigClicked().connect([this, i](){ onTranslationButtonClicked(i); });
-        layout->addWidget(button);
+        auto xyzButton = new QToolButton;
+        xyzButton->setText(list.at(i));
+        connect(xyzButton, &QToolButton::clicked, [&, i](){ on_xyzButton_clicked(i); });
+        layout->addWidget(xyzButton);
     }
 
     auto layout2 = new QHBoxLayout;
@@ -107,14 +94,14 @@ BodyLocator::Impl::Impl()
 
     const QStringList list2 = { "r+", "r-", "p+", "p-", "y+", "y-" };
     for(int i = 0; i < 6; ++i) {
-        ToolButton* button = new ToolButton;
-        button->setText(list2.at(i));
-        button->sigClicked().connect([this, i](){ onRotationButtonClocked(i); });
-        layout2->addWidget(button);
+        auto rpyButton = new QToolButton;
+        rpyButton->setText(list2.at(i));
+        connect(rpyButton, &QToolButton::clicked, [&, i](){ on_rpyButton_clicked(i); });
+        layout2->addWidget(rpyButton);
     }
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addLayout(layout);
@@ -128,19 +115,7 @@ BodyLocator::Impl::Impl()
 }
 
 
-BodyLocator::~BodyLocator()
-{
-    delete impl;
-}
-
-
-BodyLocator::Impl::~Impl()
-{
-
-}
-
-
-void BodyLocator::Impl::onTranslationButtonClicked(const int& id)
+void LocatorDialog::on_xyzButton_clicked(const int& id)
 {
     auto rootItem = RootItem::instance();
     int index1 = id / 2;
@@ -162,7 +137,7 @@ void BodyLocator::Impl::onTranslationButtonClicked(const int& id)
 }
 
 
-void BodyLocator::Impl::onRotationButtonClocked(const int& id)
+void LocatorDialog::on_rpyButton_clicked(const int& id)
 {
     auto rootItem = RootItem::instance();
     int index1 = id / 2;
