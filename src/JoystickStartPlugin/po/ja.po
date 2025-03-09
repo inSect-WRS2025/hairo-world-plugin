@@ -56,9 +56,6 @@ msgstr "現在位置からのシミュレーションを開始： SELECT ボタ�
 msgid "Joystick Tester"
 msgstr "ジョイスティックのテスト"
 
-msgid "Show the joystick tester"
-msgstr "ジョイスティックのテスト"
-
 msgid "Interval Timer"
 msgstr "インターバルタイマ"
 
