@@ -9,6 +9,7 @@ set(sources
   LayoutManager.cpp
   SystemTrayIcon.cpp
   WorldLogManager.cpp
+  SwitchableWidget.cpp
 )
 
 set(headers
@@ -21,11 +22,13 @@ set(headers
   LayoutManager.h
   SystemTrayIcon.h
   WorldLogManager.h
+  SwitchableWidget.h
   exportdecl.h
 )
 
 choreonoid_make_header_public(SystemTrayIcon.h)
 choreonoid_make_header_public(HamburgerMenu.h)
+choreonoid_make_header_public(SwitchableWidget.h)
 
 set(target CnoidBookmarkPlugin)
 choreonoid_make_gettext_mo_files(${target} mofiles)
