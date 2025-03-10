@@ -28,19 +28,20 @@ public:
     Impl(ArchiveListDialog* self);
     ~Impl();
 
-    Menu* contextMenu;
-    Signal<void()> sigListUpdated;
-
-    QListWidget* listWidget;
-    QDialogButtonBox* buttonBox;
-    std::string archive_key;
-    QHBoxLayout* elementLayout;
-
     void removeDuplicates();
     void onItemDoubleClicked(QListWidgetItem* item);
     void onClearButtonClicked();
     void updateList();
     void clearList();
+
+    Menu* contextMenu;
+    Signal<void()> sigListUpdated;
+
+    QListWidget* listWidget;
+    QDialogButtonBox* buttonBox;
+    QHBoxLayout* elementLayout;
+
+    std::string archive_key;
 };
 
 }

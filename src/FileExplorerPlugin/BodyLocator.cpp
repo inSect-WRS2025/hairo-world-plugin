@@ -30,8 +30,8 @@ private:
     void on_xyzButton_clicked(const int& id);
     void on_rpyButton_clicked(const int& id);
 
-    DoubleSpinBox* distanceSpinBox;
-    DoubleSpinBox* angleSpinBox;
+    QDoubleSpinBox* distanceSpinBox;
+    QDoubleSpinBox* angleSpinBox;
     QDialogButtonBox* buttonBox;
 };
 
@@ -68,7 +68,7 @@ LocatorDialog::LocatorDialog(QWidget* parent)
 {
     auto layout = new QHBoxLayout;
 
-    distanceSpinBox = new DoubleSpinBox;
+    distanceSpinBox = new QDoubleSpinBox;
     distanceSpinBox->setRange(0.0, 9999.0);
     distanceSpinBox->setValue(1.0);
     layout->addWidget(distanceSpinBox);
@@ -85,7 +85,7 @@ LocatorDialog::LocatorDialog(QWidget* parent)
 
     auto layout2 = new QHBoxLayout;
 
-    angleSpinBox = new DoubleSpinBox;
+    angleSpinBox = new QDoubleSpinBox;
     angleSpinBox->setRange(0.0, 9999.0);
     angleSpinBox->setValue(10.0);
     layout2->addWidget(angleSpinBox);
