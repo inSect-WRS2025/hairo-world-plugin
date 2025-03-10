@@ -16,10 +16,6 @@ public:
 
     CrawlerGenerator();
     virtual ~CrawlerGenerator();
-
-private:
-    class Impl;
-    Impl* impl;
 };
 
 }

@@ -16,10 +16,6 @@ public:
 
     TerrainGenerator();
     virtual ~TerrainGenerator();
-
-private:
-    class Impl;
-    Impl* impl;
 };
 
 }

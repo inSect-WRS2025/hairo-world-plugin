@@ -29,8 +29,6 @@ namespace filesystem = cnoid::stdx::filesystem;
 
 namespace {
 
-BentPipeGenerator* bentInstance = nullptr;
-
 DoubleSpinInfo doubleSpinInfo[] = {
     { 0, 1, 0.01, 1000.0, 0.01, 3, 1.00,           "mass", nullptr },
     { 0, 3, 0.01, 1000.0, 0.01, 3, 0.50,    "bent_radius", nullptr },
@@ -44,13 +42,21 @@ SpinInfo spinInfo[] = {
     { 3, 3, 1, 120, 1, 30,      "step_angle", nullptr }
 };
 
-}
-
-namespace cnoid {
-
-class BentPipeGenerator::Impl : public Dialog
+class BentPipeConfigDialog : public QDialog
 {
 public:
+    BentPipeConfigDialog(QWidget* parent = nullptr);
+
+private:
+    void reset();
+    bool save(const string& filename);
+
+    MappingPtr writeBody(const string& filename);
+    MappingPtr writeLink();
+    void writeLinkShape(Listing* elementsNode);
+    void onBentAngleChanged(double value);
+    void onInnerDiameterChanged(double diameter);
+    void onOuterDiameterChanged(double diameter);
 
     enum { MASS, BENT_RAD, IN_DIA, OUT_DIA, NumDoubleSpinBoxes };
     enum { BENT_ANGLE, BENT_STEP, STEP, NumSpinBoxes };
@@ -60,18 +66,6 @@ public:
     ColorButton* colorButton;
     GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
-
-    Impl();
-
-    void reset();
-    bool save(const string& filename);
-
-    MappingPtr writeBody(const string& filename);
-    MappingPtr writeLink();
-    void writeLinkShape(Listing* elementsNode);
-    void onBentAngleChanged(double value);
-    void onInnerDiameterChanged(const double& diameter);
-    void onOuterDiameterChanged(const double& diameter);
 };
 
 }
@@ -79,26 +73,32 @@ public:
 
 void BentPipeGenerator::initializeClass(ExtensionManager* ext)
 {
-    if(!bentInstance) {
-        bentInstance = ext->manage(new BentPipeGenerator);
+    static BentPipeConfigDialog* dialog = nullptr;
+
+    if(!dialog) {
+        dialog = ext->manage(new BentPipeConfigDialog);
 
         MenuManager& mm = ext->menuManager().setPath("/Tools").setPath(_("Make a body file"));
-        mm.addItem(_("BentPipe"))->sigTriggered().connect(
-                    [&](){ bentInstance->impl->show(); });
+        mm.addItem(_("BentPipe"))->sigTriggered().connect([&](){ dialog->show(); });
     }
 }
 
 
 BentPipeGenerator::BentPipeGenerator()
 {
-    impl = new Impl;
+
 }
 
 
-BentPipeGenerator::Impl::Impl()
-    : Dialog()
+BentPipeGenerator::~BentPipeGenerator()
 {
-    setWindowTitle(_("BentPipe Generator"));
+
+}
+
+
+BentPipeConfigDialog::BentPipeConfigDialog(QWidget* parent)
+    : QDialog(parent)
+{
     yamlWriter.setKeyOrderPreservationMode(true);
 
     auto gridLayout = new QGridLayout;
@@ -145,22 +145,18 @@ BentPipeGenerator::Impl::Impl()
     buttonBox->sigResetRequested().connect([&](){ reset(); });
     buttonBox->sigSaveRequested().connect([&](const string& filename){ save(filename); });
 
-    auto vbox = new QVBoxLayout;
-    vbox->addLayout(gridLayout);
-    vbox->addStretch();
-    vbox->addWidget(new HSeparator);
-    vbox->addWidget(buttonBox);
-    setLayout(vbox);
+    auto mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(gridLayout);
+    mainLayout->addStretch();
+    mainLayout->addWidget(new HSeparator);
+    mainLayout->addWidget(buttonBox);
+    setLayout(mainLayout);
+
+    setWindowTitle(_("BentPipe Generator"));
 }
 
 
-BentPipeGenerator::~BentPipeGenerator()
-{
-    delete impl;
-}
-
-
-void BentPipeGenerator::Impl::reset()
+void BentPipeConfigDialog::reset()
 {
     for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
@@ -178,7 +174,7 @@ void BentPipeGenerator::Impl::reset()
 }
 
 
-bool BentPipeGenerator::Impl::save(const string& filename)
+bool BentPipeConfigDialog::save(const string& filename)
 {
     if(!filename.empty()) {
         auto topNode = writeBody(filename);
@@ -192,7 +188,7 @@ bool BentPipeGenerator::Impl::save(const string& filename)
 }
 
 
-MappingPtr BentPipeGenerator::Impl::writeBody(const string& filename)
+MappingPtr BentPipeConfigDialog::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
@@ -214,7 +210,7 @@ MappingPtr BentPipeGenerator::Impl::writeBody(const string& filename)
 }
 
 
-MappingPtr BentPipeGenerator::Impl::writeLink()
+MappingPtr BentPipeConfigDialog::writeLink()
 {
     MappingPtr node = new Mapping;
 
@@ -236,7 +232,7 @@ MappingPtr BentPipeGenerator::Impl::writeLink()
 }
 
 
-void BentPipeGenerator::Impl::writeLinkShape(Listing* elementsNode)
+void BentPipeConfigDialog::writeLinkShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
@@ -343,7 +339,7 @@ void BentPipeGenerator::Impl::writeLinkShape(Listing* elementsNode)
 }
 
 
-void BentPipeGenerator::Impl::onBentAngleChanged(double value)
+void BentPipeConfigDialog::onBentAngleChanged(double value)
 {
     double bent_step = spinBoxes[BENT_STEP]->value();
     if(value < bent_step) {
@@ -352,7 +348,7 @@ void BentPipeGenerator::Impl::onBentAngleChanged(double value)
 }
 
 
-void BentPipeGenerator::Impl::onInnerDiameterChanged(const double& diameter)
+void BentPipeConfigDialog::onInnerDiameterChanged(double diameter)
 {
     double d_out = doubleSpinBoxes[OUT_DIA]->value();
     if(diameter >= d_out) {
@@ -362,7 +358,7 @@ void BentPipeGenerator::Impl::onInnerDiameterChanged(const double& diameter)
 }
 
 
-void BentPipeGenerator::Impl::onOuterDiameterChanged(const double& diameter)
+void BentPipeConfigDialog::onOuterDiameterChanged(double diameter)
 {
     double d_in = doubleSpinBoxes[IN_DIA]->value();
     if(diameter <= d_in) {

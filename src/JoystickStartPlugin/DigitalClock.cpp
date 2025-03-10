@@ -74,10 +74,7 @@ ClockDialog::ClockDialog(QWidget* parent)
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
 
-    auto layout = new QHBoxLayout;
-
     auto mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(layout);
     mainLayout->addWidget(lcdNumber);
     mainLayout->addWidget(new HSeparator);
     mainLayout->addWidget(buttonBox);

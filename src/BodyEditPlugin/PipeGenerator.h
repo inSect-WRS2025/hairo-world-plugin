@@ -16,10 +16,6 @@ public:
 
     PipeGenerator();
     virtual ~PipeGenerator();
-
-private:
-    class Impl;
-    Impl* impl;
 };
 
 }

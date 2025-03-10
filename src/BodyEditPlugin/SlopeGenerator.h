@@ -16,10 +16,6 @@ public:
 
     SlopeGenerator();
     virtual ~SlopeGenerator();
-
-private:
-    class Impl;
-    Impl* impl;
 };
 
 }

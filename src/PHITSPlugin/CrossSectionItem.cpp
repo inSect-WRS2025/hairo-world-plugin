@@ -118,14 +118,10 @@ SgMesh* generateSquare(const double xside, const double yside)
     return mesh;
 }
 
-}
-
-namespace cnoid {
-
-class DoseConfigDialog : public Dialog
+class DoseConfigDialog : public QDialog
 {
 public:
-    DoseConfigDialog();
+    DoseConfigDialog(QWidget* parent = nullptr);
 
     SpinBox* maxCasSpinBox;
     SpinBox* maxBchSpinBox;
@@ -159,6 +155,9 @@ public:
     void restoreState(const Archive& archive);
 };
 
+}
+
+namespace cnoid {
 
 class CrossSectionItem::Impl
 {
@@ -520,11 +519,9 @@ bool CrossSectionItem::Impl::restore(const Archive& archive)
 }
 
 
-DoseConfigDialog::DoseConfigDialog()
-    : Dialog()
+DoseConfigDialog::DoseConfigDialog(QWidget* parent)
+    : QDialog(parent)
 {
-    setWindowTitle(_("Configuration of PHITS"));
-
     codeComboBox = new ComboBox;
     QStringList codes;
     string env = getenv("PATH");
@@ -635,22 +632,6 @@ DoseConfigDialog::DoseConfigDialog()
         zSpinBox->setValue(value);
     });
 
-    auto buttonBox = new QDialogButtonBox(this);
-    auto okButton = new PushButton(_("&Ok"));
-    buttonBox->addButton(okButton, QDialogButtonBox::AcceptRole);
-    connect(buttonBox, &QDialogButtonBox::accepted, [this](){ this->accept(); });
-
-    auto vbox = new QVBoxLayout;
-    vbox->addLayout(new HSeparatorBox(new QLabel("PHITS/QAD")));
-    vbox->addWidget(rangeBox);
-    vbox->addLayout(gridLayout2);
-    vbox->addLayout(new HSeparatorBox(new QLabel(_("Plain"))));
-    vbox->addLayout(gridLayout3);
-    vbox->addStretch();
-    vbox->addWidget(new HSeparator);
-    vbox->addWidget(buttonBox);
-    setLayout(vbox);
-
     phitsRunner.sigReadPHITSData().connect([&](const string& filename){ readPHITSData(filename); });
     for(int i = 0; i < MAX_PROCESS; ++i) {
         qadRunners[i].sigReadPHITSData().connect([&](const string& filename){ readPHITSData(filename); });
@@ -658,6 +639,24 @@ DoseConfigDialog::DoseConfigDialog()
 
     defaultNuclideTableFile = toUTF8((shareDirPath() / "default" / "nuclides.yaml").string());
     defaultElementTableFile = toUTF8((shareDirPath() / "default" / "elements.yaml").string());
+
+    auto buttonBox = new QDialogButtonBox(this);
+    auto okButton = new PushButton(_("&Ok"));
+    buttonBox->addButton(okButton, QDialogButtonBox::AcceptRole);
+    connect(buttonBox, &QDialogButtonBox::accepted, [this](){ this->accept(); });
+
+    auto mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(new HSeparatorBox(new QLabel("PHITS/QAD")));
+    mainLayout->addWidget(rangeBox);
+    mainLayout->addLayout(gridLayout2);
+    mainLayout->addLayout(new HSeparatorBox(new QLabel(_("Plain"))));
+    mainLayout->addLayout(gridLayout3);
+    mainLayout->addStretch();
+    mainLayout->addWidget(new HSeparator);
+    mainLayout->addWidget(buttonBox);
+    setLayout(mainLayout);
+
+    setWindowTitle(_("Configuration of PHITS"));
 }
 
 

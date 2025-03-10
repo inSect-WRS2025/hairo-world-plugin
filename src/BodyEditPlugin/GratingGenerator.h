@@ -17,9 +17,6 @@ public:
     GratingGenerator();
     virtual ~GratingGenerator();
 
-private:
-    class Impl;
-    Impl* impl;
 };
 
 }

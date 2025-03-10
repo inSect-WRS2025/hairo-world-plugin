@@ -26,10 +26,10 @@ namespace filesystem = cnoid::stdx::filesystem;
 
 namespace {
 
-class EnergyFilterDialog : public Dialog
+class EnergyFilterDialog : public QDialog
 {
 public:
-    EnergyFilterDialog();
+    EnergyFilterDialog(QWidget* parent = nullptr);
 
     enum ItemId { CHECK, SPECIES, MIN, MAX };
 
@@ -181,11 +181,9 @@ void EnergyFilter::restoreState(const Archive& archive)
 }
 
 
-EnergyFilterDialog::EnergyFilterDialog()
-    : Dialog()
+EnergyFilterDialog::EnergyFilterDialog(QWidget* parent)
+    : QDialog(parent)
 {
-    setWindowTitle(_("Energy Filter Config"));
-
     ButtonGroup group;
     group.addButton(&noFilterRadio);
     group.addButton(&rangeFilterRadio);
@@ -240,15 +238,17 @@ EnergyFilterDialog::EnergyFilterDialog()
             nuclideTree->setEnabled(checked);
         });
 
-    auto vbox = new QVBoxLayout();
-    vbox->addWidget(&noFilterRadio);
-    vbox->addLayout(rangeHbox);
-    vbox->addLayout(nuclideHbox);
-    vbox->addWidget(nuclideTree);
-    vbox->addStretch();
-    vbox->addWidget(new HSeparator());
-    vbox->addWidget(buttonBox);
-    setLayout(vbox);
+    auto mainLayout = new QVBoxLayout();
+    mainLayout->addWidget(&noFilterRadio);
+    mainLayout->addLayout(rangeHbox);
+    mainLayout->addLayout(nuclideHbox);
+    mainLayout->addWidget(nuclideTree);
+    mainLayout->addStretch();
+    mainLayout->addWidget(new HSeparator());
+    mainLayout->addWidget(buttonBox);
+    setLayout(mainLayout);
+
+    setWindowTitle(_("Energy Filter Config"));
 }
 
 

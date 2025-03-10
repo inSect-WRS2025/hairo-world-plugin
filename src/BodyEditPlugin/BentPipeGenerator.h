@@ -16,10 +16,6 @@ public:
 
     BentPipeGenerator();
     virtual ~BentPipeGenerator();
-
-private:
-    class Impl;
-    Impl* impl;
 };
 
 }

@@ -29,12 +29,7 @@ namespace filesystem = cnoid::stdx::filesystem;
 
 namespace {
 
-TerrainGenerator* terrainInstance = nullptr;
 double scale = 1.0;
-
-}
-
-namespace cnoid {
 
 class TerrainData
 {
@@ -62,13 +57,12 @@ private:
     int id_;
 };
 
-
-class TerrainGenerator::Impl : public Dialog
+class TerrainConfigDialog : public QDialog
 {
 public:
+    TerrainConfigDialog(QWidget* parent = nullptr);
 
-    Impl();
-
+private:
     void reset();
     bool save(const string& filename);
     void load();
@@ -91,28 +85,33 @@ public:
 
 void TerrainGenerator::initializeClass(ExtensionManager* ext)
 {
-    if(!terrainInstance) {
-        terrainInstance = ext->manage(new TerrainGenerator);
+    static TerrainConfigDialog* dialog = nullptr;
+
+    if(!dialog) {
+        dialog = ext->manage(new TerrainConfigDialog);
 
         MenuManager& mm = ext->menuManager().setPath("/Tools").setPath(_("Make a body file"));
-        mm.addItem(_("BoxTerrain"))->sigTriggered().connect(
-                    [&](){ terrainInstance->impl->show(); });
+        mm.addItem(_("BoxTerrain"))->sigTriggered().connect([&](){ dialog->show(); });
     }
 }
 
 
 TerrainGenerator::TerrainGenerator()
 {
-    impl = new Impl;
 
 }
 
 
-TerrainGenerator::Impl::Impl()
-    : Dialog(),
-      fileName("")
+TerrainGenerator::~TerrainGenerator()
 {
-    setWindowTitle(_("BoxTerrain Generator"));
+
+}
+
+
+TerrainConfigDialog::TerrainConfigDialog(QWidget* parent)
+    : QDialog(parent),
+    fileName("")
+{
     yamlWriter.setKeyOrderPreservationMode(true);
 
     data = nullptr;
@@ -137,22 +136,18 @@ TerrainGenerator::Impl::Impl()
     buttonBox->sigResetRequested().connect([&](){ reset(); });
     buttonBox->sigSaveRequested().connect([&](const string& filename){ save(filename); });
 
-    auto vbox = new QVBoxLayout;
-    vbox->addLayout(formLayout);
-    vbox->addStretch();
-    vbox->addWidget(new HSeparator);
-    vbox->addWidget(buttonBox);
-    setLayout(vbox);
+    auto mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(formLayout);
+    mainLayout->addStretch();
+    mainLayout->addWidget(new HSeparator);
+    mainLayout->addWidget(buttonBox);
+    setLayout(mainLayout);
+
+    setWindowTitle(_("BoxTerrain Generator"));
 }
 
 
-TerrainGenerator::~TerrainGenerator()
-{
-    delete impl;
-}
-
-
-void TerrainGenerator::Impl::reset()
+void TerrainConfigDialog::reset()
 {
     fileName.clear();
 
@@ -160,7 +155,7 @@ void TerrainGenerator::Impl::reset()
 }
 
 
-bool TerrainGenerator::Impl::save(const string& filename)
+bool TerrainConfigDialog::save(const string& filename)
 {
     string inputFile = fileName.toStdString();
     if(inputFile.empty()) {
@@ -184,7 +179,7 @@ bool TerrainGenerator::Impl::save(const string& filename)
 }
 
 
-void TerrainGenerator::Impl::load()
+void TerrainConfigDialog::load()
 {
     string filename = getOpenFileName(_("CSV File"), "csv");
     if(!filename.empty()) {
@@ -193,7 +188,7 @@ void TerrainGenerator::Impl::load()
 }
 
 
-MappingPtr TerrainGenerator::Impl::writeBody(const string& filename)
+MappingPtr TerrainConfigDialog::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
@@ -215,7 +210,7 @@ MappingPtr TerrainGenerator::Impl::writeBody(const string& filename)
 }
 
 
-MappingPtr TerrainGenerator::Impl::writeLink()
+MappingPtr TerrainConfigDialog::writeLink()
 {
     MappingPtr node = new Mapping;
 
@@ -235,7 +230,7 @@ MappingPtr TerrainGenerator::Impl::writeLink()
 }
 
 
-void TerrainGenerator::Impl::writeLinkShape(Listing* elementsNode)
+void TerrainConfigDialog::writeLinkShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
@@ -348,7 +343,7 @@ void TerrainGenerator::Impl::writeLinkShape(Listing* elementsNode)
 }
 
 
-void TerrainGenerator::Impl::writeLinkShape2(Listing* elementsNode)
+void TerrainConfigDialog::writeLinkShape2(Listing* elementsNode)
 {
     int xsize = data->xsize();
     int ysize = data->ysize();

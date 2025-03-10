@@ -29,8 +29,6 @@ namespace filesystem = cnoid::stdx::filesystem;
 
 namespace {
 
-StairsGenerator* stairsInstance = nullptr;
-
 DoubleSpinInfo doubleSpinInfo[] = {
     { 0, 1, 0.001, 1000.0, 0.01, 3, 0.15,     "tread", nullptr },
     { 0, 3, 0.001, 1000.0, 0.01, 3, 0.75,     "width", nullptr },
@@ -39,13 +37,21 @@ DoubleSpinInfo doubleSpinInfo[] = {
     { 2, 1, 0.001, 1000.0, 0.01, 3, 0.02, "thickness", nullptr }
 };
 
-}
-
-namespace cnoid {
-
-class StairsGenerator::Impl : public Dialog
+class StairsConfigDialog : public QDialog
 {
 public:
+    StairsConfigDialog(QWidget* parent = nullptr);
+
+private:
+    void reset();
+    bool save(const string& filename);
+
+    void onColorButtonClicked();
+    MappingPtr writeBody(const string& filename);
+    MappingPtr writeLink();
+    void writeLinkShape(Listing* elementsNode);
+    void writeStringerShape(Listing* elementsNode);
+    void writeStepShape(Listing* elementsNode);
 
     enum {
         TREAD, WIDTH, RISER,
@@ -58,18 +64,6 @@ public:
     ColorButton* colorButton;
     GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
-
-    Impl();
-
-    void reset();
-    bool save(const string& filename);
-
-    void onColorButtonClicked();
-    MappingPtr writeBody(const string& filename);
-    MappingPtr writeLink();
-    void writeLinkShape(Listing* elementsNode);
-    void writeStringerShape(Listing* elementsNode);
-    void writeStepShape(Listing* elementsNode);
 };
 
 }
@@ -77,26 +71,32 @@ public:
 
 void StairsGenerator::initializeClass(ExtensionManager* ext)
 {
-    if(!stairsInstance) {
-        stairsInstance = ext->manage(new StairsGenerator);
+    static StairsConfigDialog* dialog = nullptr;
+
+    if(!dialog) {
+        dialog = ext->manage(new StairsConfigDialog);
 
         MenuManager& mm = ext->menuManager().setPath("/Tools").setPath(_("Make a body file"));
-        mm.addItem(_("Stairs"))->sigTriggered().connect(
-                    [&](){ stairsInstance->impl->show(); });
+        mm.addItem(_("Stairs"))->sigTriggered().connect([&](){ dialog->show(); });
     }
 }
 
 
 StairsGenerator::StairsGenerator()
 {
-    impl = new Impl;
+
 }
 
 
-StairsGenerator::Impl::Impl()
-    : Dialog()
+StairsGenerator::~StairsGenerator()
 {
-    setWindowTitle(_("Stairs Generator"));
+
+}
+
+
+StairsConfigDialog::StairsConfigDialog(QWidget* parent)
+    : QDialog(parent)
+{
     yamlWriter.setKeyOrderPreservationMode(true);
 
     auto gridLayout = new QGridLayout;
@@ -133,22 +133,18 @@ StairsGenerator::Impl::Impl()
     buttonBox->sigResetRequested().connect([&](){ reset(); });
     buttonBox->sigSaveRequested().connect([&](const string& filename){ save(filename); });
 
-    auto vbox = new QVBoxLayout;
-    vbox->addLayout(gridLayout);
-    vbox->addStretch();
-    vbox->addWidget(new HSeparator);
-    vbox->addWidget(buttonBox);
-    setLayout(vbox);
+    auto mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(gridLayout);
+    mainLayout->addStretch();
+    mainLayout->addWidget(new HSeparator);
+    mainLayout->addWidget(buttonBox);
+    setLayout(mainLayout);
+
+    setWindowTitle(_("Stairs Generator"));
 }
 
 
-StairsGenerator::~StairsGenerator()
-{
-    delete impl;
-}
-
-
-void StairsGenerator::Impl::reset()
+void StairsConfigDialog::reset()
 {
     for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
@@ -162,7 +158,7 @@ void StairsGenerator::Impl::reset()
 }
 
 
-bool StairsGenerator::Impl::save(const string& filename)
+bool StairsConfigDialog::save(const string& filename)
 {
     if(!filename.empty()) {
         auto topNode = writeBody(filename);
@@ -176,7 +172,7 @@ bool StairsGenerator::Impl::save(const string& filename)
 }
 
 
-MappingPtr StairsGenerator::Impl::writeBody(const string& filename)
+MappingPtr StairsConfigDialog::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
@@ -198,7 +194,7 @@ MappingPtr StairsGenerator::Impl::writeBody(const string& filename)
 }
 
 
-MappingPtr StairsGenerator::Impl::writeLink()
+MappingPtr StairsConfigDialog::writeLink()
 {
     MappingPtr node = new Mapping;
 
@@ -218,7 +214,7 @@ MappingPtr StairsGenerator::Impl::writeLink()
 }
 
 
-void StairsGenerator::Impl::writeLinkShape(Listing* elementsNode)
+void StairsConfigDialog::writeLinkShape(Listing* elementsNode)
 {
     double tread = doubleSpinBoxes[TREAD]->value();
     double width = doubleSpinBoxes[WIDTH]->value();
@@ -269,7 +265,7 @@ void StairsGenerator::Impl::writeLinkShape(Listing* elementsNode)
 }
 
 
-void StairsGenerator::Impl::writeStringerShape(Listing* elementsNode)
+void StairsConfigDialog::writeStringerShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
@@ -318,7 +314,7 @@ void StairsGenerator::Impl::writeStringerShape(Listing* elementsNode)
 }
 
 
-void StairsGenerator::Impl::writeStepShape(Listing* elementsNode)
+void StairsConfigDialog::writeStepShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 

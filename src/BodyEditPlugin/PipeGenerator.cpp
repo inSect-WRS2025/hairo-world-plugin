@@ -35,8 +35,6 @@ namespace filesystem = cnoid::stdx::filesystem;
 
 namespace {
 
-PipeGenerator* pipeInstance = nullptr;
-
 DoubleSpinInfo doubleSpinInfo[] = {
     { 0, 1, 0.01, 1000.0, 0.01, 3, 1.00,           "mass", nullptr },
     { 0, 3, 0.01, 1000.0, 0.01, 3, 1.00,         "length", nullptr },
@@ -50,14 +48,10 @@ SpinInfo spinInfo[] = {
     { 2, 3, 1, 120, 1, 30, "outer_step", nullptr }
 };
 
-}
-
-namespace cnoid {
-
-class SquarePipeGenerator : public Dialog
+class SquarePipeConfigDialog : public QDialog
 {
 public:
-    SquarePipeGenerator(QWidget* parent = nullptr);
+    SquarePipeConfigDialog(QWidget* parent = nullptr);
 
     void setWidth(double width) { widthSpinBox->setValue(width); }
     double width() const { return widthSpinBox->value(); }
@@ -76,22 +70,12 @@ private:
     QDialogButtonBox* buttonBox;
 };
 
-class PipeGenerator::Impl : public Dialog
+class PipeConfigDialog : public QDialog
 {
 public:
+    PipeConfigDialog(QWidget* parent = nullptr);
 
-    enum { MASS, LENGTH, IN_DIA, OUT_DIA, NumDoubleSpinBoxes };
-    enum { ANGLE, IN_STEP, OUT_STEP, NumSpinBoxes };
-
-    DoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
-    SpinBox* spinBoxes[NumSpinBoxes];
-    ColorButton* colorButton;
-    GeneratorButtonBox* buttonBox;
-    YAMLWriter yamlWriter;
-    Action* configureAct;
-
-    Impl();
-
+private:
     virtual void contextMenuEvent(QContextMenuEvent* event) override;
 
     void reset();
@@ -104,33 +88,50 @@ public:
     MappingPtr writeLink();
     void writeLinkShape(Listing* elementsNode);
     VectorXd calcInertia();
+
+    enum { MASS, LENGTH, IN_DIA, OUT_DIA, NumDoubleSpinBoxes };
+    enum { ANGLE, IN_STEP, OUT_STEP, NumSpinBoxes };
+
+    DoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
+    SpinBox* spinBoxes[NumSpinBoxes];
+    ColorButton* colorButton;
+    GeneratorButtonBox* buttonBox;
+    YAMLWriter yamlWriter;
+    Action* configureAct;
 };
+
 
 }
 
 
 void PipeGenerator::initializeClass(ExtensionManager* ext)
 {
-    if(!pipeInstance) {
-        pipeInstance = ext->manage(new PipeGenerator);
+    static PipeConfigDialog* dialog = nullptr;
+
+    if(!dialog) {
+        dialog = ext->manage(new PipeConfigDialog);
 
         MenuManager& mm = ext->menuManager().setPath("/Tools").setPath(_("Make a body file"));
-        mm.addItem(_("Pipe"))->sigTriggered().connect(
-                    [&](){ pipeInstance->impl->show(); });
+        mm.addItem(_("Pipe"))->sigTriggered().connect([&](){ dialog->show(); });
     }
 }
 
 
 PipeGenerator::PipeGenerator()
 {
-    impl = new Impl;
+
 }
 
 
-PipeGenerator::Impl::Impl()
-    : Dialog()
+PipeGenerator::~PipeGenerator()
 {
-    setWindowTitle(_("Pipe Generator"));
+
+}
+
+
+PipeConfigDialog::PipeConfigDialog(QWidget* parent)
+    : QDialog(parent)
+{
     yamlWriter.setKeyOrderPreservationMode(true);
 
     auto gridLayout = new QGridLayout;
@@ -168,30 +169,26 @@ PipeGenerator::Impl::Impl()
     gridLayout->addWidget(new QLabel(_("Color [-]")), 3, 0);
     gridLayout->addWidget(colorButton, 3, 1);
 
-    buttonBox = new GeneratorButtonBox;
-    buttonBox->sigResetRequested().connect([&](){ reset(); });
-    buttonBox->sigSaveRequested().connect([&](const string& filename){ save(filename); });
-
     configureAct = new Action;
     configureAct->setText(_("Advanced settings"));
     configureAct->sigTriggered().connect([this](){ configure(); });
 
-    auto vbox = new QVBoxLayout;
-    vbox->addLayout(gridLayout);
-    vbox->addStretch();
-    vbox->addWidget(new HSeparator);
-    vbox->addWidget(buttonBox);
-    setLayout(vbox);
+    buttonBox = new GeneratorButtonBox;
+    buttonBox->sigResetRequested().connect([&](){ reset(); });
+    buttonBox->sigSaveRequested().connect([&](const string& filename){ save(filename); });
+
+    auto mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(gridLayout);
+    mainLayout->addStretch();
+    mainLayout->addWidget(new HSeparator);
+    mainLayout->addWidget(buttonBox);
+    setLayout(mainLayout);
+
+    setWindowTitle(_("Pipe Generator"));
 }
 
 
-PipeGenerator::~PipeGenerator()
-{
-    delete impl;
-}
-
-
-void PipeGenerator::Impl::contextMenuEvent(QContextMenuEvent* event)
+void PipeConfigDialog::contextMenuEvent(QContextMenuEvent* event)
 {
     Menu menu(this);
     menu.addAction(configureAct);
@@ -199,7 +196,7 @@ void PipeGenerator::Impl::contextMenuEvent(QContextMenuEvent* event)
 }
 
 
-void PipeGenerator::Impl::reset()
+void PipeConfigDialog::reset()
 {
     for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
@@ -217,9 +214,9 @@ void PipeGenerator::Impl::reset()
 }
 
 
-void PipeGenerator::Impl::configure()
+void PipeConfigDialog::configure()
 {
-    SquarePipeGenerator dialog;
+    SquarePipeConfigDialog dialog;
     dialog.setWidth(doubleSpinBoxes[OUT_DIA]->value() / qSqrt(2.0));
     dialog.setRadius(doubleSpinBoxes[IN_DIA]->value() / 2.0);
     dialog.setLength(doubleSpinBoxes[LENGTH]->value());
@@ -234,7 +231,7 @@ void PipeGenerator::Impl::configure()
 }
 
 
-bool PipeGenerator::Impl::save(const string& filename)
+bool PipeConfigDialog::save(const string& filename)
 {
     if(!filename.empty()) {
         auto topNode = writeBody(filename);
@@ -248,7 +245,7 @@ bool PipeGenerator::Impl::save(const string& filename)
 }
 
 
-void PipeGenerator::Impl::onInnerDiameterChanged(const double& diameter)
+void PipeConfigDialog::onInnerDiameterChanged(const double& diameter)
 {
     double d_out = doubleSpinBoxes[OUT_DIA]->value();
     if(diameter >= d_out) {
@@ -258,7 +255,7 @@ void PipeGenerator::Impl::onInnerDiameterChanged(const double& diameter)
 }
 
 
-void PipeGenerator::Impl::onOuterDiameterChanged(const double& diameter)
+void PipeConfigDialog::onOuterDiameterChanged(const double& diameter)
 {
     double d_in = doubleSpinBoxes[IN_DIA]->value();
     if(diameter <= d_in) {
@@ -268,7 +265,7 @@ void PipeGenerator::Impl::onOuterDiameterChanged(const double& diameter)
 }
 
 
-MappingPtr PipeGenerator::Impl::writeBody(const string& filename)
+MappingPtr PipeConfigDialog::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
@@ -290,7 +287,7 @@ MappingPtr PipeGenerator::Impl::writeBody(const string& filename)
 }
 
 
-MappingPtr PipeGenerator::Impl::writeLink()
+MappingPtr PipeConfigDialog::writeLink()
 {
     MappingPtr node = new Mapping;
 
@@ -312,7 +309,7 @@ MappingPtr PipeGenerator::Impl::writeLink()
 }
 
 
-void PipeGenerator::Impl::writeLinkShape(Listing* elementsNode)
+void PipeConfigDialog::writeLinkShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
@@ -373,7 +370,7 @@ void PipeGenerator::Impl::writeLinkShape(Listing* elementsNode)
 }
 
 
-VectorXd PipeGenerator::Impl::calcInertia()
+VectorXd PipeConfigDialog::calcInertia()
 {
     VectorXd innerInertia, outerInertia;
     innerInertia.resize(9);
@@ -414,11 +411,9 @@ VectorXd PipeGenerator::Impl::calcInertia()
 }
 
 
-SquarePipeGenerator::SquarePipeGenerator(QWidget* parent)
-    : Dialog(parent)
+SquarePipeConfigDialog::SquarePipeConfigDialog(QWidget* parent)
+    : QDialog(parent)
 {
-    setWindowTitle(_("SquarePipe Generator"));
-
     widthSpinBox = new DoubleSpinBox;
     widthSpinBox->setRange(0.01, 1000.0);
     widthSpinBox->setSingleStep(0.01);
@@ -453,9 +448,11 @@ SquarePipeGenerator::SquarePipeGenerator(QWidget* parent)
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
-    auto vbox = new QVBoxLayout;
-    vbox->addLayout(formLayout);
-    vbox->addWidget(new HSeparator);
-    vbox->addWidget(buttonBox);
-    setLayout(vbox);
+    auto mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(formLayout);
+    mainLayout->addWidget(new HSeparator);
+    mainLayout->addWidget(buttonBox);
+    setLayout(mainLayout);
+
+    setWindowTitle(_("SquarePipe Generator"));
 }

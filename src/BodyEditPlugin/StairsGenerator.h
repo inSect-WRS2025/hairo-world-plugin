@@ -16,10 +16,6 @@ public:
 
     StairsGenerator();
     virtual ~StairsGenerator();
-
-private:
-    class Impl;
-    Impl* impl;
 };
 
 }
