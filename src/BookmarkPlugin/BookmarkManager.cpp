@@ -54,22 +54,25 @@ BookmarkManager::BookmarkManager(QWidget* parent)
     setArchiveKey("bookmark_list");
     setFixedSize(800, 450);
 
-    auto button1 = fileBar()->addButton(":/GoogleMaterialSymbols/icon/bookmark_add_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-    button1->setToolTip(_("Bookmark a current project"));
+    const QIcon bookmarkIcon = QIcon(":/GoogleMaterialSymbols/icon/bookmark_add_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
+    auto button1 = new ToolButton;
+    button1->setIcon(bookmarkIcon);
+    // button1->setToolTip(_("Bookmark a current project"));
     button1->sigClicked().connect([&](){ onAddButtonClicked(); });
 
     button1->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(button1, &ToolButton::customContextMenuRequested,
         [&](const QPoint& pos){ this->contextMenu()->exec(QCursor::pos()); });
 
-    const QIcon icon = QIcon(":/GoogleMaterialSymbols/icon/file_open_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
+    const QIcon openIcon = QIcon(":/GoogleMaterialSymbols/icon/file_open_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
     auto button2 = new ToolButton;
-    button2->setIcon(icon);
+    button2->setIcon(openIcon);
     button2->sigClicked().connect([&](){ onOpenButtonClicked(); });
 
     autoCheck_ = new CheckBox;
     autoCheck_->setText(_("Autoplay"));
 
+    addWidget(button1);
     addWidget(button2);
     addWidget(autoCheck_);
 
