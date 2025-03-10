@@ -84,7 +84,7 @@ public:
 
 
 OnScreenJoystickWidget::OnScreenJoystickWidget(QWidget* parent)
-    : Widget(parent)
+    : QWidget(parent)
 {
     impl = new Impl(this);
 }

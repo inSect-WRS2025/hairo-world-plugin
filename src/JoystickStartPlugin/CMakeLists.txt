@@ -7,7 +7,6 @@ set(sources
   JoystickStartPlugin.cpp
   OnScreenJoystickView.cpp
   JoystickTester.cpp
-  KeyConfig.cpp
   JoystickStarter.cpp
   VirtualJoystickWidget.cpp
 )
@@ -22,7 +21,6 @@ set(headers
   JoystickLoggerItem.h
   OnScreenJoystickView.h
   JoystickTester.h
-  KeyConfig.h
   JoystickStarter.h
   VirtualJoystickWidget.h
   exportdecl.h
