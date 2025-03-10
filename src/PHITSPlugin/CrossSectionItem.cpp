@@ -130,6 +130,7 @@ public:
     DoubleSpinBox maxSpin[MAX_PARAMETER];
     ComboBox* codeComboBox;
     CheckBox* messageCheckBox;
+    QDialogButtonBox* buttonBox;
 
     PHITSRunner phitsRunner;
     PHITSRunner qadRunners[MAX_PROCESS];
@@ -640,10 +641,8 @@ DoseConfigDialog::DoseConfigDialog(QWidget* parent)
     defaultNuclideTableFile = toUTF8((shareDirPath() / "default" / "nuclides.yaml").string());
     defaultElementTableFile = toUTF8((shareDirPath() / "default" / "elements.yaml").string());
 
-    auto buttonBox = new QDialogButtonBox(this);
-    auto okButton = new PushButton(_("&Ok"));
-    buttonBox->addButton(okButton, QDialogButtonBox::AcceptRole);
-    connect(buttonBox, &QDialogButtonBox::accepted, [this](){ this->accept(); });
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addLayout(new HSeparatorBox(new QLabel("PHITS/QAD")));

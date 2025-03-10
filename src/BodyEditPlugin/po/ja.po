@@ -176,9 +176,6 @@ msgstr "インポート(&I)"
 msgid "&Export"
 msgstr "エクスポート(&E)"
 
-msgid "&Ok"
-msgstr "Ｏｋ(&O)"
-
 msgid "YAML File"
 msgstr "YAMLファイル"
 

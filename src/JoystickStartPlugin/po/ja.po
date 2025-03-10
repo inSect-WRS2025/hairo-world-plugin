@@ -26,9 +26,6 @@ msgstr "デバイス"
 msgid "KeyConfig"
 msgstr "キーコンフィグ"
 
-msgid "&Ok"
-msgstr "了解(&O)"
-
 msgid "Virtual Joystick2"
 msgstr "仮想ジョイスティック2"
 

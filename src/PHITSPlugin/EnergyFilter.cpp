@@ -39,6 +39,7 @@ public:
     SpinBox* minChSpinBox;
     SpinBox* maxChSpinBox;
     TreeWidget* nuclideTree;
+    QDialogButtonBox* buttonBox;
 
     void storeState(Archive& archive);
     void restoreState(const Archive& archive);
@@ -218,12 +219,6 @@ EnergyFilterDialog::EnergyFilterDialog(QWidget* parent)
     const QStringList headers = { " ", _("Nuclide"), _("Min [Ch]"), _("Max [Ch]") };
     nuclideTree->setHeaderLabels(headers);
 
-    QPushButton* okButton = new QPushButton(_("&Ok"));
-    okButton->setDefault(true);
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(this);
-    buttonBox->addButton(okButton, QDialogButtonBox::AcceptRole);
-    connect(buttonBox,SIGNAL(accepted()), this, SLOT(accept()));
-
     noFilterRadio.setChecked(true);
     minChSpinBox->setEnabled(false);
     maxChSpinBox->setEnabled(false);
@@ -237,6 +232,9 @@ EnergyFilterDialog::EnergyFilterDialog(QWidget* parent)
         [&](bool checked){
             nuclideTree->setEnabled(checked);
         });
+
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
 
     auto mainLayout = new QVBoxLayout();
     mainLayout->addWidget(&noFilterRadio);
