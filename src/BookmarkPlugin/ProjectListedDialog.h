@@ -19,13 +19,13 @@ public:
     static void initializeClass(ExtensionManager* ext);
     static ProjectListedDialog* instance();
 
-    ListedWidget* listWidget() { return listWidget_; }
+    ListedWidget* listedWidget() { return listedWidget_; }
 
     ProjectListedDialog(QWidget* parent = nullptr);
     virtual ~ProjectListedDialog();
 
 private:
-    ListedWidget* listWidget_;
+    ListedWidget* listedWidget_;
     QDialogButtonBox* buttonBox;
 };
 

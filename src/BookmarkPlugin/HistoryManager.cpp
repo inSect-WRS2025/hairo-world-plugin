@@ -24,7 +24,7 @@ void HistoryManager::initializeClass(ExtensionManager* ext)
         widget = ext->manage(new HistoryManager);
 
         const QIcon historyIcon = QIcon(":/GoogleMaterialSymbols/icon/manage_history_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        ProjectListedDialog::instance()->listWidget()->addWidget(historyIcon, _("History"), widget);
+        ProjectListedDialog::instance()->listedWidget()->addWidget(historyIcon, _("History"), widget);
 
         auto action = get_Tools_Menu()->addAction(_("History"));
         action->setMenu(widget->contextMenu());

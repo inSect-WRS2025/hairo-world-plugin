@@ -9,7 +9,6 @@
 #include <cnoid/EigenTypes>
 #include <cnoid/ExtensionManager>
 #include <cnoid/MenuManager>
-#include <cnoid/Separator>
 #include <cnoid/SpinBox>
 #include <cnoid/UTF8>
 #include <cnoid/YAMLWriter>
@@ -19,7 +18,7 @@
 #include <QLabel>
 #include "BodyCreatorDialog.h"
 #include "ColorButton.h"
-#include "GeneratorButtonBox.h"
+#include "CreatorToolBar.h"
 #include "WidgetInfo.h"
 #include "gettext.h"
 
@@ -71,7 +70,6 @@ private:
 
     QLabel* sizeLabel;
     ColorButton* colorButton;
-    GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
 };
 
@@ -85,7 +83,7 @@ void GratingCreator::initializeClass(ExtensionManager* ext)
     if(!dialog) {
         dialog = ext->manage(new GratingCreatorWidget);
 
-        BodyCreatorDialog::instance()->listWidget()->addWidget(_("Grating"), dialog);
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Grating"), dialog);
     }
 }
 
@@ -154,15 +152,14 @@ GratingCreatorWidget::GratingCreatorWidget(QWidget* parent)
 
     onValueChanged();
 
-    buttonBox = new GeneratorButtonBox;
-    buttonBox->sigResetRequested().connect([&](){ reset(); });
-    buttonBox->sigSaveRequested().connect([&](const string& filename){ save(filename); });
+    auto toolBar = new CreatorToolBar;
+    toolBar->sigNewRequested().connect([&](){ reset(); });
+    toolBar->sigSaveRequested().connect([&](const string& filename){ save(filename); });
 
     auto mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(toolBar);
     mainLayout->addLayout(gridLayout);
     mainLayout->addStretch();
-    mainLayout->addWidget(new HSeparator);
-    mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
     setWindowTitle(_("Grating Generator"));

@@ -54,7 +54,7 @@ msgid "Stairs"
 msgstr "階段"
 
 msgid "Stairs Creator"
-msgstr "階段生成"
+msgstr "階段の作成"
 
 msgid "Tread [m]"
 msgstr "踏み面 [m]"
@@ -84,7 +84,7 @@ msgid "CrawlerRobot"
 msgstr "クローラロボット"
 
 msgid "CrawlerRobot Creator"
-msgstr "クローラロボット生成"
+msgstr "クローラロボットの作成"
 
 msgid "Front SubTrack"
 msgstr "サブトラック（前）"
@@ -168,13 +168,13 @@ msgid "nodes to wheels split threshold [-]"
 msgstr "ノードのスプリット閾値 [-]"
 
 msgid "&New"
-msgstr "新規(&N)"
+msgstr ""
 
 msgid "&Import"
-msgstr "インポート(&I)"
+msgstr ""
 
 msgid "&Export"
-msgstr "エクスポート(&E)"
+msgstr ""
 
 msgid "YAML File"
 msgstr "YAMLファイル"
@@ -191,20 +191,17 @@ msgstr "色の選択"
 msgid "File"
 msgstr "ファイル"
 
-msgid "&Reset"
-msgstr "リセット(&R)"
-
 msgid "&Save"
-msgstr "上書き保存(&S)"
+msgstr ""
 
 msgid "Save &As..."
-msgstr "名前を付けて保存(&A)"
+msgstr ""
 
 msgid "Body"
 msgstr "ボディ"
 
 msgid "Grating Creator"
-msgstr "グレーチング生成"
+msgstr "グレーチングの作成"
 
 msgid "Mass [kg]"
 msgstr "質量 [kg]"
@@ -240,7 +237,7 @@ msgid "Size [m, m, m]"
 msgstr "大きさ [m, m, m]"
 
 msgid "Pipe Creator"
-msgstr "パイプ生成"
+msgstr "パイプの作成"
 
 msgid "Length [m]"
 msgstr "長さ [m]"
@@ -264,7 +261,7 @@ msgid "Outer step angle [deg]"
 msgstr "きざみ角度（外側） [deg]"
 
 msgid "BentPipe Creator"
-msgstr "ベントパイプ生成"
+msgstr "ベントパイプの作成"
 
 msgid "Bent angle [deg]"
 msgstr "曲げ角度 [deg]"
@@ -276,13 +273,13 @@ msgid "Bent step angle [deg]"
 msgstr "曲げきざみ角度 [deg]"
 
 msgid "Slope Creator"
-msgstr "スロープ生成"
+msgstr "スロープの作成"
 
 msgid "Width [m]"
 msgstr "幅 [m]"
 
 msgid "BoxTerrain Creator"
-msgstr "ボックステレイン生成"
+msgstr "ボックステレインの作成"
 
 msgid "&Load"
 msgstr "読み込み(&L)"
@@ -363,7 +360,7 @@ msgid "Advanced settings"
 msgstr "高度な設定"
 
 msgid "SquarePipe Creator"
-msgstr "角パイプ生成"
+msgstr "角パイプの作成"
 
 msgid "Radius [m]"
 msgstr "半径 [m]"
@@ -373,3 +370,6 @@ msgstr "ボディの作成"
 
 msgid "Body Creator"
 msgstr "ボディクリエイタ"
+
+msgid "Creator ToolBar"
+msgstr "クリエイタツールバー"

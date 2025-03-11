@@ -26,7 +26,7 @@
 #include <QtMath>
 #include "BodyCreatorDialog.h"
 #include "ColorButton.h"
-#include "GeneratorButtonBox.h"
+#include "CreatorToolBar.h"
 #include "WidgetInfo.h"
 #include "gettext.h"
 
@@ -96,7 +96,6 @@ private:
     DoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
     SpinBox* spinBoxes[NumSpinBoxes];
     ColorButton* colorButton;
-    GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
     Action* configureAct;
 };
@@ -112,7 +111,7 @@ void PipeCreator::initializeClass(ExtensionManager* ext)
     if(!dialog) {
         dialog = ext->manage(new PipeCreatorWidget);
 
-        BodyCreatorDialog::instance()->listWidget()->addWidget(_("Pipe"), dialog);
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Pipe"), dialog);
     }
 }
 
@@ -173,15 +172,14 @@ PipeCreatorWidget::PipeCreatorWidget(QWidget* parent)
     configureAct->setText(_("Advanced settings"));
     configureAct->sigTriggered().connect([this](){ configure(); });
 
-    buttonBox = new GeneratorButtonBox;
-    buttonBox->sigResetRequested().connect([&](){ reset(); });
-    buttonBox->sigSaveRequested().connect([&](const string& filename){ save(filename); });
+    auto toolBar = new CreatorToolBar;
+    toolBar->sigNewRequested().connect([&](){ reset(); });
+    toolBar->sigSaveRequested().connect([&](const string& filename){ save(filename); });
 
     auto mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(toolBar);
     mainLayout->addLayout(gridLayout);
     mainLayout->addStretch();
-    mainLayout->addWidget(new HSeparator);
-    mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
     setWindowTitle(_("Pipe Generator"));

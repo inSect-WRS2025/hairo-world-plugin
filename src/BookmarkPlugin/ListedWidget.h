@@ -7,6 +7,7 @@
 
 #include <QBoxLayout>
 #include <QListWidget>
+#include <QPushButton>
 #include <QStackedWidget>
 #include <QWidget>
 #include "exportdecl.h"
@@ -24,8 +25,8 @@ public:
     void addLayout(const QString& text, QLayout* layout);
     void addLayout(const QIcon& icon, const QString& text, QLayout* layout);
 
-    void addButton(const QString& text);
-    void addButton(const QIcon& icon, const QString& text);
+    QPushButton* addButton(const QString& text);
+    QPushButton* addButton(const QIcon& icon, const QString& text);
 
 private:
     QListWidget* listWidget;

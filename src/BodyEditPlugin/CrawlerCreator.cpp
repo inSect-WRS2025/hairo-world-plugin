@@ -29,7 +29,7 @@
 #include <QWidget>
 #include "BodyCreatorDialog.h"
 #include "ColorButton.h"
-#include "GeneratorButtonBox.h"
+#include "CreatorToolBar.h"
 #include "gettext.h"
 
 using namespace std;
@@ -274,19 +274,16 @@ private:
         RFL_CLR, SPC_CLR, NumColorButtons
     };
     enum { FFL_CHK, RFL_CHK, AGX_CHK, NumCheckBoxes };
-    enum { IMPORT, EXPORT, NumToolButtons };
 
     CheckBox* checkBoxes[NumCheckBoxes];
     ColorButton* colorButtons[NumColorButtons];
     DoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
     DoubleSpinBox* agxDoubleSpinBoxes[NumAGXDoubleSpinBoxes];
     SpinBox* agxSpinBoxes[NumSpinBoxes];
-    PushButton* toolButtons[NumToolButtons];
     ButtonGroup settingGroup;
     RadioButton setting1Radio;
     RadioButton setting2Radio;
     QStackedWidget* topWidget;
-    GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
     YAMLWriter yamlWriter2;
 };
@@ -301,7 +298,7 @@ void CrawlerCreator::initializeClass(ExtensionManager* ext)
     if(!dialog) {
         dialog = ext->manage(new CrawlerCreatorWidget);
 
-        BodyCreatorDialog::instance()->listWidget()->addWidget(_("Crawler"), dialog);
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Crawler"), dialog);
     }
 }
 
@@ -426,13 +423,6 @@ CrawlerCreatorWidget::CrawlerCreatorWidget(QWidget* parent)
 
     hbox->addStretch();
 
-    for(int i = 0; i < NumToolButtons; ++i) {
-        const QIcon icon = QIcon::fromTheme(i == 0 ? "document-open" : "document-save");
-        PushButton* button = toolButtons[i] = new PushButton(icon, i == 0 ? _("&Import") : _("&Export"), this);
-        button->sigClicked().connect([&, i](){ i == 0 ? onImportButtonClicked() : onExportButtonClicked(); });
-        hbox->addWidget(button);
-    }
-
     initialize();
 
     QWidget* page1Widget = new QWidget;
@@ -459,15 +449,20 @@ CrawlerCreatorWidget::CrawlerCreatorWidget(QWidget* parent)
     topWidget->addWidget(page2Widget);
     // topWidget->addWidget(page3Widget);
 
-    buttonBox = new GeneratorButtonBox;
-    buttonBox->sigResetRequested().connect([&](){ initialize(); });
-    buttonBox->sigSaveRequested().connect([&](const string& filename){ save(filename); });
+    auto toolBar = new CreatorToolBar;
+    toolBar->sigNewRequested().connect([&](){ initialize(); });
+    toolBar->sigSaveRequested().connect([&](const string& filename){ save(filename); });
+
+    for(int i = 0; i < 2; ++i) {
+        const QIcon icon = QIcon::fromTheme(i == 0 ? "document-open" : "document-save");
+        auto button = toolBar->addButton(icon, i == 0 ? _("&Import") : _("&Export"));
+        connect(button, &QPushButton::clicked, [&, i](){ i == 0 ? onImportButtonClicked() : onExportButtonClicked(); });
+    }
 
     auto mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(toolBar);
     mainLayout->addLayout(hbox);
     mainLayout->addWidget(topWidget);
-    mainLayout->addWidget(new HSeparator);
-    mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
     setWindowTitle(_("CrawlerRobot Generator"));

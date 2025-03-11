@@ -2,11 +2,10 @@
    @author Kenta Suzuki
 */
 
-#include "GeneratorButtonBox.h"
+#include "CreatorToolBar.h"
 #include <cnoid/BodyItem>
 #include <cnoid/RootItem>
 #include <QBoxLayout>
-#include <QPushButton>
 #include <cnoid/UTF8>
 #include <cnoid/stdx/filesystem>
 #include <cnoid/HamburgerMenu>
@@ -18,14 +17,14 @@ namespace filesystem = cnoid::stdx::filesystem;
 
 namespace cnoid {
 
-class GeneratorButtonBox::Impl
+class CreatorToolBar::Impl
 {
 public:
-    GeneratorButtonBox* self;
+    CreatorToolBar* self;
 
-    Impl(GeneratorButtonBox* self);
+    Impl(CreatorToolBar* self);
 
-    void reset();
+    void newFile();
     void save();
     void saveAs();
 
@@ -33,27 +32,28 @@ public:
     void reloadItem();
 
     QString fileName;
+    QHBoxLayout* elementLayout;
 
-    Signal<void()> sigResetRequested_;
+    Signal<void()> sigNewRequested_;
     Signal<void(const string& filename)> sigSaveRequested_;
 };
 
 }
 
 
-GeneratorButtonBox::GeneratorButtonBox(QWidget* parent)
-    : QDialogButtonBox(parent)
+CreatorToolBar::CreatorToolBar(QWidget* parent)
+    : QWidget(parent)
 {
     impl = new Impl(this);
 }
 
 
-GeneratorButtonBox::Impl::Impl(GeneratorButtonBox* self)
+CreatorToolBar::Impl::Impl(CreatorToolBar* self)
     : self(self)
 {
-    const QIcon resetIcon = QIcon::fromTheme("document-new");
-    QPushButton* resetButton = new QPushButton(resetIcon, _("&Reset"), self);
-    self->connect(resetButton, &QPushButton::clicked, [&](){ reset(); });
+    const QIcon newIcon = QIcon::fromTheme("document-new");
+    QPushButton* newButton = new QPushButton(newIcon, _("&New"), self);
+    self->connect(newButton, &QPushButton::clicked, [&](){ newFile(); });
 
     const QIcon saveIcon = QIcon::fromTheme("document-save");
     QPushButton* saveButton = new QPushButton(saveIcon, _("&Save"), self);
@@ -63,37 +63,53 @@ GeneratorButtonBox::Impl::Impl(GeneratorButtonBox* self)
     QPushButton* saveAsButton = new QPushButton(saveAsIcon, _("Save &As..."), self);
     self->connect(saveAsButton, &QPushButton::clicked, [&](){ saveAs(); });
 
-    self->addButton(resetButton, QDialogButtonBox::ResetRole);
-    self->addButton(saveButton, QDialogButtonBox::ActionRole);
-    self->addButton(saveAsButton, QDialogButtonBox::ActionRole);
+    elementLayout = new QHBoxLayout;
+
+    auto mainLayout = new QHBoxLayout;
+    mainLayout->addWidget(newButton);
+    mainLayout->addWidget(saveButton);
+    mainLayout->addWidget(saveAsButton);
+    mainLayout->addStretch();
+    mainLayout->addLayout(elementLayout);
+    self->setLayout(mainLayout);
+
+    self->setWindowTitle(_("Creator ToolBar"));
 }
 
 
-GeneratorButtonBox::~GeneratorButtonBox()
+CreatorToolBar::~CreatorToolBar()
 {
     delete impl;
 }
 
 
-SignalProxy<void()> GeneratorButtonBox::sigResetRequested()
+QPushButton* CreatorToolBar::addButton(const QIcon& icon, const QString& text)
 {
-    return impl->sigResetRequested_;
+    auto pushButton = new QPushButton(icon, text);
+    impl->elementLayout->addWidget(pushButton);
+    return pushButton;
 }
 
 
-SignalProxy<void(const string& filename)> GeneratorButtonBox::sigSaveRequested()
+SignalProxy<void()> CreatorToolBar::sigNewRequested()
+{
+    return impl->sigNewRequested_;
+}
+
+
+SignalProxy<void(const string& filename)> CreatorToolBar::sigSaveRequested()
 {
     return impl->sigSaveRequested_;
 }
 
 
-void GeneratorButtonBox::Impl::reset()
+void CreatorToolBar::Impl::newFile()
 {
-    sigResetRequested_();
+    sigNewRequested_();
 }
 
 
-void GeneratorButtonBox::Impl::save()
+void CreatorToolBar::Impl::save()
 {
     if(!fileName.isEmpty()) {
         saveFile(fileName);
@@ -103,14 +119,14 @@ void GeneratorButtonBox::Impl::save()
 }
 
 
-void GeneratorButtonBox::Impl::saveAs()
+void CreatorToolBar::Impl::saveAs()
 {
     fileName = getSaveFileName(_("Body"), "body").c_str();
     saveFile(fileName);
 }
 
 
-void GeneratorButtonBox::Impl::saveFile(const QString& fileName)
+void CreatorToolBar::Impl::saveFile(const QString& fileName)
 {
     string filename = fileName.toStdString();
 
@@ -128,7 +144,7 @@ void GeneratorButtonBox::Impl::saveFile(const QString& fileName)
 }
 
 
-void GeneratorButtonBox::Impl::reloadItem()
+void CreatorToolBar::Impl::reloadItem()
 {
     RootItem* rootItem = RootItem::instance();
     ItemList<BodyItem> bodyItems = rootItem->checkedItems<BodyItem>();

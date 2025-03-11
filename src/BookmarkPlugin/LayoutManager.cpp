@@ -30,7 +30,7 @@ void LayoutManager::initializeClass(ExtensionManager* ext)
         widget = ext->manage(new LayoutManager);
 
         const QIcon layoutIcon = QIcon(":/GoogleMaterialSymbols/icon/dashboard_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        ProjectListedDialog::instance()->listWidget()->addWidget(layoutIcon, _("Layout"), widget);
+        ProjectListedDialog::instance()->listedWidget()->addWidget(layoutIcon, _("Layout"), widget);
     }
 }
 

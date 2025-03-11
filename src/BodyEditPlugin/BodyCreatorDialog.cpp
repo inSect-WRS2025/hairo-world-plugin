@@ -29,13 +29,13 @@ BodyCreatorDialog* BodyCreatorDialog::instance()
 BodyCreatorDialog::BodyCreatorDialog(QWidget* parent)
     : QDialog(parent)
 {
-    listWidget_ = new ListedWidget;
+    listedWidget_ = new ListedWidget;
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
 
     auto mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(listWidget_);
+    mainLayout->addWidget(listedWidget_);
     // mainLayout->addWidget(new HSeparator);
     // mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);

@@ -5,9 +5,9 @@
 #include "ListedWidget.h"
 #include <QBoxLayout>
 #include <QListWidgetItem>
-#include <QPushButton>
 
 using namespace cnoid;
+
 
 ListedWidget::ListedWidget(QWidget* parent)
     : QWidget(parent)
@@ -82,16 +82,17 @@ void ListedWidget::addLayout(const QIcon& icon, const QString& text, QLayout* la
 }
 
 
-void ListedWidget::addButton(const QString& text)
+QPushButton* ListedWidget::addButton(const QString& text)
 {
     auto pushButton = new QPushButton(text);
     elementLayout->addWidget(pushButton);
+    return pushButton;
 }
 
 
-void ListedWidget::addButton(const QIcon& icon, const QString& text)
+QPushButton* ListedWidget::addButton(const QIcon& icon, const QString& text)
 {
-    auto pushButton = new QPushButton(text);
-    pushButton->setIcon(icon);
+    auto pushButton = new QPushButton(icon, text);
     elementLayout->addWidget(pushButton);
+    return pushButton;
 }

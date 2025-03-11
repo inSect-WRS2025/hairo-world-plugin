@@ -3,7 +3,7 @@ set(sources
   FormatConverter.cpp
   ColorButton.cpp
   CrawlerCreator.cpp
-  GeneratorButtonBox.cpp
+  CreatorToolBar.cpp
   GratingCreator.cpp
   BodyEditPlugin.cpp
   InertiaCalculator.cpp
@@ -21,7 +21,7 @@ set(headers
   BodyCreatorDialog.h
   FormatConverter.h
   ColorButton.h
-  GeneratorButtonBox.h
+  CreatorToolBar.h
   InertiaCalculator.h
   FileDroppableWidget.h
   Notepad.h

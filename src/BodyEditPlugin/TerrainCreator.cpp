@@ -9,7 +9,6 @@
 #include <cnoid/ExtensionManager>
 #include <cnoid/ItemManager>
 #include <cnoid/MenuManager>
-#include <cnoid/Separator>
 #include <cnoid/UTF8>
 #include <cnoid/YAMLWriter>
 #include <cnoid/stdx/filesystem>
@@ -21,7 +20,7 @@
 #include <sstream>
 #include <stdio.h>
 #include "BodyCreatorDialog.h"
-#include "GeneratorButtonBox.h"
+#include "CreatorToolBar.h"
 #include "gettext.h"
 
 using namespace std;
@@ -77,7 +76,6 @@ private:
     QDoubleSpinBox* scaleSpinBox;
 
     TerrainData* data;
-    GeneratorButtonBox* buttonBox;
     YAMLWriter yamlWriter;
 };
 
@@ -91,7 +89,7 @@ void TerrainCreator::initializeClass(ExtensionManager* ext)
     if(!dialog) {
         dialog = ext->manage(new TerrainCreatorWidget);
 
-        BodyCreatorDialog::instance()->listWidget()->addWidget(_("BoxTerrain"), dialog);
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("BoxTerrain"), dialog);
     }
 }
 
@@ -132,15 +130,14 @@ TerrainCreatorWidget::TerrainCreatorWidget(QWidget* parent)
     formLayout->addRow(_("CSV File"), openButton);
     formLayout->addRow(_("scale[0.1-10.0]"), scaleSpinBox);
 
-    buttonBox = new GeneratorButtonBox;
-    buttonBox->sigResetRequested().connect([&](){ reset(); });
-    buttonBox->sigSaveRequested().connect([&](const string& filename){ save(filename); });
+    auto toolBar = new CreatorToolBar;
+    toolBar->sigNewRequested().connect([&](){ reset(); });
+    toolBar->sigSaveRequested().connect([&](const string& filename){ save(filename); });
 
     auto mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(toolBar);
     mainLayout->addLayout(formLayout);
     mainLayout->addStretch();
-    mainLayout->addWidget(new HSeparator);
-    mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
     setWindowTitle(_("BoxTerrain Generator"));

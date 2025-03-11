@@ -19,13 +19,13 @@ public:
     static void initializeClass(ExtensionManager* ext);
     static BodyCreatorDialog* instance();
 
-    ListedWidget* listWidget() { return listWidget_; }
+    ListedWidget* listedWidget() { return listedWidget_; }
 
     BodyCreatorDialog(QWidget* parent = nullptr);
     virtual ~BodyCreatorDialog();
 
 private:
-    ListedWidget* listWidget_;
+    ListedWidget* listedWidget_;
     QDialogButtonBox* buttonBox;
 };
 
