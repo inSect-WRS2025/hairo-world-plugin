@@ -105,12 +105,12 @@ TesterDialog::TesterDialog(QWidget* parent)
     vbox->addStretch();
     groupBox2->setLayout(vbox);
 
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
-
     auto layout = new QHBoxLayout;
     layout->addWidget(groupBox);
     layout->addWidget(groupBox2);
+
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addLayout(layout);

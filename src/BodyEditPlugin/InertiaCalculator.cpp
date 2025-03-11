@@ -139,16 +139,16 @@ CalculatorDialog::CalculatorDialog(QWidget* parent)
     formLayout[Page_Cylinder]->addRow(_("axis [-]"), axisComboBox);
     formLayout[Page_Cone]->addRow(_("axis [-]"), axisComboBox2);
 
+    auto layout = new QHBoxLayout;
+    layout->addWidget(new QLabel(_("Shape")));
+    layout->addWidget(shapeComboBox);
+
     const QIcon calcIcon = QIcon::fromTheme("accessories-calculator");
     QPushButton* calcButton = new QPushButton(calcIcon, _("&Calc"), this);
     connect(calcButton, &QPushButton::clicked, [&](){ calc(); });
 
     buttonBox = new QDialogButtonBox(this);
     buttonBox->addButton(calcButton, QDialogButtonBox::ActionRole);
-
-    auto layout = new QHBoxLayout;
-    layout->addWidget(new QLabel(_("Shape")));
-    layout->addWidget(shapeComboBox);
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addLayout(layout);

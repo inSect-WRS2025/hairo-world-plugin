@@ -131,9 +131,6 @@ ObjectBrowser::Impl::Impl()
     treeWidget = new TreeWidget(this);
     treeWidget->setHeaderLabels(QStringList() << _("Download") << _("Object"));
 
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
-
     elementLayout = new QHBoxLayout;
 
     auto layout = new QHBoxLayout;
@@ -146,6 +143,9 @@ ObjectBrowser::Impl::Impl()
     layout->addWidget(button4);
     layout->addLayout(elementLayout);
     // layout->addStretch();
+
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addLayout(layout);

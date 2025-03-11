@@ -196,13 +196,13 @@ ConverterDialog::ConverterDialog(QWidget* parent)
     dropWidget->sigFileDropped().connect(
         [this](const string& filename){ onFileDropped(filename); });
 
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
-
     auto layout = new QHBoxLayout;
     layout->addWidget(convertCheckBox);
     layout->addWidget(formatComboBox);
     layout->addStretch();
+
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addLayout(layout);

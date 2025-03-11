@@ -1,32 +1,28 @@
 set(sources
+  BodyCreatorDialog.cpp
   FormatConverter.cpp
   ColorButton.cpp
-  CrawlerGenerator.cpp
+  CrawlerCreator.cpp
   GeneratorButtonBox.cpp
-  GratingGenerator.cpp
+  GratingCreator.cpp
   BodyEditPlugin.cpp
   InertiaCalculator.cpp
-  PipeGenerator.cpp
-  SlopeGenerator.cpp
-  StairsGenerator.cpp
-  TerrainGenerator.cpp
-  BentPipeGenerator.cpp
+  PipeCreator.cpp
+  SlopeCreator.cpp
+  StairsCreator.cpp
+  TerrainCreator.cpp
+  BentPipeCreator.cpp
   FileDroppableWidget.cpp
   Notepad.cpp
 )
 
 set(headers
+  BodyCreator.h
+  BodyCreatorDialog.h
   FormatConverter.h
   ColorButton.h
-  CrawlerGenerator.h
   GeneratorButtonBox.h
-  GratingGenerator.h
   InertiaCalculator.h
-  PipeGenerator.h
-  SlopeGenerator.h
-  StairsGenerator.h
-  TerrainGenerator.h
-  BentPipeGenerator.h
   FileDroppableWidget.h
   Notepad.h
   WidgetInfo.h

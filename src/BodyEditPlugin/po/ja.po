@@ -53,7 +53,7 @@ msgstr "スロープ"
 msgid "Stairs"
 msgstr "階段"
 
-msgid "Stairs Generator"
+msgid "Stairs Creator"
 msgstr "階段生成"
 
 msgid "Tread [m]"
@@ -77,13 +77,13 @@ msgstr "段数 [-]"
 msgid "BoxTerrain"
 msgstr "ボックステレイン"
 
+msgid "Crawler"
+msgstr "クローラ"
+
 msgid "CrawlerRobot"
 msgstr "クローラロボット"
 
-msgid "Make a body file"
-msgstr "Bodyファイルの生成"
-
-msgid "CrawlerRobot Generator"
+msgid "CrawlerRobot Creator"
 msgstr "クローラロボット生成"
 
 msgid "Front SubTrack"
@@ -203,7 +203,7 @@ msgstr "名前を付けて保存(&A)"
 msgid "Body"
 msgstr "ボディ"
 
-msgid "Grating Generator"
+msgid "Grating Creator"
 msgstr "グレーチング生成"
 
 msgid "Mass [kg]"
@@ -239,7 +239,7 @@ msgstr "色 [-]"
 msgid "Size [m, m, m]"
 msgstr "大きさ [m, m, m]"
 
-msgid "Pipe Generator"
+msgid "Pipe Creator"
 msgstr "パイプ生成"
 
 msgid "Length [m]"
@@ -263,7 +263,7 @@ msgstr "きざみ角度（内側） [deg]"
 msgid "Outer step angle [deg]"
 msgstr "きざみ角度（外側） [deg]"
 
-msgid "BentPipe Generator"
+msgid "BentPipe Creator"
 msgstr "ベントパイプ生成"
 
 msgid "Bent angle [deg]"
@@ -275,13 +275,13 @@ msgstr "曲げ半径 [m]"
 msgid "Bent step angle [deg]"
 msgstr "曲げきざみ角度 [deg]"
 
-msgid "Slope Generator"
+msgid "Slope Creator"
 msgstr "スロープ生成"
 
 msgid "Width [m]"
 msgstr "幅 [m]"
 
-msgid "BoxTerrain Generator"
+msgid "BoxTerrain Creator"
 msgstr "ボックステレイン生成"
 
 msgid "&Load"
@@ -362,8 +362,14 @@ msgstr "{0} が生成されました．"
 msgid "Advanced settings"
 msgstr "高度な設定"
 
-msgid "SquarePipe Generator"
+msgid "SquarePipe Creator"
 msgstr "角パイプ生成"
 
 msgid "Radius [m]"
 msgstr "半径 [m]"
+
+msgid "Create a body"
+msgstr "ボディの作成"
+
+msgid "Body Creator"
+msgstr "ボディクリエイタ"

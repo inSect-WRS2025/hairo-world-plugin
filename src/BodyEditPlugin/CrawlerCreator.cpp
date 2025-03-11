@@ -2,7 +2,7 @@
    @author Kenta Suzuki
 */
 
-#include "CrawlerGenerator.h"
+#include "BodyCreator.h"
 #include <cnoid/Button>
 #include <cnoid/ButtonGroup>
 #include <cnoid/CheckBox>
@@ -27,6 +27,7 @@
 #include <QLabel>
 #include <QStackedWidget>
 #include <QWidget>
+#include "BodyCreatorDialog.h"
 #include "ColorButton.h"
 #include "GeneratorButtonBox.h"
 #include "gettext.h"
@@ -199,10 +200,10 @@ struct AGXVehicleContinuousTrackDeviceInfo {
     bool isSubTrack;
 };
 
-class CrawlerConfigDialog : public QDialog
+class CrawlerCreatorWidget : public QWidget
 {
 public:
-    CrawlerConfigDialog(QWidget* parent = nullptr);
+    CrawlerCreatorWidget(QWidget* parent = nullptr);
 
 private:
     bool save(const string& filename);
@@ -293,33 +294,32 @@ private:
 }
 
 
-void CrawlerGenerator::initializeClass(ExtensionManager* ext)
+void CrawlerCreator::initializeClass(ExtensionManager* ext)
 {
-    static CrawlerConfigDialog* dialog = nullptr;
+    static CrawlerCreatorWidget* dialog = nullptr;
 
     if(!dialog) {
-        dialog = ext->manage(new CrawlerConfigDialog);
+        dialog = ext->manage(new CrawlerCreatorWidget);
 
-        MenuManager& mm = ext->menuManager().setPath("/Tools").setPath(_("Make a body file"));
-        mm.addItem(_("CrawlerRobot"))->sigTriggered().connect([&](){ dialog->show(); });
+        BodyCreatorDialog::instance()->listWidget()->addWidget(_("Crawler"), dialog);
     }
 }
 
 
-CrawlerGenerator::CrawlerGenerator()
+CrawlerCreator::CrawlerCreator()
 {
 
 }
 
 
-CrawlerGenerator::~CrawlerGenerator()
+CrawlerCreator::~CrawlerCreator()
 {
 
 }
 
 
-CrawlerConfigDialog::CrawlerConfigDialog(QWidget* parent)
-    : QDialog(parent)
+CrawlerCreatorWidget::CrawlerCreatorWidget(QWidget* parent)
+    : QWidget(parent)
 {
     yamlWriter.setKeyOrderPreservationMode(true);
     yamlWriter2.setKeyOrderPreservationMode(true);
@@ -474,7 +474,7 @@ CrawlerConfigDialog::CrawlerConfigDialog(QWidget* parent)
 }
 
 
-bool CrawlerConfigDialog::save(const string& filename)
+bool CrawlerCreatorWidget::save(const string& filename)
 {
     if(!filename.empty()) {
         auto topNode = writeBody(filename);
@@ -488,7 +488,7 @@ bool CrawlerConfigDialog::save(const string& filename)
 }
 
 
-bool CrawlerConfigDialog::save2(const string& filename)
+bool CrawlerCreatorWidget::save2(const string& filename)
 {
     if(!filename.empty()) {
         auto topNode = writeConfig(filename);
@@ -502,7 +502,7 @@ bool CrawlerConfigDialog::save2(const string& filename)
 }
 
 
-void CrawlerConfigDialog::initialize()
+void CrawlerCreatorWidget::initialize()
 {
     for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
@@ -543,7 +543,7 @@ void CrawlerConfigDialog::initialize()
 }
 
 
-void CrawlerConfigDialog::onImportButtonClicked()
+void CrawlerCreatorWidget::onImportButtonClicked()
 {
     string filename = getOpenFileName(_("YAML File"), "yaml");
 
@@ -553,7 +553,7 @@ void CrawlerConfigDialog::onImportButtonClicked()
 }
 
 
-bool CrawlerConfigDialog::load2(const string& filename, std::ostream& os)
+bool CrawlerCreatorWidget::load2(const string& filename, std::ostream& os)
 {
     try {
         YAMLReader reader;
@@ -613,7 +613,7 @@ bool CrawlerConfigDialog::load2(const string& filename, std::ostream& os)
 }
 
 
-void CrawlerConfigDialog::onExportButtonClicked()
+void CrawlerCreatorWidget::onExportButtonClicked()
 {
     string filename = getSaveFileName(_("YAML File"), "yaml");
 
@@ -628,7 +628,7 @@ void CrawlerConfigDialog::onExportButtonClicked()
 }
 
 
-void CrawlerConfigDialog::onEnableAGXCheckToggled(bool checked)
+void CrawlerCreatorWidget::onEnableAGXCheckToggled(bool checked)
 {
     agxDoubleSpinBoxes[TRK_BNT]->setEnabled(checked);
     agxDoubleSpinBoxes[TRK_BNW]->setEnabled(checked);
@@ -668,7 +668,7 @@ void CrawlerConfigDialog::onEnableAGXCheckToggled(bool checked)
 }
 
 
-void CrawlerConfigDialog::onButtonToggled(const int& id, bool checked)
+void CrawlerCreatorWidget::onButtonToggled(const int& id, bool checked)
 {
     if(checked) {
         topWidget->setCurrentIndex(id);
@@ -676,7 +676,7 @@ void CrawlerConfigDialog::onButtonToggled(const int& id, bool checked)
 }
 
 
-MappingPtr CrawlerConfigDialog::writeBody(const string& filename)
+MappingPtr CrawlerCreatorWidget::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
@@ -705,7 +705,7 @@ MappingPtr CrawlerConfigDialog::writeBody(const string& filename)
 }
 
 
-MappingPtr CrawlerConfigDialog::writeConfig(const string& filename)
+MappingPtr CrawlerCreatorWidget::writeConfig(const string& filename)
 {
     MappingPtr node = new Mapping;
 
@@ -758,7 +758,7 @@ MappingPtr CrawlerConfigDialog::writeConfig(const string& filename)
 }
 
 
-void CrawlerConfigDialog::writeBody(Listing* linksNode)
+void CrawlerCreatorWidget::writeBody(Listing* linksNode)
 {
     int jointID = 0;
 
@@ -870,7 +870,7 @@ void CrawlerConfigDialog::writeBody(Listing* linksNode)
 }
 
 
-MappingPtr CrawlerConfigDialog::writeChassis()
+MappingPtr CrawlerCreatorWidget::writeChassis()
 {
     MappingPtr chassisNode = new Mapping;
 
@@ -903,7 +903,7 @@ MappingPtr CrawlerConfigDialog::writeChassis()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeSpacer()
+MappingPtr CrawlerCreatorWidget::writeSpacer()
 {
     MappingPtr node = new Mapping;
 
@@ -925,7 +925,7 @@ MappingPtr CrawlerConfigDialog::writeSpacer()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeTrack()
+MappingPtr CrawlerCreatorWidget::writeTrack()
 {
     MappingPtr trackNode = new Mapping;
     trackNode->write("parent", "CHASSIS");
@@ -980,7 +980,7 @@ MappingPtr CrawlerConfigDialog::writeTrack()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeFrontTrack()
+MappingPtr CrawlerCreatorWidget::writeFrontTrack()
 {
     MappingPtr trackNode = new Mapping;
 
@@ -1036,7 +1036,7 @@ MappingPtr CrawlerConfigDialog::writeFrontTrack()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeRearTrack()
+MappingPtr CrawlerCreatorWidget::writeRearTrack()
 {
     MappingPtr trackNode = new Mapping;
 
@@ -1092,7 +1092,7 @@ MappingPtr CrawlerConfigDialog::writeRearTrack()
 }
 
 
-void CrawlerConfigDialog::writeAGXBody(Listing* linksNode)
+void CrawlerCreatorWidget::writeAGXBody(Listing* linksNode)
 {
     int jointID = 0;
 
@@ -1431,7 +1431,7 @@ void CrawlerConfigDialog::writeAGXBody(Listing* linksNode)
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXTrack()
+MappingPtr CrawlerCreatorWidget::writeAGXTrack()
 {
     MappingPtr node = new Mapping;
 
@@ -1445,7 +1445,7 @@ MappingPtr CrawlerConfigDialog::writeAGXTrack()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXTrackBelt()
+MappingPtr CrawlerCreatorWidget::writeAGXTrackBelt()
 {
     MappingPtr node = new Mapping;
 
@@ -1468,7 +1468,7 @@ MappingPtr CrawlerConfigDialog::writeAGXTrackBelt()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXSprocket()
+MappingPtr CrawlerCreatorWidget::writeAGXSprocket()
 {
     MappingPtr node = new Mapping;
 
@@ -1488,19 +1488,19 @@ MappingPtr CrawlerConfigDialog::writeAGXSprocket()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXRoller()
+MappingPtr CrawlerCreatorWidget::writeAGXRoller()
 {
     return writeAGXSprocket();
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXIdler()
+MappingPtr CrawlerCreatorWidget::writeAGXIdler()
 {
     return writeAGXSprocket();
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXFrontTrack()
+MappingPtr CrawlerCreatorWidget::writeAGXFrontTrack()
 {
     MappingPtr node = new Mapping;
 
@@ -1513,7 +1513,7 @@ MappingPtr CrawlerConfigDialog::writeAGXFrontTrack()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXRearTrack()
+MappingPtr CrawlerCreatorWidget::writeAGXRearTrack()
 {
     MappingPtr node = new Mapping;
 
@@ -1526,7 +1526,7 @@ MappingPtr CrawlerConfigDialog::writeAGXRearTrack()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXSubTrackBelt()
+MappingPtr CrawlerCreatorWidget::writeAGXSubTrackBelt()
 {
     MappingPtr node = new Mapping;
 
@@ -1549,7 +1549,7 @@ MappingPtr CrawlerConfigDialog::writeAGXSubTrackBelt()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXFrontSprocket()
+MappingPtr CrawlerCreatorWidget::writeAGXFrontSprocket()
 {
     MappingPtr node = new Mapping;
 
@@ -1574,7 +1574,7 @@ MappingPtr CrawlerConfigDialog::writeAGXFrontSprocket()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXFrontRoller()
+MappingPtr CrawlerCreatorWidget::writeAGXFrontRoller()
 {
     MappingPtr node = new Mapping;
 
@@ -1599,7 +1599,7 @@ MappingPtr CrawlerConfigDialog::writeAGXFrontRoller()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXFrontIdler()
+MappingPtr CrawlerCreatorWidget::writeAGXFrontIdler()
 {
     MappingPtr node = new Mapping;
 
@@ -1624,7 +1624,7 @@ MappingPtr CrawlerConfigDialog::writeAGXFrontIdler()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXRearSprocket()
+MappingPtr CrawlerCreatorWidget::writeAGXRearSprocket()
 {
     MappingPtr node = new Mapping;
 
@@ -1649,7 +1649,7 @@ MappingPtr CrawlerConfigDialog::writeAGXRearSprocket()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXRearRoller()
+MappingPtr CrawlerCreatorWidget::writeAGXRearRoller()
 {
     MappingPtr node = new Mapping;
 
@@ -1674,7 +1674,7 @@ MappingPtr CrawlerConfigDialog::writeAGXRearRoller()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXRearIdler()
+MappingPtr CrawlerCreatorWidget::writeAGXRearIdler()
 {
     MappingPtr node = new Mapping;
 
@@ -1699,7 +1699,7 @@ MappingPtr CrawlerConfigDialog::writeAGXRearIdler()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXWheel()
+MappingPtr CrawlerCreatorWidget::writeAGXWheel()
 {
     MappingPtr node = new Mapping;
 
@@ -1712,7 +1712,7 @@ MappingPtr CrawlerConfigDialog::writeAGXWheel()
 }
 
 
-MappingPtr CrawlerConfigDialog::writeCylinderShape(const double& radius, const double& height, const Vector3& color)
+MappingPtr CrawlerCreatorWidget::writeCylinderShape(const double& radius, const double& height, const Vector3& color)
 {
     MappingPtr node = new Mapping;
 
@@ -1731,7 +1731,7 @@ MappingPtr CrawlerConfigDialog::writeCylinderShape(const double& radius, const d
 }
 
 
-MappingPtr CrawlerConfigDialog::writeAGXVehicleContinuousTrackDevice(const char* name, const char* sprocketName, const char* rollerName, const char* idlerName, const bool isSubTrack)
+MappingPtr CrawlerCreatorWidget::writeAGXVehicleContinuousTrackDevice(const char* name, const char* sprocketName, const char* rollerName, const char* idlerName, const bool isSubTrack)
 {
     MappingPtr node = new Mapping;
 

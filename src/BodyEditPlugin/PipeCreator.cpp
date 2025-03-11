@@ -2,7 +2,7 @@
    @author Kenta Suzuki
 */
 
-#include "PipeGenerator.h"
+#include "BodyCreator.h"
 #include <cnoid/Action>
 #include <cnoid/Button>
 #include <cnoid/Dialog>
@@ -24,6 +24,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QtMath>
+#include "BodyCreatorDialog.h"
 #include "ColorButton.h"
 #include "GeneratorButtonBox.h"
 #include "WidgetInfo.h"
@@ -48,10 +49,10 @@ SpinInfo spinInfo[] = {
     { 2, 3, 1, 120, 1, 30, "outer_step", nullptr }
 };
 
-class SquarePipeConfigDialog : public QDialog
+class SquarePipeCreatorDialog : public QDialog
 {
 public:
-    SquarePipeConfigDialog(QWidget* parent = nullptr);
+    SquarePipeCreatorDialog(QWidget* parent = nullptr);
 
     void setWidth(double width) { widthSpinBox->setValue(width); }
     double width() const { return widthSpinBox->value(); }
@@ -70,10 +71,10 @@ private:
     QDialogButtonBox* buttonBox;
 };
 
-class PipeConfigDialog : public QDialog
+class PipeCreatorWidget : public QWidget
 {
 public:
-    PipeConfigDialog(QWidget* parent = nullptr);
+    PipeCreatorWidget(QWidget* parent = nullptr);
 
 private:
     virtual void contextMenuEvent(QContextMenuEvent* event) override;
@@ -104,33 +105,32 @@ private:
 }
 
 
-void PipeGenerator::initializeClass(ExtensionManager* ext)
+void PipeCreator::initializeClass(ExtensionManager* ext)
 {
-    static PipeConfigDialog* dialog = nullptr;
+    static PipeCreatorWidget* dialog = nullptr;
 
     if(!dialog) {
-        dialog = ext->manage(new PipeConfigDialog);
+        dialog = ext->manage(new PipeCreatorWidget);
 
-        MenuManager& mm = ext->menuManager().setPath("/Tools").setPath(_("Make a body file"));
-        mm.addItem(_("Pipe"))->sigTriggered().connect([&](){ dialog->show(); });
+        BodyCreatorDialog::instance()->listWidget()->addWidget(_("Pipe"), dialog);
     }
 }
 
 
-PipeGenerator::PipeGenerator()
+PipeCreator::PipeCreator()
 {
 
 }
 
 
-PipeGenerator::~PipeGenerator()
+PipeCreator::~PipeCreator()
 {
 
 }
 
 
-PipeConfigDialog::PipeConfigDialog(QWidget* parent)
-    : QDialog(parent)
+PipeCreatorWidget::PipeCreatorWidget(QWidget* parent)
+    : QWidget(parent)
 {
     yamlWriter.setKeyOrderPreservationMode(true);
 
@@ -188,7 +188,7 @@ PipeConfigDialog::PipeConfigDialog(QWidget* parent)
 }
 
 
-void PipeConfigDialog::contextMenuEvent(QContextMenuEvent* event)
+void PipeCreatorWidget::contextMenuEvent(QContextMenuEvent* event)
 {
     Menu menu(this);
     menu.addAction(configureAct);
@@ -196,7 +196,7 @@ void PipeConfigDialog::contextMenuEvent(QContextMenuEvent* event)
 }
 
 
-void PipeConfigDialog::reset()
+void PipeCreatorWidget::reset()
 {
     for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
@@ -214,9 +214,9 @@ void PipeConfigDialog::reset()
 }
 
 
-void PipeConfigDialog::configure()
+void PipeCreatorWidget::configure()
 {
-    SquarePipeConfigDialog dialog;
+    SquarePipeCreatorDialog dialog;
     dialog.setWidth(doubleSpinBoxes[OUT_DIA]->value() / qSqrt(2.0));
     dialog.setRadius(doubleSpinBoxes[IN_DIA]->value() / 2.0);
     dialog.setLength(doubleSpinBoxes[LENGTH]->value());
@@ -231,7 +231,7 @@ void PipeConfigDialog::configure()
 }
 
 
-bool PipeConfigDialog::save(const string& filename)
+bool PipeCreatorWidget::save(const string& filename)
 {
     if(!filename.empty()) {
         auto topNode = writeBody(filename);
@@ -245,7 +245,7 @@ bool PipeConfigDialog::save(const string& filename)
 }
 
 
-void PipeConfigDialog::onInnerDiameterChanged(const double& diameter)
+void PipeCreatorWidget::onInnerDiameterChanged(const double& diameter)
 {
     double d_out = doubleSpinBoxes[OUT_DIA]->value();
     if(diameter >= d_out) {
@@ -255,7 +255,7 @@ void PipeConfigDialog::onInnerDiameterChanged(const double& diameter)
 }
 
 
-void PipeConfigDialog::onOuterDiameterChanged(const double& diameter)
+void PipeCreatorWidget::onOuterDiameterChanged(const double& diameter)
 {
     double d_in = doubleSpinBoxes[IN_DIA]->value();
     if(diameter <= d_in) {
@@ -265,7 +265,7 @@ void PipeConfigDialog::onOuterDiameterChanged(const double& diameter)
 }
 
 
-MappingPtr PipeConfigDialog::writeBody(const string& filename)
+MappingPtr PipeCreatorWidget::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
@@ -287,7 +287,7 @@ MappingPtr PipeConfigDialog::writeBody(const string& filename)
 }
 
 
-MappingPtr PipeConfigDialog::writeLink()
+MappingPtr PipeCreatorWidget::writeLink()
 {
     MappingPtr node = new Mapping;
 
@@ -309,7 +309,7 @@ MappingPtr PipeConfigDialog::writeLink()
 }
 
 
-void PipeConfigDialog::writeLinkShape(Listing* elementsNode)
+void PipeCreatorWidget::writeLinkShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
@@ -370,7 +370,7 @@ void PipeConfigDialog::writeLinkShape(Listing* elementsNode)
 }
 
 
-VectorXd PipeConfigDialog::calcInertia()
+VectorXd PipeCreatorWidget::calcInertia()
 {
     VectorXd innerInertia, outerInertia;
     innerInertia.resize(9);
@@ -411,7 +411,7 @@ VectorXd PipeConfigDialog::calcInertia()
 }
 
 
-SquarePipeConfigDialog::SquarePipeConfigDialog(QWidget* parent)
+SquarePipeCreatorDialog::SquarePipeCreatorDialog(QWidget* parent)
     : QDialog(parent)
 {
     widthSpinBox = new DoubleSpinBox;

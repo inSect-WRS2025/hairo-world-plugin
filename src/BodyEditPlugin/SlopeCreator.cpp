@@ -2,7 +2,7 @@
    @author Kenta Suzuki
 */
 
-#include "SlopeGenerator.h"
+#include "BodyCreator.h"
 #include <cnoid/Button>
 #include <cnoid/Dialog>
 #include <cnoid/EigenArchive>
@@ -18,6 +18,7 @@
 #include <QBoxLayout>
 #include <QGridLayout>
 #include <QLabel>
+#include "BodyCreatorDialog.h"
 #include "ColorButton.h"
 #include "GeneratorButtonBox.h"
 #include "WidgetInfo.h"
@@ -36,10 +37,10 @@ DoubleSpinInfo doubleSpinInfo[] = {
     { 1, 3, 0.001, 1000.0, 0.01, 3, 1.0, "length", nullptr }
 };
 
-class SlopeConfigDialog : public QDialog
+class SlopeCreatorWidget : public QWidget
 {
 public:
-    SlopeConfigDialog(QWidget* parent = nullptr);
+    SlopeCreatorWidget(QWidget* parent = nullptr);
 
 private:
     void reset();
@@ -64,33 +65,32 @@ private:
 }
 
 
-void SlopeGenerator::initializeClass(ExtensionManager* ext)
+void SlopeCreator::initializeClass(ExtensionManager* ext)
 {
-    static SlopeConfigDialog* dialog = nullptr;
+    static SlopeCreatorWidget* dialog = nullptr;
 
     if(!dialog) {
-        dialog = ext->manage(new SlopeConfigDialog);
+        dialog = ext->manage(new SlopeCreatorWidget);
 
-        MenuManager& mm = ext->menuManager().setPath("/Tools").setPath(_("Make a body file"));
-        mm.addItem(_("Slope"))->sigTriggered().connect([&](){ dialog->show(); });
+        BodyCreatorDialog::instance()->listWidget()->addWidget(_("Slope"), dialog);
     }
 }
 
 
-SlopeGenerator::SlopeGenerator()
+SlopeCreator::SlopeCreator()
 {
 
 }
 
 
-SlopeGenerator::~SlopeGenerator()
+SlopeCreator::~SlopeCreator()
 {
 
 }
 
 
-SlopeConfigDialog::SlopeConfigDialog(QWidget* parent)
-    : QDialog(parent)
+SlopeCreatorWidget::SlopeCreatorWidget(QWidget* parent)
+    : QWidget(parent)
 {
     yamlWriter.setKeyOrderPreservationMode(true);
 
@@ -131,7 +131,7 @@ SlopeConfigDialog::SlopeConfigDialog(QWidget* parent)
 }
 
 
-void SlopeConfigDialog::reset()
+void SlopeCreatorWidget::reset()
 {
     for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
@@ -143,7 +143,7 @@ void SlopeConfigDialog::reset()
 }
 
 
-bool SlopeConfigDialog::save(const string& filename)
+bool SlopeCreatorWidget::save(const string& filename)
 {
     if(!filename.empty()) {
         auto topNode = writeBody(filename);
@@ -157,7 +157,7 @@ bool SlopeConfigDialog::save(const string& filename)
 }
 
 
-MappingPtr SlopeConfigDialog::writeBody(const string& filename)
+MappingPtr SlopeCreatorWidget::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
@@ -179,7 +179,7 @@ MappingPtr SlopeConfigDialog::writeBody(const string& filename)
 }
 
 
-MappingPtr SlopeConfigDialog::writeLink()
+MappingPtr SlopeCreatorWidget::writeLink()
 {
     MappingPtr node = new Mapping;
 
@@ -201,7 +201,7 @@ MappingPtr SlopeConfigDialog::writeLink()
 }
 
 
-void SlopeConfigDialog::writeLinkShape(Listing* elementsNode)
+void SlopeCreatorWidget::writeLinkShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
@@ -246,7 +246,7 @@ void SlopeConfigDialog::writeLinkShape(Listing* elementsNode)
 }
 
 
-VectorXd SlopeConfigDialog::calcInertia()
+VectorXd SlopeCreatorWidget::calcInertia()
 {
     VectorXd inertia;
     inertia.resize(9);

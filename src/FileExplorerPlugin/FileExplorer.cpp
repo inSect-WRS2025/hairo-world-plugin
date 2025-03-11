@@ -81,14 +81,14 @@ ExplorerDialog::ExplorerDialog(QWidget* parent)
     auto folderButton = new QPushButton(folderIcon, _("Nautilus"));
     connect(folderButton, &QPushButton::clicked, [&](){ on_folderButton_clicked(); });
 
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
-
     auto layout = new QHBoxLayout;
     layout->addWidget(updateButton);
     layout->addWidget(fileButton);
     layout->addWidget(folderButton);
     layout->addStretch();
+
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addLayout(layout);

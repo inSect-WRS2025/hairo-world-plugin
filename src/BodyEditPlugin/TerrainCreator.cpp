@@ -2,7 +2,7 @@
    @author Kenta Suzuki
 */
 
-#include "TerrainGenerator.h"
+#include "BodyCreator.h"
 #include <cnoid/Dialog>
 #include <cnoid/EigenArchive>
 #include <cnoid/EigenTypes>
@@ -20,6 +20,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
+#include "BodyCreatorDialog.h"
 #include "GeneratorButtonBox.h"
 #include "gettext.h"
 
@@ -57,10 +58,10 @@ private:
     int id_;
 };
 
-class TerrainConfigDialog : public QDialog
+class TerrainCreatorWidget : public QWidget
 {
 public:
-    TerrainConfigDialog(QWidget* parent = nullptr);
+    TerrainCreatorWidget(QWidget* parent = nullptr);
 
 private:
     void reset();
@@ -83,34 +84,33 @@ private:
 }
 
 
-void TerrainGenerator::initializeClass(ExtensionManager* ext)
+void TerrainCreator::initializeClass(ExtensionManager* ext)
 {
-    static TerrainConfigDialog* dialog = nullptr;
+    static TerrainCreatorWidget* dialog = nullptr;
 
     if(!dialog) {
-        dialog = ext->manage(new TerrainConfigDialog);
+        dialog = ext->manage(new TerrainCreatorWidget);
 
-        MenuManager& mm = ext->menuManager().setPath("/Tools").setPath(_("Make a body file"));
-        mm.addItem(_("BoxTerrain"))->sigTriggered().connect([&](){ dialog->show(); });
+        BodyCreatorDialog::instance()->listWidget()->addWidget(_("BoxTerrain"), dialog);
     }
 }
 
 
-TerrainGenerator::TerrainGenerator()
+TerrainCreator::TerrainCreator()
 {
 
 }
 
 
-TerrainGenerator::~TerrainGenerator()
+TerrainCreator::~TerrainCreator()
 {
 
 }
 
 
-TerrainConfigDialog::TerrainConfigDialog(QWidget* parent)
-    : QDialog(parent),
-    fileName("")
+TerrainCreatorWidget::TerrainCreatorWidget(QWidget* parent)
+    : QWidget(parent),
+      fileName("")
 {
     yamlWriter.setKeyOrderPreservationMode(true);
 
@@ -147,7 +147,7 @@ TerrainConfigDialog::TerrainConfigDialog(QWidget* parent)
 }
 
 
-void TerrainConfigDialog::reset()
+void TerrainCreatorWidget::reset()
 {
     fileName.clear();
 
@@ -155,7 +155,7 @@ void TerrainConfigDialog::reset()
 }
 
 
-bool TerrainConfigDialog::save(const string& filename)
+bool TerrainCreatorWidget::save(const string& filename)
 {
     string inputFile = fileName.toStdString();
     if(inputFile.empty()) {
@@ -179,7 +179,7 @@ bool TerrainConfigDialog::save(const string& filename)
 }
 
 
-void TerrainConfigDialog::load()
+void TerrainCreatorWidget::load()
 {
     string filename = getOpenFileName(_("CSV File"), "csv");
     if(!filename.empty()) {
@@ -188,7 +188,7 @@ void TerrainConfigDialog::load()
 }
 
 
-MappingPtr TerrainConfigDialog::writeBody(const string& filename)
+MappingPtr TerrainCreatorWidget::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
@@ -210,7 +210,7 @@ MappingPtr TerrainConfigDialog::writeBody(const string& filename)
 }
 
 
-MappingPtr TerrainConfigDialog::writeLink()
+MappingPtr TerrainCreatorWidget::writeLink()
 {
     MappingPtr node = new Mapping;
 
@@ -230,7 +230,7 @@ MappingPtr TerrainConfigDialog::writeLink()
 }
 
 
-void TerrainConfigDialog::writeLinkShape(Listing* elementsNode)
+void TerrainCreatorWidget::writeLinkShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
@@ -343,7 +343,7 @@ void TerrainConfigDialog::writeLinkShape(Listing* elementsNode)
 }
 
 
-void TerrainConfigDialog::writeLinkShape2(Listing* elementsNode)
+void TerrainCreatorWidget::writeLinkShape2(Listing* elementsNode)
 {
     int xsize = data->xsize();
     int ysize = data->ysize();

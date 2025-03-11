@@ -2,7 +2,7 @@
    @author Kenta Suzuki
 */
 
-#include "BentPipeGenerator.h"
+#include "BodyCreator.h"
 #include <cnoid/Button>
 #include <cnoid/Dialog>
 #include <cnoid/EigenArchive>
@@ -18,6 +18,7 @@
 #include <QBoxLayout>
 #include <QGridLayout>
 #include <QLabel>
+#include "BodyCreatorDialog.h"
 #include "ColorButton.h"
 #include "GeneratorButtonBox.h"
 #include "WidgetInfo.h"
@@ -42,10 +43,10 @@ SpinInfo spinInfo[] = {
     { 3, 3, 1, 120, 1, 30,      "step_angle", nullptr }
 };
 
-class BentPipeConfigDialog : public QDialog
+class BentPipeCreatorWidget : public QWidget
 {
 public:
-    BentPipeConfigDialog(QWidget* parent = nullptr);
+    BentPipeCreatorWidget(QWidget* parent = nullptr);
 
 private:
     void reset();
@@ -71,33 +72,32 @@ private:
 }
 
 
-void BentPipeGenerator::initializeClass(ExtensionManager* ext)
+void BentPipeCreator::initializeClass(ExtensionManager* ext)
 {
-    static BentPipeConfigDialog* dialog = nullptr;
+    static BentPipeCreatorWidget* dialog = nullptr;
 
     if(!dialog) {
-        dialog = ext->manage(new BentPipeConfigDialog);
+        dialog = ext->manage(new BentPipeCreatorWidget);
 
-        MenuManager& mm = ext->menuManager().setPath("/Tools").setPath(_("Make a body file"));
-        mm.addItem(_("BentPipe"))->sigTriggered().connect([&](){ dialog->show(); });
+        BodyCreatorDialog::instance()->listWidget()->addWidget(_("BentPipe"), dialog);
     }
 }
 
 
-BentPipeGenerator::BentPipeGenerator()
+BentPipeCreator::BentPipeCreator()
 {
 
 }
 
 
-BentPipeGenerator::~BentPipeGenerator()
+BentPipeCreator::~BentPipeCreator()
 {
 
 }
 
 
-BentPipeConfigDialog::BentPipeConfigDialog(QWidget* parent)
-    : QDialog(parent)
+BentPipeCreatorWidget::BentPipeCreatorWidget(QWidget* parent)
+    : QWidget(parent)
 {
     yamlWriter.setKeyOrderPreservationMode(true);
 
@@ -156,7 +156,7 @@ BentPipeConfigDialog::BentPipeConfigDialog(QWidget* parent)
 }
 
 
-void BentPipeConfigDialog::reset()
+void BentPipeCreatorWidget::reset()
 {
     for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
@@ -174,7 +174,7 @@ void BentPipeConfigDialog::reset()
 }
 
 
-bool BentPipeConfigDialog::save(const string& filename)
+bool BentPipeCreatorWidget::save(const string& filename)
 {
     if(!filename.empty()) {
         auto topNode = writeBody(filename);
@@ -188,7 +188,7 @@ bool BentPipeConfigDialog::save(const string& filename)
 }
 
 
-MappingPtr BentPipeConfigDialog::writeBody(const string& filename)
+MappingPtr BentPipeCreatorWidget::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
@@ -210,7 +210,7 @@ MappingPtr BentPipeConfigDialog::writeBody(const string& filename)
 }
 
 
-MappingPtr BentPipeConfigDialog::writeLink()
+MappingPtr BentPipeCreatorWidget::writeLink()
 {
     MappingPtr node = new Mapping;
 
@@ -232,7 +232,7 @@ MappingPtr BentPipeConfigDialog::writeLink()
 }
 
 
-void BentPipeConfigDialog::writeLinkShape(Listing* elementsNode)
+void BentPipeCreatorWidget::writeLinkShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
@@ -339,7 +339,7 @@ void BentPipeConfigDialog::writeLinkShape(Listing* elementsNode)
 }
 
 
-void BentPipeConfigDialog::onBentAngleChanged(double value)
+void BentPipeCreatorWidget::onBentAngleChanged(double value)
 {
     double bent_step = spinBoxes[BENT_STEP]->value();
     if(value < bent_step) {
@@ -348,7 +348,7 @@ void BentPipeConfigDialog::onBentAngleChanged(double value)
 }
 
 
-void BentPipeConfigDialog::onInnerDiameterChanged(double diameter)
+void BentPipeCreatorWidget::onInnerDiameterChanged(double diameter)
 {
     double d_out = doubleSpinBoxes[OUT_DIA]->value();
     if(diameter >= d_out) {
@@ -358,7 +358,7 @@ void BentPipeConfigDialog::onInnerDiameterChanged(double diameter)
 }
 
 
-void BentPipeConfigDialog::onOuterDiameterChanged(double diameter)
+void BentPipeCreatorWidget::onOuterDiameterChanged(double diameter)
 {
     double d_in = doubleSpinBoxes[IN_DIA]->value();
     if(diameter <= d_in) {

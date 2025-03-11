@@ -125,14 +125,14 @@ TimerDialog::TimerDialog(QWidget* parent)
 
     onTimeChanged(0.0);
 
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
-
     auto layout = new QHBoxLayout;
     layout->addWidget(new QLabel(_("Interval [s]")));
     layout->addWidget(intervalSpinBox);
     layout->addWidget(startButton);
     // layout->addStretch();
+
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addLayout(layout);

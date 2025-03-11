@@ -4,15 +4,10 @@
 
 #include <cnoid/Format>
 #include <cnoid/Plugin>
-#include "BentPipeGenerator.h"
+#include "BodyCreator.h"
+#include "BodyCreatorDialog.h"
 #include "FormatConverter.h"
-#include "CrawlerGenerator.h"
-#include "GratingGenerator.h"
 #include "InertiaCalculator.h"
-#include "PipeGenerator.h"
-#include "SlopeGenerator.h"
-#include "StairsGenerator.h"
-#include "TerrainGenerator.h"
 
 using namespace cnoid;
 
@@ -28,15 +23,16 @@ public:
 
     virtual bool initialize() override
     {
-        FormatConverter::initializeClass(this);
-        CrawlerGenerator::initializeClass(this);
-        GratingGenerator::initializeClass(this);
+        BodyCreatorDialog::initializeClass(this);
+        BentPipeCreator::initializeClass(this);
+        CrawlerCreator::initializeClass(this);
+        GratingCreator::initializeClass(this);
+        PipeCreator::initializeClass(this);
+        SlopeCreator::initializeClass(this);
+        StairsCreator::initializeClass(this);
+        TerrainCreator::initializeClass(this);
         InertiaCalculator::initializeClass(this);
-        PipeGenerator::initializeClass(this);
-        BentPipeGenerator::initializeClass(this);
-        SlopeGenerator::initializeClass(this);
-        StairsGenerator::initializeClass(this);
-        TerrainGenerator::initializeClass(this);
+        FormatConverter::initializeClass(this);
         return true;
     }
 

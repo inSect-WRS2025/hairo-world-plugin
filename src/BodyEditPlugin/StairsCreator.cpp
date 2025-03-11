@@ -2,7 +2,7 @@
    @author Kenta Suzuki
 */
 
-#include "StairsGenerator.h"
+#include "BodyCreator.h"
 #include <cnoid/Button>
 #include <cnoid/Dialog>
 #include <cnoid/EigenArchive>
@@ -18,6 +18,7 @@
 #include <QBoxLayout>
 #include <QGridLayout>
 #include <QLabel>
+#include "BodyCreatorDialog.h"
 #include "ColorButton.h"
 #include "GeneratorButtonBox.h"
 #include "WidgetInfo.h"
@@ -37,10 +38,10 @@ DoubleSpinInfo doubleSpinInfo[] = {
     { 2, 1, 0.001, 1000.0, 0.01, 3, 0.02, "thickness", nullptr }
 };
 
-class StairsConfigDialog : public QDialog
+class StairsCreatorWidget : public QWidget
 {
 public:
-    StairsConfigDialog(QWidget* parent = nullptr);
+    StairsCreatorWidget(QWidget* parent = nullptr);
 
 private:
     void reset();
@@ -69,33 +70,32 @@ private:
 }
 
 
-void StairsGenerator::initializeClass(ExtensionManager* ext)
+void StairsCreator::initializeClass(ExtensionManager* ext)
 {
-    static StairsConfigDialog* dialog = nullptr;
+    static StairsCreatorWidget* dialog = nullptr;
 
     if(!dialog) {
-        dialog = ext->manage(new StairsConfigDialog);
+        dialog = ext->manage(new StairsCreatorWidget);
 
-        MenuManager& mm = ext->menuManager().setPath("/Tools").setPath(_("Make a body file"));
-        mm.addItem(_("Stairs"))->sigTriggered().connect([&](){ dialog->show(); });
+        BodyCreatorDialog::instance()->listWidget()->addWidget(_("Stairs"), dialog);
     }
 }
 
 
-StairsGenerator::StairsGenerator()
+StairsCreator::StairsCreator()
 {
 
 }
 
 
-StairsGenerator::~StairsGenerator()
+StairsCreator::~StairsCreator()
 {
 
 }
 
 
-StairsConfigDialog::StairsConfigDialog(QWidget* parent)
-    : QDialog(parent)
+StairsCreatorWidget::StairsCreatorWidget(QWidget* parent)
+    : QWidget(parent)
 {
     yamlWriter.setKeyOrderPreservationMode(true);
 
@@ -144,7 +144,7 @@ StairsConfigDialog::StairsConfigDialog(QWidget* parent)
 }
 
 
-void StairsConfigDialog::reset()
+void StairsCreatorWidget::reset()
 {
     for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
         DoubleSpinInfo info = doubleSpinInfo[i];
@@ -158,7 +158,7 @@ void StairsConfigDialog::reset()
 }
 
 
-bool StairsConfigDialog::save(const string& filename)
+bool StairsCreatorWidget::save(const string& filename)
 {
     if(!filename.empty()) {
         auto topNode = writeBody(filename);
@@ -172,7 +172,7 @@ bool StairsConfigDialog::save(const string& filename)
 }
 
 
-MappingPtr StairsConfigDialog::writeBody(const string& filename)
+MappingPtr StairsCreatorWidget::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
@@ -194,7 +194,7 @@ MappingPtr StairsConfigDialog::writeBody(const string& filename)
 }
 
 
-MappingPtr StairsConfigDialog::writeLink()
+MappingPtr StairsCreatorWidget::writeLink()
 {
     MappingPtr node = new Mapping;
 
@@ -214,7 +214,7 @@ MappingPtr StairsConfigDialog::writeLink()
 }
 
 
-void StairsConfigDialog::writeLinkShape(Listing* elementsNode)
+void StairsCreatorWidget::writeLinkShape(Listing* elementsNode)
 {
     double tread = doubleSpinBoxes[TREAD]->value();
     double width = doubleSpinBoxes[WIDTH]->value();
@@ -265,7 +265,7 @@ void StairsConfigDialog::writeLinkShape(Listing* elementsNode)
 }
 
 
-void StairsConfigDialog::writeStringerShape(Listing* elementsNode)
+void StairsCreatorWidget::writeStringerShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
@@ -314,7 +314,7 @@ void StairsConfigDialog::writeStringerShape(Listing* elementsNode)
 }
 
 
-void StairsConfigDialog::writeStepShape(Listing* elementsNode)
+void StairsCreatorWidget::writeStepShape(Listing* elementsNode)
 {
     MappingPtr node = new Mapping;
 
