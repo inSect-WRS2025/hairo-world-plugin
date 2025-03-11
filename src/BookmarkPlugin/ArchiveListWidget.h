@@ -2,21 +2,21 @@
    @author Kenta Suzuki
 */
 
-#ifndef CNOID_BOOKMARK_PLUGIN_ARCHIVE_LIST_DIALOG_H
-#define CNOID_BOOKMARK_PLUGIN_ARCHIVE_LIST_DIALOG_H
+#ifndef CNOID_BOOKMARK_PLUGIN_ARCHIVE_LIST_WIDGET_H
+#define CNOID_BOOKMARK_PLUGIN_ARCHIVE_LIST_WIDGET_H
 
-#include <cnoid/Dialog>
 #include <cnoid/Signal>
+#include <QWidget>
 
 namespace cnoid {
 
 class Menu;
 
-class ArchiveListDialog : public Dialog
+class ArchiveListWidget : public QWidget
 {
 public:
-    ArchiveListDialog(QWidget* parent = nullptr);
-    virtual ~ArchiveListDialog();
+    ArchiveListWidget(QWidget* parent = nullptr);
+    virtual ~ArchiveListWidget();
 
     void addItem(const QString& text);
     void addItems(const QStringList& texts);
@@ -39,4 +39,4 @@ private:
 
 }
 
-#endif // CNOID_BOOKMARK_PLUGIN_ARCHIVE_LIST_DIALOG_H
+#endif // CNOID_BOOKMARK_PLUGIN_ARCHIVE_LIST_WIDGET_H

@@ -2,13 +2,13 @@
     @author Kenta Suzuki
 */
 
-#include "SwitchableWidget.h"
+#include "ListedWidget.h"
 #include <QBoxLayout>
 #include <QListWidgetItem>
 
 using namespace cnoid;
 
-SwitchableWidget::SwitchableWidget(QWidget* parent)
+ListedWidget::ListedWidget(QWidget* parent)
     : QWidget(parent)
 {
     stackedWidget = new QStackedWidget(this);
@@ -30,13 +30,13 @@ SwitchableWidget::SwitchableWidget(QWidget* parent)
 }
 
 
-SwitchableWidget::~SwitchableWidget()
+ListedWidget::~ListedWidget()
 {
 
 }
 
 
-void SwitchableWidget::addWidget(const QString& text, QWidget* widget)
+void ListedWidget::addWidget(const QString& text, QWidget* widget)
 {
     auto item = new QListWidgetItem(listWidget);
     item->setIcon(QIcon());
@@ -46,7 +46,7 @@ void SwitchableWidget::addWidget(const QString& text, QWidget* widget)
 }
 
 
-void SwitchableWidget::addWidget(const QIcon& icon, const QString& text, QWidget* widget)
+void ListedWidget::addWidget(const QIcon& icon, const QString& text, QWidget* widget)
 {
     auto item = new QListWidgetItem(listWidget);
     item->setIcon(icon);
@@ -56,7 +56,7 @@ void SwitchableWidget::addWidget(const QIcon& icon, const QString& text, QWidget
 }
 
 
-void SwitchableWidget::addLayout(const QString& text, QLayout* layout)
+void ListedWidget::addLayout(const QString& text, QLayout* layout)
 {
     auto widget = new QWidget;
     widget->setLayout(layout);
@@ -69,7 +69,7 @@ void SwitchableWidget::addLayout(const QString& text, QLayout* layout)
 }
 
 
-void SwitchableWidget::addLayout(const QIcon& icon, const QString& text, QLayout* layout)
+void ListedWidget::addLayout(const QIcon& icon, const QString& text, QLayout* layout)
 {
     auto widget = new QWidget;
     widget->setLayout(layout);
@@ -77,6 +77,7 @@ void SwitchableWidget::addLayout(const QIcon& icon, const QString& text, QLayout
     auto item = new QListWidgetItem(listWidget);
     item->setIcon(icon);
     item->setText(text);
+    // auto firstItem = listWidget->item(0);
     listWidget->setCurrentItem(item);
     stackedWidget->addWidget(widget);
 }

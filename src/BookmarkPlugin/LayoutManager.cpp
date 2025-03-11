@@ -3,7 +3,6 @@
 */
 
 #include "LayoutManager.h"
-#include <cnoid/Action>
 #include <cnoid/Buttons>
 #include <cnoid/ExtensionManager>
 #include <cnoid/ItemManager>
@@ -14,6 +13,7 @@
 #include <cnoid/YAMLWriter>
 #include <cnoid/stdx/filesystem>
 #include "HamburgerMenu.h"
+#include "ProjectListedDialog.h"
 #include "gettext.h"
 
 using namespace std;
@@ -32,37 +32,27 @@ void LayoutManager::initializeClass(ExtensionManager* ext)
     if(!layoutInstance) {
         layoutInstance = ext->manage(new LayoutManager);
 
-        const QIcon icon = QIcon(":/GoogleMaterialSymbols/icon/dashboard_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        auto action = new Action;
-        action->setText(_("Layout Manager"));
-        action->setIcon(icon);
-        action->setToolTip(_("Show the layout manager"));
-        action->sigTriggered().connect([&](){ layoutInstance->show(); });
-        HamburgerMenu::instance()->addAction(action);
+        const QIcon layoutIcon = QIcon(":/GoogleMaterialSymbols/icon/dashboard_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
+        ProjectListedDialog::instance()->addWidget(layoutIcon, _("Layout"), layoutInstance);
     }
 }
 
 
 LayoutManager::LayoutManager(QWidget* parent)
-    : ArchiveListDialog(parent)
+    : ArchiveListWidget(parent)
 {
     setWindowTitle(_("Layout Manager"));
     setArchiveKey("layout_list");
     setFixedSize(800, 450);
 
-    const QIcon saveIcon = QIcon(":/GoogleMaterialSymbols/icon/dashboard_customize_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-    auto button1 = new ToolButton;
-    button1->setIcon(saveIcon);
-    // button1->setToolTip(_("Save a current layout"));
+    auto button1 = new ToolButton(_("New"));
     button1->sigClicked().connect([&](){ onSaveButtonClicked(); });
 
     button1->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(button1, &ToolButton::customContextMenuRequested,
         [&](const QPoint& pos){ this->contextMenu()->exec(QCursor::pos()); });
 
-    const QIcon openIcon = QIcon(":/GoogleMaterialSymbols/icon/file_open_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-    auto button2 = new ToolButton;
-    button2->setIcon(openIcon);
+    auto button2 = new ToolButton(_("Open"));
     button2->sigClicked().connect([&](){ onOpenButtonClicked(); });
 
     addWidget(button1);

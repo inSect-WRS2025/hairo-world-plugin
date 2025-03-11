@@ -2,8 +2,8 @@
     @author Kenta Suzuki
 */
 
-#ifndef CNOID_BOOKMARK_PLUGIN_SWITCHABLE_WIDGET_H
-#define CNOID_BOOKMARK_PLUGIN_SWITCHABLE_WIDGET_H
+#ifndef CNOID_BOOKMARK_PLUGIN_LISTED_WIDGET_H
+#define CNOID_BOOKMARK_PLUGIN_LISTED_WIDGET_H
 
 #include <QListWidget>
 #include <QStackedWidget>
@@ -12,11 +12,11 @@
 
 namespace cnoid {
 
-class CNOID_EXPORT SwitchableWidget : public QWidget
+class CNOID_EXPORT ListedWidget : public QWidget
 {
 public:
-    SwitchableWidget(QWidget* parent = nullptr);
-    virtual ~SwitchableWidget();
+    ListedWidget(QWidget* parent = nullptr);
+    virtual ~ListedWidget();
 
     void addWidget(const QString& text, QWidget* widget);
     void addWidget(const QIcon& icon, const QString& text, QWidget* widget);
@@ -30,4 +30,4 @@ private:
 
 }
 
-#endif // CNOID_BOOKMARK_PLUGIN_SWITCHABLE_WIDGET_H
+#endif // CNOID_BOOKMARK_PLUGIN_LISTED_WIDGET_H

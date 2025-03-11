@@ -10,6 +10,7 @@
 #include "LayoutManager.h"
 #include "WorldLogManager.h"
 #include "HamburgerMenu.h"
+#include "ProjectListedDialog.h"
 
 using namespace cnoid;
 
@@ -26,6 +27,7 @@ public:
 
     virtual bool initialize() override
     {
+        ProjectListedDialog::initializeClass(this);
         HamburgerMenu::initializeClass(this);
         BookmarkManager::initializeClass(this);
         HistoryManager::initializeClass(this);

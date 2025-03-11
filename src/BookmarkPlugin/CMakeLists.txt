@@ -1,5 +1,5 @@
 set(sources
-  ArchiveListDialog.cpp
+  ArchiveListWidget.cpp
   BookmarkManager.cpp
   BookmarkPlugin.cpp
   HamburgerMenu.cpp
@@ -9,11 +9,12 @@ set(sources
   LayoutManager.cpp
   SystemTrayIcon.cpp
   WorldLogManager.cpp
-  SwitchableWidget.cpp
+  ListedWidget.cpp
+  ProjectListedDialog.cpp
 )
 
 set(headers
-  ArchiveListDialog.h
+  ArchiveListWidget.h
   BookmarkManager.h
   HamburgerMenu.h
   HistoryManager.h
@@ -22,13 +23,14 @@ set(headers
   LayoutManager.h
   SystemTrayIcon.h
   WorldLogManager.h
-  SwitchableWidget.h
+  ListedWidget.h
+  ProjectListedDialog.h
   exportdecl.h
 )
 
 choreonoid_make_header_public(SystemTrayIcon.h)
 choreonoid_make_header_public(HamburgerMenu.h)
-choreonoid_make_header_public(SwitchableWidget.h)
+choreonoid_make_header_public(ListedWidget.h)
 
 set(target CnoidBookmarkPlugin)
 choreonoid_make_gettext_mo_files(${target} mofiles)

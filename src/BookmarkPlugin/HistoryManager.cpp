@@ -8,6 +8,7 @@
 #include <cnoid/Menu>
 #include <cnoid/ProjectManager>
 #include "HamburgerMenu.h"
+#include "ProjectListedDialog.h"
 #include "gettext.h"
 
 using namespace std;
@@ -25,22 +26,17 @@ void HistoryManager::initializeClass(ExtensionManager* ext)
     if(!historyInstance) {
         historyInstance = ext->manage(new HistoryManager);
 
-        const QIcon icon = QIcon(":/GoogleMaterialSymbols/icon/manage_history_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        auto action = new Action;
-        action->setText(_("History Manager"));
-        action->setIcon(icon);
-        action->setToolTip(_("Show the history manager"));
-        action->sigTriggered().connect([&](){ historyInstance->show(); });
-        HamburgerMenu::instance()->addAction(action);
+        const QIcon historyIcon = QIcon(":/GoogleMaterialSymbols/icon/manage_history_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
+        ProjectListedDialog::instance()->addWidget(historyIcon, _("History"), historyInstance);
 
-        auto action2 = get_Tools_Menu()->addAction(_("History"));
-        action2->setMenu(historyInstance->contextMenu());
+        auto action = get_Tools_Menu()->addAction(_("History"));
+        action->setMenu(historyInstance->contextMenu());
     }
 }
 
 
 HistoryManager::HistoryManager(QWidget* parent)
-    : ArchiveListDialog(parent)
+    : ArchiveListWidget(parent)
 {
     setWindowTitle(_("History Manager"));
     setArchiveKey("history_list");
