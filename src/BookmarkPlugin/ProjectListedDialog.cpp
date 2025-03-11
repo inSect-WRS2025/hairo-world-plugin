@@ -11,6 +11,7 @@
 
 using namespace cnoid;
 
+
 void ProjectListedDialog::initializeClass(ExtensionManager* ext)
 {
     MainMenu::instance()->add_Tools_Item(

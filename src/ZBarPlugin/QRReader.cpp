@@ -18,12 +18,6 @@ using namespace std;
 using namespace cnoid;
 namespace filesystem = cnoid::stdx::filesystem;
 
-namespace {
-
-QRReader* readerInstance = nullptr;
-
-}
-
 namespace cnoid {
 
 class QRReader::Impl
@@ -46,8 +40,10 @@ public:
 
 void QRReader::initializeClass(ExtensionManager* ext)
 {
-    if(!readerInstance) {
-        readerInstance = ext->manage(new QRReader);
+    static QRReader* reader = nullptr;
+
+    if(!reader) {
+        reader = ext->manage(new QRReader);
     }
 }
 

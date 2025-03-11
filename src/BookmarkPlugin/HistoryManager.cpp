@@ -15,23 +15,19 @@
 using namespace std;
 using namespace cnoid;
 
-namespace {
-
-HistoryManager* historyInstance = nullptr;
-
-}
-
 
 void HistoryManager::initializeClass(ExtensionManager* ext)
 {
-    if(!historyInstance) {
-        historyInstance = ext->manage(new HistoryManager);
+    static HistoryManager* widget = nullptr;
+
+    if(!widget) {
+        widget = ext->manage(new HistoryManager);
 
         const QIcon historyIcon = QIcon(":/GoogleMaterialSymbols/icon/manage_history_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        ProjectListedDialog::instance()->listWidget()->addWidget(historyIcon, _("History"), historyInstance);
+        ProjectListedDialog::instance()->listWidget()->addWidget(historyIcon, _("History"), widget);
 
         auto action = get_Tools_Menu()->addAction(_("History"));
-        action->setMenu(historyInstance->contextMenu());
+        action->setMenu(widget->contextMenu());
     }
 }
 

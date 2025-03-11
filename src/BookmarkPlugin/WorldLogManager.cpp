@@ -25,20 +25,16 @@ using namespace std;
 using namespace cnoid;
 namespace filesystem = cnoid::stdx::filesystem;
 
-namespace {
-
-WorldLogManager* logInstance = nullptr;
-
-}
-
 
 void WorldLogManager::initializeClass(ExtensionManager* ext)
 {
-    if(!logInstance) {
-        logInstance = ext->manage(new WorldLogManager);
+    static WorldLogManager* widget = nullptr;
+
+    if(!widget) {
+        widget = ext->manage(new WorldLogManager);
 
         const QIcon logIcon = QIcon(":/GoogleMaterialSymbols/icon/restore_page_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        ProjectListedDialog::instance()->listWidget()->addWidget(logIcon, _("World Log"), logInstance);
+        ProjectListedDialog::instance()->listWidget()->addWidget(logIcon, _("World Log"), widget);
     }
 }
 

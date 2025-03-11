@@ -21,20 +21,16 @@ using namespace std;
 using namespace cnoid;
 namespace filesystem = cnoid::stdx::filesystem;
 
-namespace {
-
-LayoutManager* layoutInstance = nullptr;
-
-}
-
 
 void LayoutManager::initializeClass(ExtensionManager* ext)
 {
-    if(!layoutInstance) {
-        layoutInstance = ext->manage(new LayoutManager);
+    static LayoutManager* widget = nullptr;
+
+    if(!widget) {
+        widget = ext->manage(new LayoutManager);
 
         const QIcon layoutIcon = QIcon(":/GoogleMaterialSymbols/icon/dashboard_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        ProjectListedDialog::instance()->listWidget()->addWidget(layoutIcon, _("Layout"), layoutInstance);
+        ProjectListedDialog::instance()->listWidget()->addWidget(layoutIcon, _("Layout"), widget);
     }
 }
 
