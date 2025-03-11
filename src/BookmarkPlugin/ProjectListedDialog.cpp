@@ -5,6 +5,8 @@
 #include "ProjectListedDialog.h"
 #include <cnoid/ExtensionManager>
 #include <cnoid/MainMenu>
+#include <cnoid/Separator>
+#include <QBoxLayout>
 #include "gettext.h"
 
 using namespace cnoid;
@@ -24,8 +26,19 @@ ProjectListedDialog* ProjectListedDialog::instance()
 
 
 ProjectListedDialog::ProjectListedDialog(QWidget* parent)
-    : ListedWidget(parent)
+    : QDialog(parent)
 {
+    listWidget_ = new ListedWidget;
+
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
+
+    auto mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(listWidget_);
+    mainLayout->addWidget(new HSeparator);
+    mainLayout->addWidget(buttonBox);
+    setLayout(mainLayout);
+
     setWindowTitle(_(" "));
 }
 

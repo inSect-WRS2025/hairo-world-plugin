@@ -9,6 +9,7 @@
 #include <cnoid/ProjectManager>
 #include "HamburgerMenu.h"
 #include "ProjectListedDialog.h"
+#include "ListedWidget.h"
 #include "gettext.h"
 
 using namespace std;
@@ -27,7 +28,7 @@ void HistoryManager::initializeClass(ExtensionManager* ext)
         historyInstance = ext->manage(new HistoryManager);
 
         const QIcon historyIcon = QIcon(":/GoogleMaterialSymbols/icon/manage_history_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        ProjectListedDialog::instance()->addWidget(historyIcon, _("History"), historyInstance);
+        ProjectListedDialog::instance()->listWidget()->addWidget(historyIcon, _("History"), historyInstance);
 
         auto action = get_Tools_Menu()->addAction(_("History"));
         action->setMenu(historyInstance->contextMenu());

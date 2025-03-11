@@ -39,10 +39,11 @@ ListedWidget::~ListedWidget()
 void ListedWidget::addWidget(const QString& text, QWidget* widget)
 {
     auto item = new QListWidgetItem(listWidget);
-    item->setIcon(QIcon());
     item->setText(text);
-    listWidget->setCurrentItem(item);
     stackedWidget->addWidget(widget);
+
+    listWidget->setCurrentRow(0);
+    stackedWidget->setCurrentIndex(0);
 }
 
 
@@ -51,8 +52,10 @@ void ListedWidget::addWidget(const QIcon& icon, const QString& text, QWidget* wi
     auto item = new QListWidgetItem(listWidget);
     item->setIcon(icon);
     item->setText(text);
-    listWidget->setCurrentItem(item);
     stackedWidget->addWidget(widget);
+
+    listWidget->setCurrentRow(0);
+    stackedWidget->setCurrentIndex(0);
 }
 
 
@@ -60,12 +63,7 @@ void ListedWidget::addLayout(const QString& text, QLayout* layout)
 {
     auto widget = new QWidget;
     widget->setLayout(layout);
-
-    auto item = new QListWidgetItem(listWidget);
-    item->setIcon(QIcon());
-    item->setText(text);
-    listWidget->setCurrentItem(item);
-    stackedWidget->addWidget(widget);
+    this->addWidget(text, widget);
 }
 
 
@@ -73,11 +71,5 @@ void ListedWidget::addLayout(const QIcon& icon, const QString& text, QLayout* la
 {
     auto widget = new QWidget;
     widget->setLayout(layout);
-
-    auto item = new QListWidgetItem(listWidget);
-    item->setIcon(icon);
-    item->setText(text);
-    // auto firstItem = listWidget->item(0);
-    listWidget->setCurrentItem(item);
-    stackedWidget->addWidget(widget);
+    this->addWidget(icon, text, widget);
 }

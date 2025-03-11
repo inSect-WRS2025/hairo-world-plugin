@@ -18,6 +18,7 @@
 #include <cnoid/LoggerUtil>
 #include "HamburgerMenu.h"
 #include "ProjectListedDialog.h"
+#include "ListedWidget.h"
 #include "gettext.h"
 
 using namespace std;
@@ -37,7 +38,7 @@ void WorldLogManager::initializeClass(ExtensionManager* ext)
         logInstance = ext->manage(new WorldLogManager);
 
         const QIcon logIcon = QIcon(":/GoogleMaterialSymbols/icon/restore_page_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        ProjectListedDialog::instance()->addWidget(logIcon, _("World Log"), logInstance);
+        ProjectListedDialog::instance()->listWidget()->addWidget(logIcon, _("World Log"), logInstance);
     }
 }
 

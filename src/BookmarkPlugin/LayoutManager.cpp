@@ -14,6 +14,7 @@
 #include <cnoid/stdx/filesystem>
 #include "HamburgerMenu.h"
 #include "ProjectListedDialog.h"
+#include "ListedWidget.h"
 #include "gettext.h"
 
 using namespace std;
@@ -33,7 +34,7 @@ void LayoutManager::initializeClass(ExtensionManager* ext)
         layoutInstance = ext->manage(new LayoutManager);
 
         const QIcon layoutIcon = QIcon(":/GoogleMaterialSymbols/icon/dashboard_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        ProjectListedDialog::instance()->addWidget(layoutIcon, _("Layout"), layoutInstance);
+        ProjectListedDialog::instance()->listWidget()->addWidget(layoutIcon, _("Layout"), layoutInstance);
     }
 }
 
