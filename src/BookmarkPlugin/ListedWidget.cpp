@@ -5,6 +5,7 @@
 #include "ListedWidget.h"
 #include <QBoxLayout>
 #include <QListWidgetItem>
+#include <QPushButton>
 
 using namespace cnoid;
 
@@ -18,12 +19,18 @@ ListedWidget::ListedWidget(QWidget* parent)
     connect(listWidget, &QListWidget::currentRowChanged,
         [&](int currentRow){ stackedWidget->setCurrentIndex(currentRow); });
 
-    auto layout = new QHBoxLayout;
+    elementLayout = new QHBoxLayout;
+
+    auto layout = new QVBoxLayout;
     layout->addWidget(listWidget);
-    layout->addWidget(stackedWidget);
+    layout->addLayout(elementLayout);
+
+    auto layout2 = new QHBoxLayout;
+    layout2->addLayout(layout);
+    layout2->addWidget(stackedWidget);
 
     auto mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(layout);
+    mainLayout->addLayout(layout2);
     setLayout(mainLayout);
 
     setWindowTitle("");
@@ -72,4 +79,19 @@ void ListedWidget::addLayout(const QIcon& icon, const QString& text, QLayout* la
     auto widget = new QWidget;
     widget->setLayout(layout);
     this->addWidget(icon, text, widget);
+}
+
+
+void ListedWidget::addButton(const QString& text)
+{
+    auto pushButton = new QPushButton(text);
+    elementLayout->addWidget(pushButton);
+}
+
+
+void ListedWidget::addButton(const QIcon& icon, const QString& text)
+{
+    auto pushButton = new QPushButton(text);
+    pushButton->setIcon(icon);
+    elementLayout->addWidget(pushButton);
 }
