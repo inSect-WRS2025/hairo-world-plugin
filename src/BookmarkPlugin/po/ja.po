@@ -23,8 +23,11 @@ msgstr ""
 msgid "AC"
 msgstr ""
 
-msgid "Enable KIOSK"
-msgstr "KIOSKモード"
+msgid "KIOSK"
+msgstr ""
+
+msgid "Full screen Mode"
+msgstr "フルスクリーンモード"
 
 msgid "Bookmark"
 msgstr "ブックマーク"
@@ -72,7 +75,7 @@ msgid "Save a project"
 msgstr "プロジェクトの保存"
 
 msgid "I couldn't detect any system tray on this system"
-msgstr ""
+msgstr "システムトレイを検出できませんでした．"
 
 msgid "Exit"
 msgstr "終了"
