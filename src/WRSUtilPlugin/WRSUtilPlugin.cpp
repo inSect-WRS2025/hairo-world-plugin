@@ -15,7 +15,6 @@ public:
     WRSUtilPlugin() : Plugin("WRSUtil")
     {
         require("Body");
-        require("Google");
     }
 
     virtual bool initialize() override

@@ -154,15 +154,18 @@ WRSUtilBar::Impl::Impl(WRSUtilBar* self)
     projectCombo->setToolTip(_("Select a project"));
     self->addWidget(projectCombo);
 
-    auto openButton = self->addButton(":/GoogleMaterialSymbols/icon/file_open_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
+    const QIcon openIcon = QIcon::fromTheme("document-open");
+    auto openButton = self->addButton(openIcon);
     openButton->setToolTip(_("Open a registration file"));
     openButton->sigClicked().connect([&](){ onOpenButtonClicked(); });
 
-    auto updateButton = self->addButton(":/GoogleMaterialSymbols/icon/refresh_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
+    const QIcon updateIcon = QIcon::fromTheme("view-refresh");
+    auto updateButton = self->addButton(updateIcon);
     updateButton->setToolTip(_("Update projects"));
     updateButton->sigClicked().connect([&](){ onUpdateButtonClicked(); });
 
-    auto loadButton = self->addButton(":/GoogleMaterialSymbols/icon/open_in_new_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
+    const QIcon loadIcon = QIcon::fromTheme("view-restore");
+    auto loadButton = self->addButton(loadIcon);
     loadButton->setToolTip(_("Load the selected project"));
     loadButton->sigClicked().connect([&](){ onLoadButtonClicked(); });
 
