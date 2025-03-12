@@ -3,7 +3,6 @@
 */
 
 #include "BodyCreator.h"
-#include <cnoid/Dialog>
 #include <cnoid/EigenArchive>
 #include <cnoid/EigenTypes>
 #include <cnoid/ExtensionManager>

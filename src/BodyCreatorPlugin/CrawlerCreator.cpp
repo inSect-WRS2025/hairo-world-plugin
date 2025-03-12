@@ -6,7 +6,6 @@
 #include <cnoid/Button>
 #include <cnoid/ButtonGroup>
 #include <cnoid/CheckBox>
-#include <cnoid/Dialog>
 #include <cnoid/EigenArchive>
 #include <cnoid/EigenTypes>
 #include <cnoid/EigenUtil>

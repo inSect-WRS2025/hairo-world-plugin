@@ -315,7 +315,7 @@ msgid "Shape"
 msgstr "形状"
 
 msgid "&Calc"
-msgstr "計算(&C)"
+msgstr ""
 
 msgid "x [m]"
 msgstr ""

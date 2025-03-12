@@ -21,7 +21,6 @@ set(headers
   BodyCreatorDialog.h
   ColorButton.h
   CreatorToolBar.h
-  InertiaCalculator.h
   FileDroppableWidget.h
   Notepad.h
   WidgetInfo.h

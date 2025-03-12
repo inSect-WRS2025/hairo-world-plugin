@@ -2,23 +2,19 @@
    @author Kenta Suzuki
 */
 
-#include "InertiaCalculator.h"
-#include <cnoid/Action>
+#include "BodyCreator.h"
 #include <cnoid/Buttons>
 #include <cnoid/ComboBox>
-#include <cnoid/Dialog>
 #include <cnoid/EigenTypes>
 #include <cnoid/ExtensionManager>
 #include <cnoid/Format>
-#include <cnoid/MainMenu>
 #include <cnoid/MessageView>
-#include <cnoid/Separator>
 #include <cnoid/SpinBox>
 #include <QBoxLayout>
-#include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QLabel>
 #include <QStackedLayout>
+#include "BodyCreatorDialog.h"
 #include "gettext.h"
 
 using namespace std;
@@ -38,10 +34,10 @@ DoubleSpinInfo doubleSpinInfo[] = {
     { 3, nullptr }, { 3, nullptr }, { 3, nullptr }
 };
 
-class CalculatorDialog : public QDialog
+class CalculatorWidget : public QWidget
 {
 public:
-    CalculatorDialog(QWidget* parent = nullptr);
+    CalculatorWidget(QWidget* parent = nullptr);
 
 private:
     void calc();
@@ -60,7 +56,6 @@ private:
     QComboBox* axisComboBox;
     QComboBox* axisComboBox2;
     QDoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
-    QDialogButtonBox* buttonBox;
 };
 
 }
@@ -68,13 +63,12 @@ private:
 
 void InertiaCalculator::initializeClass(ExtensionManager* ext)
 {
-    static CalculatorDialog* dialog = nullptr;
+    static CalculatorWidget* widget = nullptr;
 
-    if(!dialog) {
-        dialog = ext->manage(new CalculatorDialog);
+    if(!widget) {
+        widget = ext->manage(new CalculatorWidget);
 
-        MainMenu::instance()->add_Tools_Item(
-            _("Inertia Calculator"), [](){ dialog->show(); });
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Inertia Calculator"), widget);
     }
 }
 
@@ -91,8 +85,8 @@ InertiaCalculator::~InertiaCalculator()
 }
 
 
-CalculatorDialog::CalculatorDialog(QWidget* parent)
-    : QDialog(parent)
+CalculatorWidget::CalculatorWidget(QWidget* parent)
+    : QWidget(parent)
 {
     auto stackedLayout = new QStackedLayout;
 
@@ -139,30 +133,30 @@ CalculatorDialog::CalculatorDialog(QWidget* parent)
     formLayout[Page_Cylinder]->addRow(_("axis [-]"), axisComboBox);
     formLayout[Page_Cone]->addRow(_("axis [-]"), axisComboBox2);
 
-    auto layout = new QHBoxLayout;
-    layout->addWidget(new QLabel(_("Shape")));
-    layout->addWidget(shapeComboBox);
-
     const QIcon calcIcon = QIcon::fromTheme("accessories-calculator");
-    QPushButton* calcButton = new QPushButton(calcIcon, _("&Calc"), this);
+    auto calcButton = new QPushButton(calcIcon, _("&Calc"), this);
     connect(calcButton, &QPushButton::clicked, [&](){ calc(); });
 
-    buttonBox = new QDialogButtonBox(this);
-    buttonBox->addButton(calcButton, QDialogButtonBox::ActionRole);
+    auto layout = new QHBoxLayout;
+    layout->addWidget(calcButton);
+    layout->addStretch();
+
+    auto layout2 = new QHBoxLayout;
+    layout2->addWidget(new QLabel(_("Shape")));
+    layout2->addWidget(shapeComboBox);
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addLayout(layout);
+    mainLayout->addLayout(layout2);
     mainLayout->addLayout(stackedLayout);
     mainLayout->addStretch();
-    mainLayout->addWidget(new HSeparator);
-    mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
     setWindowTitle(_("Inertia Calculator"));
 }
 
 
-void CalculatorDialog::calc()
+void CalculatorWidget::calc()
 {
     MessageView* mv = MessageView::instance();
 

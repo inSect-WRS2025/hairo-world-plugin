@@ -3,7 +3,6 @@
 */
 
 #include "BodyCreator.h"
-#include <cnoid/Action>
 #include <cnoid/BodyItem>
 #include <cnoid/Buttons>
 #include <cnoid/CheckBox>

@@ -6,7 +6,6 @@
 #include <cnoid/Plugin>
 #include "BodyCreator.h"
 #include "BodyCreatorDialog.h"
-#include "InertiaCalculator.h"
 
 using namespace cnoid;
 

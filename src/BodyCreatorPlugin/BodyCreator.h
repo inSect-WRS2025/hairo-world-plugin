@@ -82,6 +82,15 @@ public:
     virtual ~FormatConverter();
 };
 
+class InertiaCalculator
+{
+public:
+    static void initializeClass(ExtensionManager* ext);
+
+    InertiaCalculator();
+    virtual ~InertiaCalculator();
+};
+
 }
 
 #endif // CNOID_BODY_CREATOR_PLUGIN_BODY_CREATOR_H

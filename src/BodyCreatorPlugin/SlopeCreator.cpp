@@ -4,7 +4,6 @@
 
 #include "BodyCreator.h"
 #include <cnoid/Button>
-#include <cnoid/Dialog>
 #include <cnoid/EigenArchive>
 #include <cnoid/EigenTypes>
 #include <cnoid/EigenUtil>
