@@ -65,7 +65,6 @@ private:
 
 }
 
-
 namespace cnoid {
 
 class ShieldTable

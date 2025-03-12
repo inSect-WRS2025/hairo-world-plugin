@@ -10,6 +10,7 @@
 
 using namespace cnoid;
 
+
 ColorButton::ColorButton(QWidget* parent)
     : PushButton(parent)
 {

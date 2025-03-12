@@ -47,7 +47,6 @@ public:
 
 }
 
-
 namespace cnoid {
 
 class EnergyFilter::Impl

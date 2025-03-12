@@ -21,14 +21,12 @@ FlightEvent::FlightEvent()
     duration_ = 0.0;
 }
 
-
 FlightEvent::FlightEvent(const FlightEvent& org)
 {
     name_ = org.name_;
     mass_ = org.mass_;
     duration_ = org.duration_;
 }
-
 
 class FlightEventReader::Impl
 {
