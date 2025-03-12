@@ -1,5 +1,6 @@
 add_subdirectory(hai-rov)
 add_subdirectory(hobby-drone)
+add_subdirectory(IconPreview)
 add_subdirectory(Lift)
 add_subdirectory(MarkerDetection)
 add_subdirectory(minio-client-plugin)
