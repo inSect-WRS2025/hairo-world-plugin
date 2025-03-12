@@ -2,30 +2,27 @@
    @author Kenta Suzuki
 */
 
-#include "FormatConverter.h"
+#include "BodyCreator.h"
 #include <cnoid/Action>
 #include <cnoid/BodyItem>
 #include <cnoid/Buttons>
 #include <cnoid/CheckBox>
 #include <cnoid/ComboBox>
-#include <cnoid/Dialog>
 #include <cnoid/ExtensionManager>
 #include <cnoid/Format>
 #include <cnoid/ItemManager>
-#include <cnoid/MainMenu>
 #include <cnoid/MessageView>
 #include <cnoid/ProjectManager>
 #include <cnoid/RootItem>
-#include <cnoid/Separator>
 #include <cnoid/UTF8>
 #include <cnoid/WorldItem>
 #include <cnoid/stdx/filesystem>
 #include <cnoid/HamburgerMenu>
 #include <QBoxLayout>
-#include <QDialogButtonBox>
 #include <QFile>
 #include <QLabel>
 #include <QTextStream>
+#include "BodyCreatorDialog.h"
 #include "FileDroppableWidget.h"
 #include "gettext.h"
 
@@ -132,10 +129,10 @@ KeyInfo keyInfo[] = {
     { "jointType:",          "joint_type:"           }
 };
 
-class ConverterDialog : public QDialog
+class ConverterWidget : public QWidget
 {
 public:
-    ConverterDialog(QWidget* parent = nullptr);
+    ConverterWidget(QWidget* parent = nullptr);
 
 private:
     void onFileDropped(const string& filename);
@@ -144,7 +141,6 @@ private:
 
     QCheckBox* convertCheckBox;
     QComboBox* formatComboBox;
-    QDialogButtonBox* buttonBox;
 };
 
 }
@@ -152,13 +148,12 @@ private:
 
 void FormatConverter::initializeClass(ExtensionManager* ext)
 {
-    static ConverterDialog* dialog = nullptr;
+    static ConverterWidget* widget = nullptr;
 
-    if(!dialog) {
-        dialog = ext->manage(new ConverterDialog);
+    if(!widget) {
+        widget = ext->manage(new ConverterWidget);
 
-        MainMenu::instance()->add_Tools_Item(
-            _("Format Converter"), [](){ dialog->show(); });
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Format Converter"), widget);
     }
 }
 
@@ -175,8 +170,8 @@ FormatConverter::~FormatConverter()
 }
 
 
-ConverterDialog::ConverterDialog(QWidget* parent)
-    : QDialog(parent)
+ConverterWidget::ConverterWidget(QWidget* parent)
+    : QWidget(parent)
 {
     convertCheckBox = new QCheckBox;
     convertCheckBox->setText(_("Format conversion"));
@@ -201,22 +196,17 @@ ConverterDialog::ConverterDialog(QWidget* parent)
     layout->addWidget(formatComboBox);
     layout->addStretch();
 
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttonBox, &QDialogButtonBox::accepted, [&](){ accept(); });
-
     auto mainLayout = new QVBoxLayout;
     mainLayout->addLayout(layout);
     mainLayout->addWidget(dropWidget);
     mainLayout->addStretch();
-    mainLayout->addWidget(new HSeparator);
-    mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
     setWindowTitle(_("Format Converter"));
 }
 
 
-void ConverterDialog::onFileDropped(const string& filename)
+void ConverterWidget::onFileDropped(const string& filename)
 {
     filesystem::path path(fromUTF8(filename));
     string ext = path.extension().string();
@@ -248,7 +238,7 @@ void ConverterDialog::onFileDropped(const string& filename)
 }
 
 
-QString ConverterDialog::convert(const QString& line) const
+QString ConverterWidget::convert(const QString& line) const
 {
     QString newLine(line);
 
@@ -269,7 +259,7 @@ QString ConverterDialog::convert(const QString& line) const
 }
 
 
-void ConverterDialog::saveFile(const QString& fileName)
+void ConverterWidget::saveFile(const QString& fileName)
 {
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {

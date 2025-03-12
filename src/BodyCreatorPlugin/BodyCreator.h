@@ -2,8 +2,8 @@
     @author Kenta Suzuki
 */
 
-#ifndef CNOID_BODY_EDIT_PLUGIN_BODY_CREATOR_H
-#define CNOID_BODY_EDIT_PLUGIN_BODY_CREATOR_H
+#ifndef CNOID_BODY_CREATOR_PLUGIN_BODY_CREATOR_H
+#define CNOID_BODY_CREATOR_PLUGIN_BODY_CREATOR_H
 
 namespace cnoid {
 
@@ -73,6 +73,15 @@ public:
     virtual ~TerrainCreator();
 };
 
+class FormatConverter
+{
+public:
+    static void initializeClass(ExtensionManager* ext);
+
+    FormatConverter();
+    virtual ~FormatConverter();
+};
+
 }
 
-#endif // CNOID_BODY_EDIT_PLUGIN_BODY_CREATOR_H
+#endif // CNOID_BODY_CREATOR_PLUGIN_BODY_CREATOR_H

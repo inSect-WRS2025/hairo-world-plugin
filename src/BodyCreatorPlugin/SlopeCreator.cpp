@@ -65,12 +65,12 @@ private:
 
 void SlopeCreator::initializeClass(ExtensionManager* ext)
 {
-    static SlopeCreatorWidget* dialog = nullptr;
+    static SlopeCreatorWidget* widget = nullptr;
 
-    if(!dialog) {
-        dialog = ext->manage(new SlopeCreatorWidget);
+    if(!widget) {
+        widget = ext->manage(new SlopeCreatorWidget);
 
-        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Slope"), dialog);
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Slope"), widget);
     }
 }
 

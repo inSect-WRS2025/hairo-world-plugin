@@ -5,7 +5,7 @@ set(sources
   CrawlerCreator.cpp
   CreatorToolBar.cpp
   GratingCreator.cpp
-  BodyEditPlugin.cpp
+  BodyCreatorPlugin.cpp
   InertiaCalculator.cpp
   PipeCreator.cpp
   SlopeCreator.cpp
@@ -19,7 +19,6 @@ set(sources
 set(headers
   BodyCreator.h
   BodyCreatorDialog.h
-  FormatConverter.h
   ColorButton.h
   CreatorToolBar.h
   InertiaCalculator.h
@@ -31,7 +30,7 @@ set(headers
 
 choreonoid_make_header_public(FileDroppableWidget.h)
 
-set(target CnoidBodyEditPlugin)
+set(target CnoidBodyCreatorPlugin)
 choreonoid_make_gettext_mo_files(${target} mofiles)
 choreonoid_add_plugin(${target} ${sources} ${mofiles} HEADERS ${headers})
 target_link_libraries(${target} PUBLIC CnoidBodyPlugin CnoidBookmarkPlugin)

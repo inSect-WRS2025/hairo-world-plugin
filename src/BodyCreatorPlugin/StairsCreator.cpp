@@ -70,12 +70,12 @@ private:
 
 void StairsCreator::initializeClass(ExtensionManager* ext)
 {
-    static StairsCreatorWidget* dialog = nullptr;
+    static StairsCreatorWidget* widget = nullptr;
 
-    if(!dialog) {
-        dialog = ext->manage(new StairsCreatorWidget);
+    if(!widget) {
+        widget = ext->manage(new StairsCreatorWidget);
 
-        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Stairs"), dialog);
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Stairs"), widget);
     }
 }
 

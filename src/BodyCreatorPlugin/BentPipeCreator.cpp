@@ -72,12 +72,12 @@ private:
 
 void BentPipeCreator::initializeClass(ExtensionManager* ext)
 {
-    static BentPipeCreatorWidget* dialog = nullptr;
+    static BentPipeCreatorWidget* widget = nullptr;
 
-    if(!dialog) {
-        dialog = ext->manage(new BentPipeCreatorWidget);
+    if(!widget) {
+        widget = ext->manage(new BentPipeCreatorWidget);
 
-        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("BentPipe"), dialog);
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("BentPipe"), widget);
     }
 }
 

@@ -84,12 +84,12 @@ private:
 
 void TerrainCreator::initializeClass(ExtensionManager* ext)
 {
-    static TerrainCreatorWidget* dialog = nullptr;
+    static TerrainCreatorWidget* widget = nullptr;
 
-    if(!dialog) {
-        dialog = ext->manage(new TerrainCreatorWidget);
+    if(!widget) {
+        widget = ext->manage(new TerrainCreatorWidget);
 
-        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("BoxTerrain"), dialog);
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("BoxTerrain"), widget);
     }
 }
 

@@ -1,11 +1,11 @@
-# Japanese translations for BodyEditPlugin package.
-# Copyright (C) 2023 THE BodyEditPlugin'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the BodyEditPlugin package.
+# Japanese translations for BodyCreatorPlugin package.
+# Copyright (C) 2023 THE BodyCreatorPlugin'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the BodyCreatorPlugin package.
 # k38-suzuki <suzuki.kenta38@jaea.go.jp>, 2023.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: BodyEditPlugin\n"
+"Project-Id-Version: BodyCreatorPlugin\n"
 "Report-Msgid-Bugs-To: suzuki.kenta38@jaea.go.jp\n"
 "POT-Creation-Date: 2023-01-11 05:08-0800\n"
 "PO-Revision-Date: 2023-01-11 05:08-0800\n"

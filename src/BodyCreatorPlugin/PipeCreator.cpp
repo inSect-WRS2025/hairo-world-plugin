@@ -106,12 +106,12 @@ private:
 
 void PipeCreator::initializeClass(ExtensionManager* ext)
 {
-    static PipeCreatorWidget* dialog = nullptr;
+    static PipeCreatorWidget* widget = nullptr;
 
-    if(!dialog) {
-        dialog = ext->manage(new PipeCreatorWidget);
+    if(!widget) {
+        widget = ext->manage(new PipeCreatorWidget);
 
-        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Pipe"), dialog);
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Pipe"), widget);
     }
 }
 

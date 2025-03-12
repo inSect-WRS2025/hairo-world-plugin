@@ -36,8 +36,8 @@ BodyCreatorDialog::BodyCreatorDialog(QWidget* parent)
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addWidget(listedWidget_);
-    // mainLayout->addWidget(new HSeparator);
-    // mainLayout->addWidget(buttonBox);
+    mainLayout->addWidget(new HSeparator);
+    mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
     setWindowTitle(_("Body Creator"));

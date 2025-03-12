@@ -78,12 +78,12 @@ private:
 
 void GratingCreator::initializeClass(ExtensionManager* ext)
 {
-    static GratingCreatorWidget* dialog = nullptr;
+    static GratingCreatorWidget* widget = nullptr;
 
-    if(!dialog) {
-        dialog = ext->manage(new GratingCreatorWidget);
+    if(!widget) {
+        widget = ext->manage(new GratingCreatorWidget);
 
-        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Grating"), dialog);
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Grating"), widget);
     }
 }
 
@@ -176,7 +176,7 @@ void GratingCreatorWidget::reset()
 
     for(int i = 0; i < NumSpinBoxes; ++i) {
         SpinInfo info = spinInfo[i];
-        info.spin = spinBoxes[i];        
+        info.spin = spinBoxes[i];
         info.spin->setValue(info.value);
     }
 

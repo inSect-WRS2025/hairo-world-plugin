@@ -293,12 +293,12 @@ private:
 
 void CrawlerCreator::initializeClass(ExtensionManager* ext)
 {
-    static CrawlerCreatorWidget* dialog = nullptr;
+    static CrawlerCreatorWidget* widget = nullptr;
 
-    if(!dialog) {
-        dialog = ext->manage(new CrawlerCreatorWidget);
+    if(!widget) {
+        widget = ext->manage(new CrawlerCreatorWidget);
 
-        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Crawler"), dialog);
+        BodyCreatorDialog::instance()->listedWidget()->addWidget(_("Crawler"), widget);
     }
 }
 
