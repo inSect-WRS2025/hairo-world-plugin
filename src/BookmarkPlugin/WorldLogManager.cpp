@@ -33,8 +33,7 @@ void WorldLogManager::initializeClass(ExtensionManager* ext)
     if(!widget) {
         widget = ext->manage(new WorldLogManager);
 
-        const QIcon logIcon = QIcon(":/GoogleMaterialSymbols/icon/restore_page_24dp_5F6368_FILL1_wght400_GRAD0_opsz24.svg");
-        ProjectListedDialog::instance()->listedWidget()->addWidget(logIcon, _("World Log"), widget);
+        ProjectListedDialog::instance()->listedWidget()->addWidget(_("World Log"), widget);
     }
 }
 
