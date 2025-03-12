@@ -24,13 +24,14 @@ public:
     virtual bool initialize() override
     {
         auto gridLayout = new QGridLayout;
-        for(int i = 0; i < iconThemes().size(); ++i) {
+        for(int i = 0; i < themeTexts().size(); ++i) {
             int row = i / 10;
             int column = i % 10;
-            const QIcon themeIcon = QIcon::fromTheme(iconThemes()[i]);
+            QString text = themeTexts().at(i);
+            const QIcon themeIcon = QIcon::fromTheme(text);
             auto button = new QPushButton;
             button->setIcon(themeIcon);
-            button->setToolTip(iconThemes()[i]);
+            button->setToolTip(text);
             gridLayout->addWidget(button, row, column);
         }
 

@@ -9,9 +9,9 @@
 
 namespace cnoid {
 
-QStringList iconThemes()
+QStringList themeTexts()
 {
-    QStringList themes = {
+    QStringList texts = {
         "address-book-new",
         "application-exit",
         "appointment-new",
@@ -299,7 +299,7 @@ QStringList iconThemes()
         "weather-snow",
         "weather-storm"
     };
-    return themes;
+    return texts;
 }
 
 }

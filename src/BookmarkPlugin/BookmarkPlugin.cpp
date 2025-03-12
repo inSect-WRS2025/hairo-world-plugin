@@ -22,7 +22,6 @@ public:
     {
         require("Body");
         require("MotionCapture");
-        require("Google");
     }
 
     virtual bool initialize() override

@@ -1,6 +1,5 @@
 add_subdirectory(BodyCreatorPlugin)
 add_subdirectory(CFDPlugin)
-add_subdirectory(GoogleMaterialSymbols)
 add_subdirectory(JoystickStartPlugin)
 add_subdirectory(MotionCapturePlugin)
 add_subdirectory(VFXPlugin)
