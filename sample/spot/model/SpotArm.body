@@ -6,7 +6,7 @@ name: SpotArm
 links:
   -
     name: base_arm_joint
-    translation: [ 0.29, 0, 0.08 ]
+    translation: [ 0, 0, 0 ]
     jointType: fixed
     centerOfMass: [ 1.2371844231029972e-17, 0.0, 0.0325 ]
     mass: 5.770791545379091
