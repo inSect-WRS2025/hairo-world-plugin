@@ -314,10 +314,10 @@ msgstr ""
 msgid "Cone"
 msgstr ""
 
-msgid "Shape"
-msgstr "形状"
-
 msgid "&Calc"
+msgstr ""
+
+msgid "C&lear"
 msgstr ""
 
 msgid "x [m]"

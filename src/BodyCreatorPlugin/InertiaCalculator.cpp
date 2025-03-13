@@ -13,7 +13,7 @@
 #include <QBoxLayout>
 #include <QFormLayout>
 #include <QLabel>
-#include <QStackedLayout>
+#include <QTabWidget>
 #include "BodyCreatorDialog.h"
 #include "gettext.h"
 
@@ -52,10 +52,11 @@ private:
     enum { Page_Box, Page_Sphere, Page_Cylinder, Page_Cone, NumPages };
     enum Axis { XAxis, YAxis, ZAxis };
 
-    QComboBox* shapeComboBox;
-    QComboBox* axisComboBox;
-    QComboBox* axisComboBox2;
+    MessageView* mv;
+
+    QComboBox* axisComboBoxes[2];
     QDoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
+    QTabWidget* tabWidget;
 };
 
 }
@@ -86,32 +87,30 @@ InertiaCalculator::~InertiaCalculator()
 
 
 CalculatorWidget::CalculatorWidget(QWidget* parent)
-    : QWidget(parent)
+    : QWidget(parent),
+      mv(new MessageView)
 {
-    auto stackedLayout = new QStackedLayout;
+    mv->clear();
+
+    tabWidget = new QTabWidget;
 
     const QStringList texts = { _("Box"), _("Sphere"), _("Cylinder"), _("Cone") };
-    shapeComboBox = new QComboBox;
-    shapeComboBox->addItems(texts);
-    connect(shapeComboBox, QOverload<int>::of(&QComboBox::activated),
-        [&, stackedLayout](int index){ stackedLayout->setCurrentIndex(index); });
-
     const QStringList texts2 = { "X", "Y", "Z" };
-    axisComboBox = new QComboBox;
-    axisComboBox->addItems(texts2);
 
-    axisComboBox2 = new QComboBox;
-    axisComboBox2->addItems(texts2);
+    for(int i = 0; i < 2; ++i) {
+        axisComboBoxes[i] = new QComboBox;
+        axisComboBoxes[i]->addItems(texts2);
+    }
 
     QFormLayout* formLayout[NumPages];
     for(int i = 0; i < NumPages; ++i) {
-        QWidget* pageWidget = new QWidget;
+        auto page = new QWidget;
         formLayout[i] = new QFormLayout;
         auto layout = new QVBoxLayout;
         layout->addLayout(formLayout[i]);
         layout->addStretch();
-        pageWidget->setLayout(layout);
-        stackedLayout->addWidget(pageWidget);
+        page->setLayout(layout);
+        tabWidget->addTab(page, texts.at(i));
     }
 
     const QStringList list = {
@@ -130,26 +129,27 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
         formLayout[info.page]->addRow(list[i], info.spin);
     }
 
-    formLayout[Page_Cylinder]->addRow(_("axis [-]"), axisComboBox);
-    formLayout[Page_Cone]->addRow(_("axis [-]"), axisComboBox2);
+    formLayout[Page_Cylinder]->addRow(_("axis [-]"), axisComboBoxes[0]);
+    formLayout[Page_Cone]->addRow(_("axis [-]"), axisComboBoxes[1]);
 
     const QIcon calcIcon = QIcon::fromTheme("accessories-calculator");
     auto calcButton = new QPushButton(calcIcon, _("&Calc"), this);
     connect(calcButton, &QPushButton::clicked, [&](){ calc(); });
 
+    const QIcon clearIcon = QIcon::fromTheme("edit-clear");
+    auto clearButton = new QPushButton(clearIcon, _("C&lear"), this);
+    connect(clearButton, &QPushButton::clicked, [&](){ mv->clear(); });
+
     auto layout = new QHBoxLayout;
     layout->addWidget(calcButton);
+    layout->addWidget(clearButton);
     layout->addStretch();
-
-    auto layout2 = new QHBoxLayout;
-    layout2->addWidget(new QLabel(_("Shape")));
-    layout2->addWidget(shapeComboBox);
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addLayout(layout);
-    mainLayout->addLayout(layout2);
-    mainLayout->addLayout(stackedLayout);
-    mainLayout->addStretch();
+    mainLayout->addWidget(tabWidget);
+    mainLayout->addWidget(mv);
+    // mainLayout->addStretch();
     setLayout(mainLayout);
 
     setWindowTitle(_("Inertia Calculator"));
@@ -158,10 +158,8 @@ CalculatorWidget::CalculatorWidget(QWidget* parent)
 
 void CalculatorWidget::calc()
 {
-    MessageView* mv = MessageView::instance();
-
     double ix, iy, iz = 0.0;
-    int index = shapeComboBox->currentIndex();
+    int index = tabWidget->currentIndex();
     if(index == Page_Box) {
         double m = doubleSpinBoxes[BOX_MAS]->value();
         double x = doubleSpinBoxes[BOX_X]->value();
@@ -186,7 +184,7 @@ void CalculatorWidget::calc()
         double m = doubleSpinBoxes[CLD_MAS]->value();
         double r = doubleSpinBoxes[CLD_RAD]->value();
         double h = doubleSpinBoxes[CLD_HGT]->value();
-        int index = axisComboBox->currentIndex();
+        int index = axisComboBoxes[0]->currentIndex();
 
         double main_inertia = m * r * r / 2.0;
         double sub_inertia = m * (3.0 * r * r + h * h) / 12.0;
@@ -203,12 +201,12 @@ void CalculatorWidget::calc()
         }
 
         mv->putln(formatR(_("shape: Cylinder, mass: {0} [kg], radius: {1} [m], height: {2} [m], axis: {3} [-]"),
-                                    m, r, h, axisComboBox->currentText().toStdString()));
+                                    m, r, h, axisComboBoxes[0]->currentText().toStdString()));
     } else if(index == Page_Cone) {
         double m = doubleSpinBoxes[CON_MAS]->value();
         double r = doubleSpinBoxes[CON_RAD]->value();
         double h = doubleSpinBoxes[CON_HGT]->value();
-        int index = axisComboBox2->currentIndex();
+        int index = axisComboBoxes[1]->currentIndex();
 
         double main_inertia = m * r * r * 3.0 / 10.0;
         double sub_inertia = m * 3.0 / 80.0 * (4.0 * r * r + h * h);
@@ -225,7 +223,7 @@ void CalculatorWidget::calc()
         }
 
         mv->putln(formatR(_("shape: Cone, mass: {0} [kg], radius: {1} [m], height: {2} [m], axis: {3} [-]"),
-                                    m, r, h, axisComboBox2->currentText().toStdString()));
+                                    m, r, h, axisComboBoxes[1]->currentText().toStdString()));
     }
 
     Vector3 inertia(ix, iy, iz);
