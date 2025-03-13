@@ -93,7 +93,7 @@ msgid "Rear SubTrack"
 msgstr "サブトラック（後）"
 
 msgid "AGX"
-msgstr "ＡＧＸ"
+msgstr ""
 
 msgid "Chassis"
 msgstr "シャーシ"
@@ -295,6 +295,9 @@ msgstr "設定1"
 
 msgid "Setting 2"
 msgstr "設定2"
+
+msgid "Setting 3"
+msgstr "設定3"
 
 msgid "Inertia Calculator"
 msgstr "慣性モーメントの計算"

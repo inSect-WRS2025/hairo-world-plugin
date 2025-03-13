@@ -1,11 +1,9 @@
 /**
-   @author Kenta Suzuki
+    @author Kenta Suzuki
 */
 
 #include "BodyCreator.h"
 #include <cnoid/Button>
-#include <cnoid/ButtonGroup>
-#include <cnoid/CheckBox>
 #include <cnoid/EigenArchive>
 #include <cnoid/EigenTypes>
 #include <cnoid/EigenUtil>
@@ -23,8 +21,9 @@
 #include <cnoid/stdx/filesystem>
 #include <cnoid/HamburgerMenu>
 #include <QBoxLayout>
+#include <QGroupBox>
 #include <QLabel>
-#include <QStackedWidget>
+#include <QTabWidget>
 #include <QWidget>
 #include "BodyCreatorDialog.h"
 #include "ColorButton.h"
@@ -76,15 +75,15 @@ struct ButtonInfo {
     double red;
     double green;
     double blue;
-    int page;
+    int group;
 };
 
 ButtonInfo buttonInfo[] = {
-    { 1, 3,   0.0 / 255.0, 153.0 / 255.0,  0.0 / 255.0, 0 },
-    { 4, 3,  51.0 / 255.0,  51.0 / 255.0, 51.0 / 255.0, 0 },
-    { 1, 3,  51.0 / 255.0,  51.0 / 255.0, 51.0 / 255.0, 1 },
-    { 5, 3,  51.0 / 255.0,  51.0 / 255.0, 51.0 / 255.0, 1 },
-    { 8, 3, 255.0 / 255.0,   0.0 / 255.0,  0.0 / 255.0, 0 }
+    { 0, 3,   0.0 / 255.0, 153.0 / 255.0,  0.0 / 255.0, 0 },
+    { 0, 3,  51.0 / 255.0,  51.0 / 255.0, 51.0 / 255.0, 1 },
+    { 0, 3, 255.0 / 255.0,   0.0 / 255.0,  0.0 / 255.0, 2 },
+    { 0, 3,  51.0 / 255.0,  51.0 / 255.0, 51.0 / 255.0, 3 },
+    { 0, 3,  51.0 / 255.0,  51.0 / 255.0, 51.0 / 255.0, 4 }
 };
 
 struct DoubleSpinInfo {
@@ -94,30 +93,22 @@ struct DoubleSpinInfo {
     double min;
     double max;
     int decimals;
-    bool enabled;
-    int page;
+    int group;
 };
 
 DoubleSpinInfo doubleSpinInfo[] = {
-    { 1, 1,  8.000, 0.0, 1000.000, 3,  true, 0 }, { 2, 1,  0.450, 0.0, 1000.000, 3,  true, 0 }, {  2, 2,  0.300, 0.0, 1000.000, 3,  true, 0 }, { 2, 3,  0.100, 0.0, 1000.000, 3,  true, 0 },
-    { 4, 1,  1.000, 0.0, 1000.000, 3,  true, 0 }, { 5, 1,  0.080, 0.0, 1000.000, 3,  true, 0 }, {  6, 1,  0.100, 0.0, 1000.000, 3,  true, 0 }, { 6, 3,  0.420, 0.0, 1000.000, 3,  true, 0 },
-    { 1, 1,  0.250, 0.0, 1000.000, 3,  true, 1 }, { 2, 1,  0.080, 0.0, 1000.000, 3,  true, 1 }, {  2, 2,  0.080, 0.0, 1000.000, 3,  true, 1 }, { 3, 1,  0.080, 0.0, 1000.000, 3,  true, 1 }, { 3, 3,  0.130, 0.0, 1000.000, 3,  true, 1 },
-    { 5, 1,  0.250, 0.0, 1000.000, 3,  true, 1 }, { 6, 1,  0.080, 0.0, 1000.000, 3,  true, 1 }, {  6, 2,  0.080, 0.0, 1000.000, 3,  true, 1 }, { 7, 1,  0.080, 0.0, 1000.000, 3,  true, 1 }, { 7, 3,  0.130, 0.0, 1000.000, 3,  true, 1 },
-    { 8, 1,  0.200, 0.0, 1000.000, 3,  true, 0 }, { 9, 1,  0.060, 0.0, 1000.000, 3,  true, 0 }, { 10, 1,  0.013, 0.0, 1000.000, 3,  true, 0 }
+    { 0, 1, 8.000, 0.0, 1000.000, 3, 0 }, { 1, 1, 0.450, 0.0, 1000.000, 3, 0 }, { 1, 2, 0.300, 0.0, 1000.000, 3, 0 }, { 1, 3, 0.100, 0.0, 1000.000, 3, 0 },
+    { 0, 1, 1.000, 0.0, 1000.000, 3, 1 }, { 1, 1, 0.080, 0.0, 1000.000, 3, 1 }, { 2, 1, 0.100, 0.0, 1000.000, 3, 1 }, { 2, 3, 0.420, 0.0, 1000.000, 3, 1 },
+    { 0, 1, 0.200, 0.0, 1000.000, 3, 2 }, { 1, 1, 0.060, 0.0, 1000.000, 3, 2 }, { 2, 1, 0.013, 0.0, 1000.000, 3, 2 },
+    { 0, 1, 0.250, 0.0, 1000.000, 3, 3 }, { 1, 1, 0.080, 0.0, 1000.000, 3, 2 }, { 1, 2, 0.080, 0.0, 1000.000, 3, 3 }, { 2, 1, 0.080, 0.0, 1000.000, 3, 3 }, { 2, 3, 0.130, 0.0, 1000.000, 3, 3 },
+    { 0, 1, 0.250, 0.0, 1000.000, 3, 4 }, { 1, 1, 0.080, 0.0, 1000.000, 3, 3 }, { 1, 2, 0.080, 0.0, 1000.000, 3, 4 }, { 2, 1, 0.080, 0.0, 1000.000, 3, 4 }, { 2, 3, 0.130, 0.0, 1000.000, 3, 4 }
 };
 
-//DoubleSpinInfo agxdoubleSpinInfo[] = {
-//    {  1, 4,  0.010, 0.0, 1000.000, 3, false }, {  2, 1,  0.090, 0.0, 1000.000, 3, false }, {  2, 4,  0.020,       0.0, 1000.000, 3, false }, {  3, 4,  2.000,       0.0, 1000.000, 3, false }, {  4, 1,  1.000, 0.0, 1000.000, 3, false },
-//    {  5, 1,  9.000, 0.0, 1000.000, 3, false }, {  5, 4,  0.010, 0.0, 1000.000, 3, false }, {  6, 1, -0.001, -1000.000, 1000.000, 3, false }, {  6, 4, -0.009, -1000.000, 1000.000, 3, false },
-//    {  8, 4,  0.010, 0.0, 1000.000, 3, false }, {  9, 1,  0.090, 0.0, 1000.000, 3, false }, {  9, 4,  0.020,       0.0, 1000.000, 3, false }, { 10, 4,  2.000,       0.0, 1000.000, 3, false }, { 11, 1,  1.000, 0.0, 1000.000, 3, false },
-//    { 12, 1,  9.000, 0.0, 1000.000, 3, false }, { 12, 4,  0.010, 0.0, 1000.000, 3, false }, { 13, 1, -0.001, -1000.000, 1000.000, 3, false }, { 13, 4, -0.009, -1000.000, 1000.000, 3, false }
-//};
-
 DoubleSpinInfo agxdoubleSpinInfo[] = {
-    {  1, 4,  0.010, 0.0, 1000.000, 3, false, 0 }, {  2, 1,  0.100, 0.0, 1000.000, 3, false, 0 }, {  2, 4,  0.020,       0.0, 1000.000, 3, false, 0 }, {  3, 4,  9.000,       0.0, 1000.000, 3, false, 0 }, {  4, 1,  4.000, 0.0, 1000.000, 3, false, 0 },
-    {  5, 1,  9.000, 0.0, 1000.000, 3, false, 0 }, {  5, 4,  0.010, 0.0, 1000.000, 3, false, 0 }, {  6, 1, -0.001, -1000.000, 1000.000, 3, false, 0 }, {  6, 4, -0.009, -1000.000, 1000.000, 3, false, 0 },
-    {  8, 4,  0.010, 0.0, 1000.000, 3, false, 0 }, {  9, 1,  0.080, 0.0, 1000.000, 3, false, 0 }, {  9, 4,  0.020,       0.0, 1000.000, 3, false, 0 }, { 10, 4,  9.000,       0.0, 1000.000, 3, false, 0 }, { 11, 1,  4.000, 0.0, 1000.000, 3, false, 0 },
-    { 12, 1,  9.000, 0.0, 1000.000, 3, false, 0 }, { 12, 4,  0.010, 0.0, 1000.000, 3, false, 0 }, { 13, 1, -0.001, -1000.000, 1000.000, 3, false, 0 }, { 13, 4, -0.009, -1000.000, 1000.000, 3, false, 0 }
+    { 0, 4, 0.010, 0.0, 1000.000, 3, 0 }, { 1, 1, 0.100, 0.0, 1000.000, 3, 0 }, { 1, 4,  0.020,       0.0, 1000.000, 3, 0 }, { 2, 4,  9.000,       0.0, 1000.000, 3, 0 }, { 3, 1, 4.000, 0.0, 1000.000, 3, 0 },
+    { 4, 1, 9.000, 0.0, 1000.000, 3, 0 }, { 4, 4, 0.010, 0.0, 1000.000, 3, 0 }, { 5, 1, -0.001, -1000.000, 1000.000, 3, 0 }, { 5, 4, -0.009, -1000.000, 1000.000, 3, 0 },
+    { 0, 4, 0.010, 0.0, 1000.000, 3, 1 }, { 1, 1, 0.080, 0.0, 1000.000, 3, 1 }, { 1, 4,  0.020,       0.0, 1000.000, 3, 1 }, { 2, 4,  9.000,       0.0, 1000.000, 3, 1 }, { 3, 1, 4.000, 0.0, 1000.000, 3, 1 },
+    { 4, 1, 9.000, 0.0, 1000.000, 3, 1 }, { 4, 4, 0.010, 0.0, 1000.000, 3, 1 }, { 5, 1, -0.001, -1000.000, 1000.000, 3, 1 }, { 5, 4, -0.009, -1000.000, 1000.000, 3, 1 }
 };
 
 struct SpinInfo {
@@ -126,69 +117,43 @@ struct SpinInfo {
     double value;
     double min;
     double max;
-    bool enabled;
+    int group;
 };
 
-//SpinInfo agxspinInfo[] = {
-//    {  1, 1, 42, 0, 9999, false }, {  3, 1,   3, 0, 9999, false }, {  3, 5,  4, 0, 9999, false },
-//    {  4, 2,  6, 0, 9999, false }, {  4, 4, 100, 0, 9999, false }, {  5, 2, 10, 0, 9999, false },
-//    {  8, 1, 42, 0, 9999, false }, { 10, 1,   3, 0, 9999, false }, { 10, 5,  4, 0, 9999, false },
-//    { 11, 2,  6, 0, 9999, false }, { 11, 4, 100, 0, 9999, false }, { 12, 2, 10, 0, 9999, false }
-//};
-
 SpinInfo agxspinInfo[] = {
-    {  1, 1, 42, 0, 9999, false }, {  3, 1,   3, 0, 9999, false }, {  3, 5,  4, 0, 9999, false },
-    {  4, 2,  7, 0, 9999, false }, {  4, 4, 100, 0, 9999, false }, {  5, 2,  7, 0, 9999, false },
-    {  8, 1, 42, 0, 9999, false }, { 10, 1,   3, 0, 9999, false }, { 10, 5,  4, 0, 9999, false },
-    { 11, 2,  7, 0, 9999, false }, { 11, 4, 100, 0, 9999, false }, { 12, 2,  7, 0, 9999, false }
+    { 0, 1, 42, 0, 9999, 0 }, { 2, 1,   3, 0, 9999, 0 }, { 2, 5, 4, 0, 9999, 0 },
+    { 3, 2,  7, 0, 9999, 0 }, { 3, 4, 100, 0, 9999, 0 }, { 4, 2, 7, 0, 9999, 0 },
+    { 0, 1, 42, 0, 9999, 1 }, { 2, 1,   3, 0, 9999, 1 }, { 2, 5, 4, 0, 9999, 1 },
+    { 3, 2,  7, 0, 9999, 1 }, { 3, 4, 100, 0, 9999, 1 }, { 4, 2, 7, 0, 9999, 1 }
 };
 
 struct LabelInfo {
     int row;
     int column;
-    int page;
+    int group;
 };
 
 LabelInfo labelInfo[] = {
-    { 1, 0, 0 }, { 1, 2, 0 }, { 2, 0, 0 },
-    { 4, 0, 0 }, { 4, 2, 0 }, { 5, 0, 0 }, {  6, 0, 0 }, { 6, 2, 0 },
-    { 1, 0, 1 }, { 1, 2, 1 }, { 2, 0, 1 }, {  3, 0, 1 }, { 3, 2, 1 },
-    { 5, 0, 1 }, { 5, 2, 1 }, { 6, 0, 1 }, {  7, 0, 1 }, { 7, 2, 1 },
-    { 8, 0, 0 }, { 8, 2, 0 }, { 9, 0, 0 }, { 10, 0, 0 }
+    { 0, 0, 0 }, { 0, 2, 0 }, { 1, 0, 0 },
+    { 0, 0, 1 }, { 0, 2, 1 }, { 1, 0, 1 }, { 2, 0, 1 }, { 2, 2, 1 },
+    { 0, 0, 2 }, { 0, 2, 2 }, { 1, 0, 2 }, { 2, 0, 2 },
+    { 0, 0, 3 }, { 0, 2, 3 }, { 1, 0, 3 }, { 2, 0, 3 }, { 2, 2, 3 },
+    { 0, 0, 4 }, { 0, 2, 4 }, { 1, 0, 4 }, { 2, 0, 4 }, { 2, 2, 4 }
 };
 
 LabelInfo agxlabelInfo[] = {
-    {  1, 0, 0 }, {  1, 3, 0 },
-    {  2, 0, 0 }, {  2, 3, 0 },
-    {  3, 0, 0 }, {  3, 3, 0 },
-    {  4, 0, 0 }, {  4, 3, 0 },
-    {  5, 0, 0 }, {  5, 3, 0 },
-    {  6, 0, 0 }, {  6, 3, 0 },
-    {  8, 0, 0 }, {  8, 3, 0 },
-    {  9, 0, 0 }, {  9, 3, 0 },
-    { 10, 0, 0 }, { 10, 3, 0 },
-    { 11, 0, 0 }, { 11, 3, 0 },
-    { 12, 0, 0 }, { 12, 3, 0 },
-    { 13, 0, 0 }, { 13, 3, 0 }
-};
-
-struct Info {
-    int row;
-    int column;
-    int page;
-};
-
-Info separatorInfo[] = {
-    { 0, 0, 0 },
-    { 3, 0, 0 },
-    { 0, 0, 1 },
-    { 4, 0, 1 },
-    { 7, 0, 0 }
-};
-
-Info agxseparatorInfo[] = {
-    { 0, 0, 0 },
-    { 7, 0, 0 }
+    { 0, 0, 0 }, { 0, 3, 0 },
+    { 1, 0, 0 }, { 1, 3, 0 },
+    { 2, 0, 0 }, { 2, 3, 0 },
+    { 3, 0, 0 }, { 3, 3, 0 },
+    { 4, 0, 0 }, { 4, 3, 0 },
+    { 5, 0, 0 }, { 5, 3, 0 },
+    { 0, 0, 1 }, { 0, 3, 1 },
+    { 1, 0, 1 }, { 1, 3, 1 },
+    { 2, 0, 1 }, { 2, 3, 1 },
+    { 3, 0, 1 }, { 3, 3, 1 },
+    { 4, 0, 1 }, { 4, 3, 1 },
+    { 5, 0, 1 }, { 5, 3, 1 }
 };
 
 struct AGXVehicleContinuousTrackDeviceInfo {
@@ -209,12 +174,10 @@ private:
     bool save2(const string& filename);
 
     void initialize();
-    void onExportButtonClicked();
-    void onImportButtonClicked();
+    void on_exportButton_clicked();
+    void on_importButton_clicked();
 
     bool load2(const string& filename, ostream& os = nullout());
-    void onEnableAGXCheckToggled(bool checked);
-    void onButtonToggled(const int& id, bool checked);
 
     MappingPtr writeBody(const string& filename);
     MappingPtr writeConfig(const string& filename);
@@ -249,10 +212,14 @@ private:
     enum {
         CHS_MAS, CHS_XSZ, CHS_YSZ, CHS_ZSZ,
         TRK_MAS, TRK_RAD, TRK_WDT, TRK_WBS,
+        SPC_MAS, SPC_RAD, SPC_WDT,
         FFL_MAS, FFL_FRD, FFL_RRD, FFL_WDT, FFL_WBS,
         RFL_MAS, RFL_FRD, RFL_RRD, RFL_WDT, RFL_WBS,
-        SPC_MAS, SPC_RAD, SPC_WDT,
         NumDoubleSpinBoxes
+    };
+    enum {
+        CHS_CLR, TRK_CLR, SPC_CLR,
+        FFL_CLR, RFL_CLR, NumColorButtons
     };
     enum {
         TRK_BNT, TRK_BNW, TRK_BNTT, TRK_BNDTM, TRK_BSHFPM,
@@ -266,23 +233,15 @@ private:
         TRK_BSHFPE, TRK_BMSHNF, TRK_BHCE,
         FLP_BNN, FLP_BUTNE, FLP_BNDTE,
         FLP_BSHFPE, FLP_BMSHNF, FLP_BHCE,
-        NumSpinBoxes
+        NumAGXSpinBoxes
     };
-    enum {
-        CHS_CLR, TRK_CLR, FFL_CLR,
-        RFL_CLR, SPC_CLR, NumColorButtons
-    };
-    enum { FFL_CHK, RFL_CHK, AGX_CHK, NumCheckBoxes };
 
-    CheckBox* checkBoxes[NumCheckBoxes];
     ColorButton* colorButtons[NumColorButtons];
     DoubleSpinBox* doubleSpinBoxes[NumDoubleSpinBoxes];
     DoubleSpinBox* agxDoubleSpinBoxes[NumAGXDoubleSpinBoxes];
-    SpinBox* agxSpinBoxes[NumSpinBoxes];
-    ButtonGroup settingGroup;
-    RadioButton setting1Radio;
-    RadioButton setting2Radio;
-    QStackedWidget* topWidget;
+    SpinBox* agxSpinBoxes[NumAGXSpinBoxes];
+    QGridLayout* gridLayouts[6];
+    QGroupBox* groupBoxes[6];
     YAMLWriter yamlWriter;
     YAMLWriter yamlWriter2;
 };
@@ -320,63 +279,65 @@ CrawlerCreatorWidget::CrawlerCreatorWidget(QWidget* parent)
     yamlWriter.setKeyOrderPreservationMode(true);
     yamlWriter2.setKeyOrderPreservationMode(true);
 
-    QGridLayout* gridLayout[2];
-    gridLayout[0] = new QGridLayout;
-    gridLayout[1] = new QGridLayout;
-    auto gridLayout2 = new QGridLayout;
-
-    for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
-        DoubleSpinInfo info = doubleSpinInfo[i];
-        doubleSpinBoxes[i] = new DoubleSpinBox;
-        gridLayout[info.page]->addWidget(doubleSpinBoxes[i], info.row, info.column);
-    }
-
-    for(int i = 0; i < NumAGXDoubleSpinBoxes; ++i) {
-        DoubleSpinInfo info = agxdoubleSpinInfo[i];
-        agxDoubleSpinBoxes[i] = new DoubleSpinBox;
-        gridLayout2->addWidget(agxDoubleSpinBoxes[i], info.row, info.column);
-    }
-
-    for(int i = 0; i < NumSpinBoxes; ++i) {
-        SpinInfo info = agxspinInfo[i];
-        agxSpinBoxes[i] = new SpinBox;
-        gridLayout2->addWidget(agxSpinBoxes[i], info.row, info.column);
-    }
-
-    for(int i = 0; i < NumColorButtons; ++i) {
-        ButtonInfo info = buttonInfo[i];
-        colorButtons[i] = new ColorButton;
-        gridLayout[info.page]->addWidget(colorButtons[i], info.row, info.column);
-    }
-
     const QStringList list = {
-        _("Chassis"), _("Track"), _("Front SubTrack"), _("Rear SubTrack"), _("Spacer")
+        _("Chassis"), _("Track"), _("Spacer"), _("Front SubTrack"), _("Rear SubTrack"), _("AGX")
     };
 
-    for(int i = 0; i < 5; ++i) {
-        Info info = separatorInfo[i];
-        gridLayout[info.page]->addLayout(new HSeparatorBox(new QLabel(list[i])), info.row, info.column, 1, 4);
+    for(int i = 0; i < 6; ++i) {
+        gridLayouts[i] = new QGridLayout;
+        groupBoxes[i] = new QGroupBox(list.at(i));
+        if(i > 2) {
+            groupBoxes[i]->setCheckable(true);
+        }
+        auto layout = new QVBoxLayout;
+        layout->addLayout(gridLayouts[i]);
+        if(i != 5) {
+            groupBoxes[i]->setLayout(layout);
+        }
     }
 
     const QStringList list2 = {
         _("mass [kg]"), _("color"), _("size(x-y-z) [m, m, m]"),
         _("mass [kg]"), _("color"), _("radius [m]"), _("width [m]"), _("wheelbase [m]"),
+        _("mass [kg]"), _("color"), _("radius [m]"), _("width [m]"),
         _("mass [kg]"), _("color"), _("radius(forward-backward) [m]"), _("width [m]"), _("wheelbase [m]"),
-        _("mass [kg]"), _("color"), _("radius(forward-backward) [m]"), _("width [m]"), _("wheelbase [m]"),
-        _("mass [kg]"), _("color"), _("radius [m]"), _("width [m]")
+        _("mass [kg]"), _("color"), _("radius(forward-backward) [m]"), _("width [m]"), _("wheelbase [m]")
     };
 
     for(int i = 0; i < 22; ++i) {
         LabelInfo info = labelInfo[i];
-        gridLayout[info.page]->addWidget(new QLabel(list2[i]), info.row, info.column);
+        gridLayouts[info.group]->addWidget(new QLabel(list2[i]), info.row, info.column);
     }
 
+    for(int i = 0; i < NumDoubleSpinBoxes; ++i) {
+        DoubleSpinInfo info = doubleSpinInfo[i];
+        doubleSpinBoxes[i] = new DoubleSpinBox;
+        gridLayouts[info.group]->addWidget(doubleSpinBoxes[i], info.row, info.column);
+    }
+
+    for(int i = 0; i < NumColorButtons; ++i) {
+        ButtonInfo info = buttonInfo[i];
+        colorButtons[i] = new ColorButton;
+        gridLayouts[info.group]->addWidget(colorButtons[i], info.row, info.column);
+    }
+
+    // for AGX configuration
     const QStringList list3 = { _("Track Belt"), _("SubTrack Belt") };
 
+    QGroupBox* groupBoxes2[2];
+    QGridLayout* gridLayouts2[2];
+
     for(int i = 0; i < 2; ++i) {
-        Info info = agxseparatorInfo[i];
-        gridLayout2->addLayout(new HSeparatorBox(new QLabel(list3[i])), info.row, info.column, 1, 6);
+        gridLayouts2[i] = new QGridLayout;
+        groupBoxes2[i] = new QGroupBox(list3.at(i));
+        groupBoxes2[i]->setLayout(gridLayouts2[i]);
     }
+
+    auto layout = new QVBoxLayout;
+    layout->addWidget(groupBoxes2[0]);
+    layout->addWidget(groupBoxes2[1]);
+    layout->addStretch();
+    groupBoxes[5]->setLayout(layout);
 
     const QStringList list4 = {
         _("number of nodes [-]"), _("node thickness [m]"),
@@ -389,79 +350,62 @@ CrawlerCreatorWidget::CrawlerCreatorWidget(QWidget* parent)
 
     for(int i = 0; i < 24; ++i) {
         LabelInfo info = agxlabelInfo[i];
-        gridLayout2->addWidget(new QLabel(list4[i % 12]), info.row, info.column);
+        gridLayouts2[info.group]->addWidget(new QLabel(list4[i % 12]), info.row, info.column);
     }
 
-    const QStringList list5 = { _("Front SubTrack"), _("Rear SubTrack"), _("AGX") };
-
-    auto hbox1 = new QHBoxLayout;
-    for(int i = 0; i < NumCheckBoxes; ++i) {
-        CheckInfo info = checkInfo[i];
-        checkBoxes[i] = new CheckBox;
-        CheckBox* check = checkBoxes[i];
-        check->setText(list5[i]);
-        hbox1->addWidget(check);
+    for(int i = 0; i < NumAGXDoubleSpinBoxes; ++i) {
+        DoubleSpinInfo info = agxdoubleSpinInfo[i];
+        agxDoubleSpinBoxes[i] = new DoubleSpinBox;
+        gridLayouts2[info.group]->addWidget(agxDoubleSpinBoxes[i], info.row, info.column);
     }
-    checkBoxes[AGX_CHK]->sigToggled().connect([&](bool checked){ onEnableAGXCheckToggled(checked); });
 
-    hbox1->addStretch();
-
-    auto hbox = new QHBoxLayout;
-    setting1Radio.setText(_("Setting 1"));
-    setting1Radio.setChecked(true);
-    hbox->addWidget(&setting1Radio);
-    settingGroup.addButton(&setting1Radio, 0);
-
-    setting2Radio.setText(_("Setting 2"));
-    hbox->addWidget(&setting2Radio);
-    settingGroup.addButton(&setting2Radio, 1);
-    hbox->addStretch();
-
-    settingGroup.sigButtonToggled().connect(
-        [&](int id, bool checked){ onButtonToggled(id, checked); });
-
-    hbox->addStretch();
+    for(int i = 0; i < NumAGXSpinBoxes; ++i) {
+        SpinInfo info = agxspinInfo[i];
+        agxSpinBoxes[i] = new SpinBox;
+        gridLayouts2[info.group]->addWidget(agxSpinBoxes[i], info.row, info.column);
+    }
 
     initialize();
 
-    QWidget* page1Widget = new QWidget;
-    auto vbox1 = new QVBoxLayout;
-    vbox1->addLayout(gridLayout[0]);
-    vbox1->addStretch();
-    page1Widget->setLayout(vbox1);
+    auto page1 = new QWidget;
+    layout = new QVBoxLayout;
+    layout->addWidget(groupBoxes[0]);
+    layout->addWidget(groupBoxes[1]);
+    layout->addStretch();
+    page1->setLayout(layout);
 
-    QWidget* page2Widget = new QWidget;
-    auto vbox2 = new QVBoxLayout;
-    vbox2->addLayout(hbox1);
-    vbox2->addLayout(gridLayout[1]);
-    vbox2->addStretch();
-    page2Widget->setLayout(vbox2);
+    auto page2 = new QWidget;
+    layout = new QVBoxLayout;
+    layout->addWidget(groupBoxes[2]);
+    layout->addWidget(groupBoxes[3]);
+    layout->addWidget(groupBoxes[4]);
+    layout->addStretch();
+    page2->setLayout(layout);
 
-    QWidget* page3Widget = new QWidget;
-    auto vbox3 = new QVBoxLayout;
-    vbox3->addLayout(gridLayout2);
-    vbox3->addStretch();
-    page3Widget->setLayout(vbox3);
+    auto page3 = new QWidget;
+    layout = new QVBoxLayout;
+    layout->addWidget(groupBoxes[5]);
+    layout->addStretch();
+    page3->setLayout(layout);
 
-    topWidget = new QStackedWidget;
-    topWidget->addWidget(page1Widget);
-    topWidget->addWidget(page2Widget);
-    // topWidget->addWidget(page3Widget);
+    auto tabWidget = new QTabWidget;
+    tabWidget->addTab(page1, _("Setting 1"));
+    tabWidget->addTab(page2, _("Setting 2"));
+    tabWidget->addTab(page3, _("Setting 3"));
 
     auto toolBar = new CreatorToolBar;
     toolBar->sigNewRequested().connect([&](){ initialize(); });
     toolBar->sigSaveRequested().connect([&](const string& filename){ save(filename); });
 
     for(int i = 0; i < 2; ++i) {
-        const QIcon icon = QIcon::fromTheme(i == 0 ? "document-open" : "document-save");
-        auto button = toolBar->addButton(icon, i == 0 ? _("&Import") : _("&Export"));
-        connect(button, &QPushButton::clicked, [&, i](){ i == 0 ? onImportButtonClicked() : onExportButtonClicked(); });
+        const QIcon documentIcon = QIcon::fromTheme(i == 0 ? "document-open" : "document-save");
+        auto documentButton = toolBar->addButton(documentIcon, i == 0 ? _("&Import") : _("&Export"));
+        connect(documentButton, &QPushButton::clicked, [&, i](){ i == 0 ? on_importButton_clicked() : on_exportButton_clicked(); });
     }
 
     auto mainLayout = new QVBoxLayout;
     mainLayout->addWidget(toolBar);
-    mainLayout->addLayout(hbox);
-    mainLayout->addWidget(topWidget);
+    mainLayout->addWidget(tabWidget);
     setLayout(mainLayout);
 
     setWindowTitle(_("CrawlerRobot Generator"));
@@ -504,7 +448,6 @@ void CrawlerCreatorWidget::initialize()
         spin->setDecimals(info.decimals);
         spin->setRange(info.min, info.max);
         spin->setValue(info.value);
-        spin->setEnabled(info.enabled);
     }
 
     for(int i = 0; i < NumAGXDoubleSpinBoxes; ++i) {
@@ -513,15 +456,13 @@ void CrawlerCreatorWidget::initialize()
         spin->setDecimals(info.decimals);
         spin->setRange(info.min, info.max);
         spin->setValue(info.value);
-        spin->setEnabled(info.enabled);
     }
 
-    for(int i = 0; i < NumSpinBoxes; ++i) {
+    for(int i = 0; i < NumAGXSpinBoxes; ++i) {
         SpinInfo info = agxspinInfo[i];
         SpinBox* spin = agxSpinBoxes[i];
         spin->setRange(info.min, info.max);
         spin->setValue(info.value);
-        spin->setEnabled(info.enabled);
     }
 
     for(int i = 0; i < NumColorButtons; ++i) {
@@ -530,14 +471,14 @@ void CrawlerCreatorWidget::initialize()
         button->setColor(Vector3(info.red, info.green, info.blue));
     }
 
-    for(int i = 0; i < NumCheckBoxes; ++i) {
+    for(int i = 0; i < 3; ++i) {
         CheckInfo info = checkInfo[i];
-        checkBoxes[i]->setChecked(info.checked);
+        groupBoxes[i + 3]->setChecked(info.checked);
     }
 }
 
 
-void CrawlerCreatorWidget::onImportButtonClicked()
+void CrawlerCreatorWidget::on_importButton_clicked()
 {
     string filename = getOpenFileName(_("YAML File"), "yaml");
 
@@ -592,7 +533,7 @@ bool CrawlerCreatorWidget::load2(const string& filename, std::ostream& os)
                     if(checkList.isValid()) {
                         for(int j = 0; j < checkList.size(); ++j) {
                             bool checked = checkList[j].toInt() == 0 ? false : true;
-                            checkBoxes[j]->setChecked(checked);
+                            groupBoxes[j + 3]->setChecked(checked);
                         }
                     }
                 }
@@ -607,7 +548,7 @@ bool CrawlerCreatorWidget::load2(const string& filename, std::ostream& os)
 }
 
 
-void CrawlerCreatorWidget::onExportButtonClicked()
+void CrawlerCreatorWidget::on_exportButton_clicked()
 {
     string filename = getSaveFileName(_("YAML File"), "yaml");
 
@@ -622,60 +563,12 @@ void CrawlerCreatorWidget::onExportButtonClicked()
 }
 
 
-void CrawlerCreatorWidget::onEnableAGXCheckToggled(bool checked)
-{
-    agxDoubleSpinBoxes[TRK_BNT]->setEnabled(checked);
-    agxDoubleSpinBoxes[TRK_BNW]->setEnabled(checked);
-    agxDoubleSpinBoxes[TRK_BNTT]->setEnabled(checked);
-    agxDoubleSpinBoxes[TRK_BNDTM]->setEnabled(checked);
-    agxDoubleSpinBoxes[TRK_BSHFPM]->setEnabled(checked);
-
-    agxDoubleSpinBoxes[TRK_BHCM]->setEnabled(checked);
-    agxDoubleSpinBoxes[TRK_BHSD]->setEnabled(checked);
-    agxDoubleSpinBoxes[TRK_BNWMT]->setEnabled(checked);
-    agxDoubleSpinBoxes[TRK_BNWST]->setEnabled(checked);
-
-    agxDoubleSpinBoxes[FLP_BNT]->setEnabled(checked);
-    agxDoubleSpinBoxes[FLP_BNW]->setEnabled(checked);
-    agxDoubleSpinBoxes[FLP_BNTT]->setEnabled(checked);
-    agxDoubleSpinBoxes[FLP_BNDTM]->setEnabled(checked);
-    agxDoubleSpinBoxes[FLP_BSHFPM]->setEnabled(checked);
-
-    agxDoubleSpinBoxes[FLP_BHCM]->setEnabled(checked);
-    agxDoubleSpinBoxes[FLP_BHSD]->setEnabled(checked);
-    agxDoubleSpinBoxes[FLP_BNWMT]->setEnabled(checked);
-    agxDoubleSpinBoxes[FLP_BNWST]->setEnabled(checked);
-
-    agxSpinBoxes[TRK_BNN]->setEnabled(checked);
-    agxSpinBoxes[TRK_BUTNE]->setEnabled(checked);
-    agxSpinBoxes[TRK_BNDTE]->setEnabled(checked);
-    agxSpinBoxes[TRK_BSHFPE]->setEnabled(checked);
-    agxSpinBoxes[TRK_BMSHNF]->setEnabled(checked);
-    agxSpinBoxes[TRK_BHCE]->setEnabled(checked);
-
-    agxSpinBoxes[FLP_BNN]->setEnabled(checked);
-    agxSpinBoxes[FLP_BUTNE]->setEnabled(checked);
-    agxSpinBoxes[FLP_BNDTE]->setEnabled(checked);
-    agxSpinBoxes[FLP_BSHFPE]->setEnabled(checked);
-    agxSpinBoxes[FLP_BMSHNF]->setEnabled(checked);
-    agxSpinBoxes[FLP_BHCE]->setEnabled(checked);
-}
-
-
-void CrawlerCreatorWidget::onButtonToggled(const int& id, bool checked)
-{
-    if(checked) {
-        topWidget->setCurrentIndex(id);
-    }
-}
-
-
 MappingPtr CrawlerCreatorWidget::writeBody(const string& filename)
 {
     MappingPtr node = new Mapping;
 
     string name = filesystem::path(fromUTF8(filename)).stem().string();
-    bool isAGXChecked = checkBoxes[AGX_CHK]->isChecked();
+    bool isAGXChecked = groupBoxes[5]->isChecked();
 
     node->write("format", "ChoreonoidBody");
     node->write("formatVersion", "1.0");
@@ -720,8 +613,8 @@ MappingPtr CrawlerCreatorWidget::writeConfig(const string& filename)
         }
 
         auto spinList = node->createFlowStyleListing("spin");
-        int n1 = NumSpinBoxes;
-        for(int i = 0; i < NumSpinBoxes; ++i) {
+        int n1 = NumAGXSpinBoxes;
+        for(int i = 0; i < NumAGXSpinBoxes; ++i) {
             spinList->append(agxSpinBoxes[i]->value(), n1, n1);
         }
 
@@ -736,9 +629,9 @@ MappingPtr CrawlerCreatorWidget::writeConfig(const string& filename)
         }
 
         auto checkList = node->createFlowStyleListing("check");
-        int n3 = NumCheckBoxes;
-        for(int i = 0; i < NumCheckBoxes; ++i) {
-            checkList->append(checkBoxes[i]->isChecked() ? 1 : 0, n3, n3);
+        int n3 = 3;
+        for(int i = 0; i < 3; ++i) {
+            checkList->append(groupBoxes[i + 3]->isChecked() ? 1 : 0, n3, n3);
         }
 
         configsNode->append(node);
@@ -780,7 +673,7 @@ void CrawlerCreatorWidget::writeBody(Listing* linksNode)
         }
     }
 
-    if(checkBoxes[FFL_CHK]->isChecked()) {
+    if(groupBoxes[3]->isChecked()) {
         {
             static const char* name[] = { "SPACER_LF", "SPACER_RF" };
             Vector3 translation[2];
@@ -821,7 +714,7 @@ void CrawlerCreatorWidget::writeBody(Listing* linksNode)
         }
     }
 
-    if(checkBoxes[RFL_CHK]->isChecked()) {
+    if(groupBoxes[4]->isChecked()) {
         {
             static const char* name[] = { "SPACER_LR", "SPACER_RR" };
             Vector3 translation[2];
@@ -1196,7 +1089,7 @@ void CrawlerCreatorWidget::writeAGXBody(Listing* linksNode)
         }
     }
 
-    if(checkBoxes[FFL_CHK]->isChecked()) {
+    if(groupBoxes[3]->isChecked()) {
         {
             static const char* name[] = { "SPACER_LF", "SPACER_RF" };
             Vector3 translation[2];
@@ -1311,7 +1204,7 @@ void CrawlerCreatorWidget::writeAGXBody(Listing* linksNode)
     }
 
 
-    if(checkBoxes[RFL_CHK]->isChecked()) {
+    if(groupBoxes[4]->isChecked()) {
         {
             static const char* name[] = { "SPACER_LR", "SPACER_RR" };
             Vector3 translation[2];
