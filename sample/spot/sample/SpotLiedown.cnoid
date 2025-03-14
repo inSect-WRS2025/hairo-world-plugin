@@ -30,8 +30,8 @@ items:
               0, 1, 0,
               0, 0, 1 ]
             jointDisplacements: [
-              25, 60, -95, -25, 60, -95, 25, 60, -95, -25,
-              60, -95 ]
+              0, 60.4, -96.2, 0, 60.4, -96.2, 0, 60.4, -96.2, 0,
+              60.4, -96.2 ]
             initialRootPosition: [ 0, 0, 0.5 ]
             initialRootAttitude: [
               1, 0, 0,
@@ -161,7 +161,7 @@ views:
           isCurrent: true
           eye: [ 3, 1.5, 1.2 ]
           direction: [ -0.880451, -0.440225, -0.17609 ]
-          up: [ -0.1575, -0.0787497, 0.984374 ]
+          up: [ -0.1575, -0.0787496, 0.984374 ]
         -
           camera: [ System, Orthographic ]
           orthoHeight: 20
@@ -310,7 +310,7 @@ viewAreas:
             -
               type: splitter
               orientation: vertical
-              sizes: [ 444, 444 ]
+              sizes: [ 504, 504 ]
               children:
                 -
                   type: pane
@@ -322,7 +322,7 @@ viewAreas:
             -
               type: splitter
               orientation: vertical
-              sizes: [ 666, 222 ]
+              sizes: [ 756, 252 ]
               children:
                 -
                   type: pane
@@ -334,7 +334,7 @@ viewAreas:
         -
           type: splitter
           orientation: vertical
-          sizes: [ 198, 690 ]
+          sizes: [ 225, 783 ]
           children:
             -
               type: pane
@@ -342,7 +342,7 @@ viewAreas:
             -
               type: splitter
               orientation: vertical
-              sizes: [ 284, 402 ]
+              sizes: [ 323, 456 ]
               children:
                 -
                   type: pane
