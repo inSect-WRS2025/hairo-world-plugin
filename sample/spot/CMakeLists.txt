@@ -1,4 +1,4 @@
-option(BUILD_SPOT_SAMPLE "Building a spot sample" ON)
+option(BUILD_SPOT_SAMPLE "Building spot sample" OFF)
 if(NOT BUILD_SPOT_SAMPLE)
   return()
 endif()
