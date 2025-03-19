@@ -10,6 +10,8 @@
 using namespace std;
 using namespace cnoid;
 
+namespace {
+
 const double down[] = {
     0.0, 96.2, -143.4, 0.0, 96.2, -143.4,
     0.0, 96.2, -143.4, 0.0, 96.2, -143.4
@@ -19,6 +21,8 @@ const double up[] = {
     0.0, 60.4, -96.2, 0.0, 60.4, -96.2,
     0.0, 60.4, -96.2, 0.0, 60.4, -96.2
 };
+
+}
 
 class SpotLiedownController : public SimpleController
 {
@@ -99,8 +103,8 @@ public:
                 joint->dq_target() = dqref;
             } else if(legActuationMode == Link::JointEffort) {
                 joint->u() = P * (qref[i] - q) + D * (dqref - dq);
-                qprev[i] = q;
             }
+            qprev[i] = q;
         }
 
         return true;

@@ -35,6 +35,7 @@ public:
         ostream& os = io->os();
         ioBody = io->body();
     
+        // jointActuationMode = Link::JointEffort;
         jointActuationMode = Link::JointVelocity;
         for(auto opt : io->options()) {
             if(opt == "position") {
@@ -132,17 +133,26 @@ public:
             qref[ioFinger->jointId()] = q_lower;
         }
 
+        static const double P = 0.0;
+        static const double D = 0.0;
+
         for(int i = 0; i < ioBody->numJoints(); ++i) {
             Link* joint = ioBody->joint(i);
+
+            double q = joint->q();
+            double dq = (q - qold[i]) / timeStep;
+            double dq_ref = 0.0;
+            double deltaq = qref[i] - qref_old[i];
+            dq_ref = deltaq / timeStep;
+
             if(jointActuationMode == Link::JointDisplacement) {
-                joint->q_target() = qref[i];
+                joint->q_target() = joint->q() + deltaq;
             } else if(jointActuationMode == Link::JointVelocity) {
-                double q = joint->q();
-                double dq = (q - qold[i]) / timeStep;
-                double dq_ref = (qref[i] - qref_old[i]) / timeStep;
                 joint->dq_target() = dq_ref;
-                qold[i] = q;
+            } else if(jointActuationMode == Link::JointEffort) {
+                joint->u() = P * (qref[i] - q) + D * (dq_ref - dq);
             }
+            qold[i] = q;
         }
         qref_old = qref;
         time += timeStep;
