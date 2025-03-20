@@ -275,24 +275,30 @@ void GainTestView::Impl::onNewButtonClicked()
 
                     unit->nameLabel = new QLabel(self);
                     unit->pgainLabel = new QLabel(self);
+                    unit->pgainLabel->setAlignment(Qt::AlignCenter);
                     unit->dgainLabel = new QLabel(self);
+                    unit->dgainLabel->setAlignment(Qt::AlignCenter);
 
                     unit->pgainSpinBox = new DoubleSpinBox(self);
+                    unit->pgainSpinBox->setAlignment(Qt::AlignCenter);
                     unit->pgainSpinBox->setDecimals(3);
                     unit->pgainSpinBox->setRange(0.000, 99999.999);
                     unit->pgainSpinBox->setValue(0.0);
 
                     unit->dgainSpinBox = new DoubleSpinBox(self);
+                    unit->dgainSpinBox->setAlignment(Qt::AlignCenter);
                     unit->dgainSpinBox->setDecimals(3);
                     unit->dgainSpinBox->setRange(0.000, 99999.999);
                     unit->dgainSpinBox->setValue(0.0);
 
                     unit->pstepSpinBox = new DoubleSpinBox(self);
+                    unit->pstepSpinBox->setAlignment(Qt::AlignCenter);
                     unit->pstepSpinBox->setDecimals(3);
                     unit->pstepSpinBox->setRange(0.001, 99999.999);
                     unit->pstepSpinBox->setValue(1.0);
 
                     unit->dstepSpinBox = new DoubleSpinBox(self);
+                    unit->dstepSpinBox->setAlignment(Qt::AlignCenter);
                     unit->dstepSpinBox->setDecimals(3);
                     unit->dstepSpinBox->setRange(0.001, 99999.999);
                     unit->dstepSpinBox->setValue(1.0);
