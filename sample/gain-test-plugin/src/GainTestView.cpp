@@ -268,7 +268,7 @@ void GainTestView::Impl::onNewButtonClicked()
 
                 size_t prevSize = interfaceUnits.size();
                 interfaceUnits.resize(numJoints);
-            
+
                 for(size_t i = prevSize; i < interfaceUnits.size(); ++i) {
                     auto& unit = interfaceUnits[i];
                     unit.reset(new InterfaceUnit);
@@ -439,7 +439,7 @@ bool GainTestView::Impl::load(const string& filename, ostream& os)
                     return false;
                 }
             }
-        
+
             int nj;
             int num_joints = bodyItem->body()->numJoints();
             if(node->read("num_joints", nj)) {
@@ -460,9 +460,9 @@ bool GainTestView::Impl::load(const string& filename, ostream& os)
                         unit->pgainSpinBox->setValue(pgain);
                     }
                 }
-    
+
                 const Listing& psteps = *node->findListing("psteps");
-    
+
                 if(psteps.isValid() && !psteps.empty()) {
                     const ValueNode& value = psteps[i];
                     double pstep;
@@ -470,9 +470,9 @@ bool GainTestView::Impl::load(const string& filename, ostream& os)
                         unit->pstepSpinBox->setValue(pstep);
                     }
                 }
-    
+
                 const Listing& dgains = *node->findListing("dgains");
-    
+
                 if(dgains.isValid() && !dgains.empty()) {
                     const ValueNode& value = dgains[i];
                     double dgain;
@@ -480,9 +480,9 @@ bool GainTestView::Impl::load(const string& filename, ostream& os)
                         unit->dgainSpinBox->setValue(dgain);
                     }
                 }
-    
+
                 const Listing& dsteps = *node->findListing("dsteps");
-    
+
                 if(dsteps.isValid() && !dsteps.empty()) {
                     const ValueNode& value = dsteps[i];
                     double dstep;
