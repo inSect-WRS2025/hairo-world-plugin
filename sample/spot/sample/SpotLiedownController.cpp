@@ -6,6 +6,7 @@
 #include <cnoid/EigenUtil>
 #include <cnoid/SimpleController>
 #include <cnoid/SharedJoystick>
+#include <vector>
 
 using namespace std;
 using namespace cnoid;
@@ -32,6 +33,21 @@ class SpotLiedownController : public SimpleController
     double qref[12];
     double qprev[12];
     double dt;
+
+    struct StateInfo {
+        int buttonId;
+        bool prevButtonState;
+        bool stateChanged;
+        const double* angleMap;
+        StateInfo(int buttonId, const double* angleMap)
+            : buttonId(buttonId),
+              prevButtonState(false),
+              stateChanged(false),
+              angleMap(angleMap)
+        { }
+    };
+    vector<StateInfo> states;
+    int currentMap;
 
     SharedJoystickPtr joystick;
     int targetMode;
@@ -68,6 +84,12 @@ public:
 
         dt = io->timeStep();
 
+        states = {
+            { Joystick::B_BUTTON, down },
+            { Joystick::X_BUTTON,   up }
+        };
+        currentMap = 1;
+
         joystick = io->getOrCreateSharedObject<SharedJoystick>("joystick");
         targetMode = joystick->addMode();
 
@@ -78,18 +100,26 @@ public:
     {
         joystick->updateState(targetMode);
 
+        for(size_t i = 0; i < states.size(); ++i) {
+            StateInfo info = states[i];
+            bool stateChanged = false;
+            bool buttonState = joystick->getButtonState(targetMode, info.buttonId);
+            if(buttonState && !info.prevButtonState) {
+                stateChanged = true;
+            }
+            info.prevButtonState = buttonState;
+            if(stateChanged) {
+                currentMap = i == 0 ? 0 : 1;
+            }
+        }
+
         static const double P = 150.0;
         static const double D = 15.0;
 
         for(int i = 0; i < 12; ++i) {
             Link* joint = legJoint[i];
-            double pos = joystick->getPosition(
-                targetMode, Joystick::R_TRIGGER_AXIS);
-            if(fabs(pos) < 0.15) {
-                pos = 0.0;
-            }
 
-            double qe = pos > 0.0 ? radian(down[i]) : radian(up[i]);
+            double qe = radian(states[currentMap].angleMap[i]);
             double q = joint->q();
             double dq = (q - qprev[i]) / dt;
             double dqref = 0.0;
