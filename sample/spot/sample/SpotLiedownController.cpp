@@ -35,12 +35,14 @@ class SpotLiedownController : public SimpleController
     double dt;
 
     struct ActionInfo {
+        int actionId;
         int buttonId;
         bool prevButtonState;
         bool stateChanged;
         const double* angleMap;
-        ActionInfo(int buttonId, const double* angleMap)
-            : buttonId(buttonId),
+        ActionInfo(int actionId, int buttonId, const double* angleMap)
+            : actionId(actionId),
+              buttonId(buttonId),
               prevButtonState(false),
               stateChanged(false),
               angleMap(angleMap)
@@ -85,8 +87,8 @@ public:
         dt = io->timeStep();
 
         actions = {
-            { Joystick::B_BUTTON, down },
-            { Joystick::X_BUTTON,   up }
+            { 0, Joystick::B_BUTTON, down },
+            { 1, Joystick::X_BUTTON,   up }
         };
         is_liedown_enabled = false;
 
@@ -100,8 +102,7 @@ public:
     {
         joystick->updateState(targetMode);
 
-        for(size_t i = 0; i < actions.size(); ++i) {
-            ActionInfo& info = actions[i];
+        for(auto& info : actions) {
             bool stateChanged = false;
             bool buttonState = joystick->getButtonState(targetMode, info.buttonId);
             if(buttonState && !info.prevButtonState) {
@@ -109,7 +110,7 @@ public:
             }
             info.prevButtonState = buttonState;
             if(stateChanged) {
-                is_liedown_enabled = i == 0 ? true: false;
+                is_liedown_enabled = info.actionId == 0 ? true: false;
             }
         }
 
