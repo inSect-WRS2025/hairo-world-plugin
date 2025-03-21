@@ -118,17 +118,17 @@ public:
 
         switch(robotType) {
             case GEN2:
-                armJoints[0] = body->link("SHOULDER");
-                armJoints[1] = body->link("ARM_HALF_1");
-                armJoints[2] = body->link("ARM_HALF_2");
-                armJoints[3] = body->link("FOREARM");
-                armJoints[4] = body->link("WRIST_SPHERICAL_1");
-                armJoints[5] = body->link("WRIST_SPHERICAL_2");
-                armJoints[6] = body->link("HAND_3FINGER");
+                armJoints[0] = body->link("j2s7s300_joint_1");
+                armJoints[1] = body->link("j2s7s300_joint_2");
+                armJoints[2] = body->link("j2s7s300_joint_3");
+                armJoints[3] = body->link("j2s7s300_joint_4");
+                armJoints[4] = body->link("j2s7s300_joint_5");
+                armJoints[5] = body->link("j2s7s300_joint_6");
+                armJoints[6] = body->link("j2s7s300_joint_7");
 
-                fingerJoints[0] = body->link("FINGER_PROXIMAL_1");
-                fingerJoints[1] = body->link("FINGER_PROXIMAL_2");
-                fingerJoints[2] = body->link("FINGER_PROXIMAL_3");
+                fingerJoints[0] = body->link("j2s7s300_joint_finger_1");
+                fingerJoints[1] = body->link("j2s7s300_joint_finger_2");
+                fingerJoints[2] = body->link("j2s7s300_joint_finger_3");
                 break;
             case GEN3:
                 armJoints[0] = body->link("joint_1");

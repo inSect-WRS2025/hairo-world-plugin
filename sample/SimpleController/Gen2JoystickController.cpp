@@ -69,13 +69,13 @@ public:
             }
         }
 
-        ioFinger1 = ioBody->link(prefix + "FINGER_PROXIMAL_1");
-        ioFinger2 = ioBody->link(prefix + "FINGER_PROXIMAL_2");
-        ioFinger3 = ioBody->link(prefix + "FINGER_PROXIMAL_3");
+        ioFinger1 = ioBody->link(prefix + "j2s7s300_joint_finger_1");
+        ioFinger2 = ioBody->link(prefix + "j2s7s300_joint_finger_2");
+        ioFinger3 = ioBody->link(prefix + "j2s7s300_joint_finger_3");
 
         ikBody = ioBody->clone();
-        ikWrist = ikBody->link(prefix + "WRIST_ORIGIN");
-        Link* base = ikBody->link(prefix + "BASE");
+        ikWrist = ikBody->link(prefix + "j2s7s300_joint_end_effector");
+        Link* base = ikBody->link(prefix + "j2s7s300_joint_base");
         baseToWrist = JointPath::getCustomPath(base, ikWrist);
         base->p().setZero();
         base->R().setIdentity();
