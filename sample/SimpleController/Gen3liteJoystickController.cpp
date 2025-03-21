@@ -8,6 +8,7 @@
 #include <cnoid/SharedJoystick>
 #include <cnoid/SimpleController>
 #include <sample/SimpleController/Interpolator.h>
+#include <vector>
 
 using namespace std;
 using namespace cnoid;
@@ -44,9 +45,22 @@ class Gen3liteJoystickController : public SimpleController
     int currentSpeed;
     bool is_pose_enabled;
 
+    struct ActionInfo {
+        int actionId;
+        int buttonId;
+        bool prevButtonState;
+        bool stateChanged;
+        ActionInfo(int actionId, int buttonId)
+            : actionId(actionId),
+              buttonId(buttonId),
+              prevButtonState(false),
+              stateChanged(false)
+        { }
+    };
+    vector<ActionInfo> actions;
+
     SharedJoystickPtr joystick;
     int targetMode;
-    bool prevButtonState[3];
     bool prevButtonState2[2];
     bool prevMapState;
 
@@ -58,7 +72,6 @@ public:
         ostream& os = io->os();
         ioBody = io->body();
 
-        prevButtonState[0] = prevButtonState[1] = prevButtonState[2] = false;
         prevButtonState2[0] = prevButtonState2[1] = false;
         prevMapState = false;
         jointActuationMode = Link::JointVelocity;
@@ -108,6 +121,12 @@ public:
         currentSpeed = 50;
         is_pose_enabled = false;
 
+        actions = {
+            { 0, Joystick::B_BUTTON      },
+            { 1, Joystick::SELECT_BUTTON },
+            { 2, Joystick::START_BUTTON  }
+        };
+
         joystick = io->getOrCreateSharedObject<SharedJoystick>("joystick");
         targetMode = joystick->addMode();
 
@@ -126,7 +145,6 @@ public:
             Joystick::R_STICK_V_AXIS, Joystick::DIRECTIONAL_PAD_H_AXIS, Joystick::DIRECTIONAL_PAD_V_AXIS,
             Joystick::L_TRIGGER_AXIS, Joystick::R_TRIGGER_AXIS
         };
-        static const int buttonID[] = { Joystick::B_BUTTON, Joystick::SELECT_BUTTON, Joystick::START_BUTTON };
 
         joystick->updateState(targetMode);
 
@@ -143,10 +161,15 @@ public:
             "joint control has set."
         };
 
-        for(int i = 0; i < 3; ++i) {
-            bool currentState = joystick->getButtonState(targetMode, buttonID[i]);
-            if(currentState && !prevButtonState[i]) {
-                if(i == 0) {
+        for(auto& info : actions) {
+            bool stateChanged = false;
+            bool buttonState = joystick->getButtonState(targetMode, info.buttonId);
+            if(buttonState && !info.prevButtonState) {
+                stateChanged = true;
+            }
+            info.prevButtonState = buttonState;
+            if(stateChanged) {
+                if(info.actionId == 0) {
                     // home position
                     jointInterpolator.clear();
                     jointInterpolator.appendSample(time, qref);
@@ -160,15 +183,14 @@ public:
                     jointInterpolator.appendSample(time + 2.0, qf);
                     jointInterpolator.update();
                     is_pose_enabled = true;
-                } else if(i == 1) {
+                } else if(info.actionId == 1) {
                     currentMap = currentMap == 0 ? 2 : currentMap - 1;
                     io->os() << texts[currentMap] << endl;
-                } else if(i == 2) {
+                } else if(info.actionId == 2) {
                     currentMap = currentMap == 2 ? 0 : currentMap + 1;
                     io->os() << texts[currentMap] << endl;
                 }
             }
-            prevButtonState[i] = currentState;
         }
 
         // speed selection
