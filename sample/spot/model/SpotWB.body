@@ -17,10 +17,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/pack_top.dae" }
+          - { type: Resource, uri: "resource/pack_top.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/pack_body.dae" }
+          - { type: Resource, uri: "resource/pack_body.dae" }
   -
     name: pack_mount_joint2
     parent: base_link_joint
@@ -29,7 +29,7 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/pack_body.dae" }
+          - { type: Resource, uri: "resource/pack_body.dae" }
   -
     name: lidar_mount_joint
     parent: pack_mount_joint
@@ -38,10 +38,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/lidar_mount.dae" }
+          - { type: Resource, uri: "resource/lidar_mount.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/lidar_mount_collision.stl" }
+          - { type: Resource, uri: "resource/lidar_mount_collision.stl" }
   -
     nama: velodyne_cage_joint
     parent: lidar_mount_joint
@@ -53,9 +53,9 @@ links:
         elements:
           -
             type: Shape
-            geometry:  { type: Resource, uri: "parts/velodyne_cage.stl" }
+            geometry:  { type: Resource, uri: "resource/velodyne_cage.stl" }
             appearance: &black { material: { diffuseColor: [ 0.3, 0.3, 0.3 ] } }
       Collision:
         scale: [ 0.001, 0.001, 0.001 ]
         elements:
-          - { type: Resource, uri: "parts/velodyne_cage.stl" }
+          - { type: Resource, uri: "resource/velodyne_cage.stl" }

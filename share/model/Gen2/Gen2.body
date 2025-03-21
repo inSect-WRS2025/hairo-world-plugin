@@ -35,7 +35,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/base.STL" }
+        geometry: { type: Resource, uri: "resource/base.STL" }
         appearance: &BodyAppearance { material: { diffuseColor: [ 0.1, 0.1, 0.1 ] } }
   -
     name: j2s7s300_joint_1
@@ -56,11 +56,11 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/shoulder.STL" }
+        geometry: { type: Resource, uri: "resource/shoulder.STL" }
         appearance: *BodyAppearance
       - &ring_big
         type: Shape
-        geometry: { type: Resource, uri: "parts/ring_big.STL" }
+        geometry: { type: Resource, uri: "resource/ring_big.STL" }
         appearance: { material: { diffuseColor: [ 0.792156862745098, 0.819607843137255, 0.933333333333333 ] } }
   -
     name: j2s7s300_joint_2
@@ -81,7 +81,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/arm_half_1.STL" }
+        geometry: { type: Resource, uri: "resource/arm_half_1.STL" }
         appearance: *BodyAppearance
       - { <<: *ring_big }
   -
@@ -103,7 +103,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/arm_half_2.STL" }
+        geometry: { type: Resource, uri: "resource/arm_half_2.STL" }
         appearance: *BodyAppearance
       - { <<: *ring_big }
   -
@@ -125,7 +125,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/forearm.STL" }
+        geometry: { type: Resource, uri: "resource/forearm.STL" }
         appearance: *BodyAppearance
       - { <<: *ring_big }
   -
@@ -147,11 +147,11 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/wrist_spherical_1.STL" }
+        geometry: { type: Resource, uri: "resource/wrist_spherical_1.STL" }
         appearance: *BodyAppearance
       - &ring_small
         type: Shape
-        geometry: { type: Resource, uri: "parts/ring_small.STL" }
+        geometry: { type: Resource, uri: "resource/ring_small.STL" }
         appearance: &RingAppearance { material: { diffuseColor: [ 0.792156862745098, 0.819607843137255, 0.933333333333333 ] } }
   -
     name: j2s7s300_joint_6
@@ -172,7 +172,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/wrist_spherical_2.STL" }
+        geometry: { type: Resource, uri: "resource/wrist_spherical_2.STL" }
         appearance: *BodyAppearance
       - { <<: *ring_small }
   -
@@ -194,7 +194,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/hand_3finger.STL" }
+        geometry: { type: Resource, uri: "resource/hand_3finger.STL" }
         appearance: *BodyAppearance
       - { <<: *ring_small }
   -
@@ -218,7 +218,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/finger_proximal.STL" }
+        geometry: { type: Resource, uri: "resource/finger_proximal.STL" }
         appearance: *RingAppearance
   -
     name: j2s7s300_joint_finger_2
@@ -234,7 +234,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/finger_proximal.STL" }
+        geometry: { type: Resource, uri: "resource/finger_proximal.STL" }
         appearance: *RingAppearance
   -
     name: j2s7s300_joint_finger_3
@@ -250,7 +250,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/finger_proximal.STL" }
+        geometry: { type: Resource, uri: "resource/finger_proximal.STL" }
         appearance: *RingAppearance
   -
     name: j2s7s300_joint_finger_tip_1
@@ -265,7 +265,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/finger_distal.STL" }
+        geometry: { type: Resource, uri: "resource/finger_distal.STL" }
         appearance: *RingAppearance
   -
     name: j2s7s300_joint_finger_tip_2
@@ -280,7 +280,7 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/finger_distal.STL" }
+        geometry: { type: Resource, uri: "resource/finger_distal.STL" }
         appearance: *RingAppearance
   -
     name: j2s7s300_joint_finger_tip_3
@@ -295,5 +295,5 @@ links:
     elements:
       -
         type: Shape
-        geometry: { type: Resource, uri: "parts/finger_distal.STL" }
+        geometry: { type: Resource, uri: "resource/finger_distal.STL" }
         appearance: *RingAppearance
