@@ -34,20 +34,20 @@ class SpotLiedownController : public SimpleController
     double qprev[12];
     double dt;
 
-    struct StateInfo {
+    struct ActionInfo {
         int buttonId;
         bool prevButtonState;
         bool stateChanged;
         const double* angleMap;
-        StateInfo(int buttonId, const double* angleMap)
+        ActionInfo(int buttonId, const double* angleMap)
             : buttonId(buttonId),
               prevButtonState(false),
               stateChanged(false),
               angleMap(angleMap)
         { }
     };
-    vector<StateInfo> states;
-    int currentMap;
+    vector<ActionInfo> actions;
+    bool is_liedown_enabled;
 
     SharedJoystickPtr joystick;
     int targetMode;
@@ -84,11 +84,11 @@ public:
 
         dt = io->timeStep();
 
-        states = {
+        actions = {
             { Joystick::B_BUTTON, down },
             { Joystick::X_BUTTON,   up }
         };
-        currentMap = 1;
+        is_liedown_enabled = false;
 
         joystick = io->getOrCreateSharedObject<SharedJoystick>("joystick");
         targetMode = joystick->addMode();
@@ -100,8 +100,8 @@ public:
     {
         joystick->updateState(targetMode);
 
-        for(size_t i = 0; i < states.size(); ++i) {
-            StateInfo info = states[i];
+        for(size_t i = 0; i < actions.size(); ++i) {
+            ActionInfo& info = actions[i];
             bool stateChanged = false;
             bool buttonState = joystick->getButtonState(targetMode, info.buttonId);
             if(buttonState && !info.prevButtonState) {
@@ -109,7 +109,7 @@ public:
             }
             info.prevButtonState = buttonState;
             if(stateChanged) {
-                currentMap = i == 0 ? 0 : 1;
+                is_liedown_enabled = i == 0 ? true: false;
             }
         }
 
@@ -119,7 +119,7 @@ public:
         for(int i = 0; i < 12; ++i) {
             Link* joint = legJoint[i];
 
-            double qe = radian(states[currentMap].angleMap[i]);
+            double qe = radian(actions[is_liedown_enabled ? 0 : 1].angleMap[i]);
             double q = joint->q();
             double dq = (q - qprev[i]) / dt;
             double dqref = 0.0;
