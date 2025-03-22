@@ -58,10 +58,10 @@ class Gen3liteJoystickController : public SimpleController
         { }
     };
     vector<ActionInfo> actions;
+    vector<ActionInfo> actions2;
 
     SharedJoystickPtr joystick;
     int targetMode;
-    bool prevButtonState2[2];
     bool prevMapState;
 
 public:
@@ -72,7 +72,6 @@ public:
         ostream& os = io->os();
         ioBody = io->body();
 
-        prevButtonState2[0] = prevButtonState2[1] = false;
         prevMapState = false;
         jointActuationMode = Link::JointVelocity;
         string prefix;
@@ -125,6 +124,10 @@ public:
             { 0, Joystick::B_BUTTON      },
             { 1, Joystick::SELECT_BUTTON },
             { 2, Joystick::START_BUTTON  }
+        };
+        actions2 = {
+            { 0, 0 },
+            { 1, 1 }
         };
 
         joystick = io->getOrCreateSharedObject<SharedJoystick>("joystick");
@@ -193,31 +196,39 @@ public:
             }
         }
 
-        // speed selection
-        bool currentState1 = fabs(pos[5]) > 0 ? true : false;
-        if(currentState1 && !prevButtonState2[0]) {
-            if(pos[5] == -1) {
-                currentSpeed = currentSpeed == 100 ? 100 : currentSpeed + 10;
-            } else if(pos[5] == 1) {
-                currentSpeed = currentSpeed == 40 ? 40 : currentSpeed - 10;
-            }
-            io->os() << "current speed is " << currentSpeed << "%." << endl;
-        }
-        prevButtonState2[0] = currentState1;
+        bool getPadState[2];
+        getPadState[0] = fabs(pos[5]) > 0 ? true : false;
+        getPadState[1] = fabs(pos[4]) > 0 ? true : false;
 
-        // joint selection
-        if(currentMap == Joint) {
-            bool currentState2 = fabs(pos[4]) > 0 ? true : false;
-            if(currentState2 && !prevButtonState2[1]) {
-                if(pos[4] == -1) {
-                    currentJoint = currentJoint == 0 ? 5 : currentJoint - 1;
-                    io->os() << "joint " << currentJoint << " is selected." << endl;
-                } else if(pos[4] == 1) {
-                    currentJoint = currentJoint == 5 ? 0 : currentJoint + 1;
-                    io->os() << "joint " << currentJoint << " is selected." << endl;
+        for(auto& info : actions2) {
+            bool stateChanged = false;
+            bool buttonState = getPadState[info.buttonId];
+            if(buttonState && !info.prevButtonState) {
+                stateChanged = true;
+            }
+            info.prevButtonState = buttonState;
+            if(stateChanged) {
+                if(info.actionId == 0) {
+                    // speed selection
+                    if(pos[5] == -1) {
+                        currentSpeed = currentSpeed == 100 ? 100 : currentSpeed + 10;
+                    } else if(pos[5] == 1) {
+                        currentSpeed = currentSpeed == 40 ? 40 : currentSpeed - 10;
+                    }
+                    io->os() << "current speed is " << currentSpeed << "%." << endl;
+                } else if(info.actionId == 1) {
+                    // joint selection
+                    if(currentMap == Joint) {
+                        if(pos[4] == -1) {
+                            currentJoint = currentJoint == 0 ? 5 : currentJoint - 1;
+                            io->os() << "joint " << currentJoint << " is selected." << endl;
+                        } else if(pos[4] == 1) {
+                            currentJoint = currentJoint == 5 ? 0 : currentJoint + 1;
+                            io->os() << "joint " << currentJoint << " is selected." << endl;
+                        }
+                    }
                 }
             }
-            prevButtonState2[1] = currentState2;
         }
 
         const double rate = (double)currentSpeed / 100.0;
