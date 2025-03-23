@@ -17,33 +17,31 @@ items:
       children:
         -
           id: 2
-          name: "Gen3lite"
+          name: "Husky-UR5-2F85"
           plugin: Body
           class: BodyItem
           is_checked: true
           data:
-            file: "${SHARE}/model/Gen3lite/Gen3lite.body"
+            file: "${SHARE}/UGV/model/Husky/Husky-UR5-2F85.body"
             format: CHOREONOID-BODY
-            rootPosition: [ 0, 0, 0 ]
+            rootPosition: [ 0, 0, 0.15 ]
             rootAttitude: [
               1, 0, 0,
               0, 1, 0,
               0, 0, 1 ]
-            jointDisplacements: [ 0, -20, 90, 80, 60, 0, 20, 0, -20, 0 ]
-            initialRootPosition: [ 0, 0, 0 ]
+            jointDisplacements: [
+              0, 0, 0, 0, 0, -150, 120, -60, -90, 0,
+              0, 0, 0, 0, 0, 0 ]
+            initialRootPosition: [ 0, 0, 0.15 ]
             initialRootAttitude: [
               1, 0, 0,
               0, 1, 0,
               0, 0, 1 ]
-            fix_root: true
+            fix_root: false
             collisionDetection: true
             selfCollisionDetection: false
             lock_location: false
             scene_sensitive: true
-            link_kinematics:
-              "end_effector":
-                base_frame: 0
-                offset_frame: 0
           children:
             -
               id: 3
@@ -57,8 +55,21 @@ items:
                 base_directory: "Controller directory"
                 reloading: false
                 export_symbols: false
+              children:
+                -
+                  id: 4
+                  name: "JoystickController2"
+                  plugin: Body
+                  class: SimpleControllerItem
+                  data:
+                    isNoDelayMode: false
+                    controllerOptions: ""
+                    controller: "UGVJoystickController"
+                    base_directory: "Controller directory"
+                    reloading: false
+                    export_symbols: false
         -
-          id: 4
+          id: 5
           name: "Floor"
           plugin: Body
           class: BodyItem
@@ -82,7 +93,7 @@ items:
             lock_location: false
             scene_sensitive: true
         -
-          id: 5
+          id: 6
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -129,7 +140,7 @@ views:
     class: ItemTreeView
     mounted: true
     state:
-      expanded: [ 1, 2 ]
+      expanded: [ 1, 2, 3 ]
   -
     id: 3
     plugin: Base
@@ -152,7 +163,7 @@ views:
     class: SceneView
     mounted: true
     state:
-      editMode: false
+      editMode: true
       viewpointOperationMode: thirdPerson
       visible_polygon_elements: [ face ]
       highlighting: false
@@ -161,7 +172,7 @@ views:
         -
           camera: [ System, Perspective ]
           isCurrent: true
-          eye: [ 1.23392, 0.523942, 0.488542 ]
+          eye: [ 3, 1.5, 1.2 ]
           direction: [ -0.880451, -0.440225, -0.17609 ]
           up: [ -0.1575, -0.0787495, 0.984374 ]
         -
@@ -225,7 +236,7 @@ views:
     class: LinkPositionView
     mounted: true
     state:
-      coordinate_mode: base
+      coordinate_mode: world
       preferred_coordinate_mode: base
       show_rpy: true
       unique_rpy: false
@@ -273,7 +284,7 @@ toolbars:
 Body:
   "BodySelectionManager":
     current_body_item: 2
-    current_link: "base_joint"
+    current_link: "BASE"
   "KinematicFaultChecker":
     checkJointPositions: true
     angleMargin: 0
@@ -291,7 +302,7 @@ Body:
         show_cm_projection: false
         show_zmp: false
       -
-        body_item: 4
+        body_item: 5
         show_cm: false
         show_cm_projection: false
         show_zmp: false
@@ -349,7 +360,7 @@ viewAreas:
         -
           type: splitter
           orientation: vertical
-          sizes: [ 225, 783 ]
+          sizes: [ 222, 786 ]
           children:
             -
               type: pane
@@ -357,7 +368,7 @@ viewAreas:
             -
               type: splitter
               orientation: vertical
-              sizes: [ 323, 456 ]
+              sizes: [ 306, 476 ]
               children:
                 -
                   type: pane

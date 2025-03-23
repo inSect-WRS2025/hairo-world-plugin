@@ -17,29 +17,33 @@ items:
       children:
         -
           id: 2
-          name: "Jackal"
+          name: "Gen3lite"
           plugin: Body
           class: BodyItem
           is_checked: true
           data:
-            file: "${SHARE}/model/Jackal/Jackal.body"
+            file: "${SHARE}/RoboticArm/model/Gen3lite/Gen3lite.body"
             format: CHOREONOID-BODY
-            rootPosition: [ 0, 0, 0.1 ]
+            rootPosition: [ 0, 0, 0 ]
             rootAttitude: [
               1, 0, 0,
               0, 1, 0,
               0, 0, 1 ]
-            jointDisplacements: [ 0, 0, 0, 0 ]
-            initialRootPosition: [ 0, 0, 0.1 ]
+            jointDisplacements: [ 0, -20, 90, 80, 60, 0, 20, 0, -20, 0 ]
+            initialRootPosition: [ 0, 0, 0 ]
             initialRootAttitude: [
               1, 0, 0,
               0, 1, 0,
               0, 0, 1 ]
-            fix_root: false
+            fix_root: true
             collisionDetection: true
             selfCollisionDetection: false
             lock_location: false
             scene_sensitive: true
+            link_kinematics:
+              "end_effector":
+                base_frame: 0
+                offset_frame: 0
           children:
             -
               id: 3
@@ -49,7 +53,7 @@ items:
               data:
                 isNoDelayMode: false
                 controllerOptions: ""
-                controller: "UGVJoystickController"
+                controller: "RAJoystickController"
                 base_directory: "Controller directory"
                 reloading: false
                 export_symbols: false
@@ -83,7 +87,7 @@ items:
           plugin: Body
           class: AISTSimulatorItem
           data:
-            time_step: 0.001
+            time_step: 0.005
             realtime_sync_mode: compensatory
             recording: full
             time_range_mode: unlimited
@@ -96,7 +100,7 @@ items:
             controller_options: ""
             block_scene_view_edit_mode: false
             dynamicsMode: "Forward dynamics"
-            integrationMode: runge-kutta
+            integrationMode: semi-implicit_euler
             gravity: [ 0, 0, -9.80665 ]
             min_friction_coefficient: 0
             max_friction_coefficient: 100
@@ -157,9 +161,9 @@ views:
         -
           camera: [ System, Perspective ]
           isCurrent: true
-          eye: [ 3, 1.5, 1.2 ]
+          eye: [ 1.23392, 0.523942, 0.488542 ]
           direction: [ -0.880451, -0.440225, -0.17609 ]
-          up: [ -0.1575, -0.0787498, 0.984374 ]
+          up: [ -0.1575, -0.0787495, 0.984374 ]
         -
           camera: [ System, Orthographic ]
           orthoHeight: 20
@@ -221,7 +225,7 @@ views:
     class: LinkPositionView
     mounted: true
     state:
-      coordinate_mode: world
+      coordinate_mode: base
       preferred_coordinate_mode: base
       show_rpy: true
       unique_rpy: false
@@ -235,6 +239,11 @@ views:
     mounted: true
   -
     id: 10
+    plugin: JoystickStart
+    class: OnScreenJoystickView
+    mounted: true
+  -
+    id: 11
     plugin: Python
     class: PythonConsoleView
     mounted: true
@@ -264,7 +273,7 @@ toolbars:
 Body:
   "BodySelectionManager":
     current_body_item: 2
-    current_link: "CHASSIS"
+    current_link: "base_joint"
   "KinematicFaultChecker":
     checkJointPositions: true
     angleMargin: 0
@@ -326,13 +335,21 @@ viewAreas:
                   type: pane
                   views: [ 5 ]
                 -
-                  type: pane
-                  views: [ 4, 10 ]
-                  current: 4
+                  type: splitter
+                  orientation: horizontal
+                  sizes: [ 516, 515 ]
+                  children:
+                    -
+                      type: pane
+                      views: [ 4, 11 ]
+                      current: 4
+                    -
+                      type: pane
+                      views: [ 10 ]
         -
           type: splitter
           orientation: vertical
-          sizes: [ 222, 786 ]
+          sizes: [ 225, 783 ]
           children:
             -
               type: pane
@@ -340,7 +357,7 @@ viewAreas:
             -
               type: splitter
               orientation: vertical
-              sizes: [ 306, 476 ]
+              sizes: [ 323, 456 ]
               children:
                 -
                   type: pane

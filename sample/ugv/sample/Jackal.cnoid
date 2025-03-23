@@ -17,20 +17,20 @@ items:
       children:
         -
           id: 2
-          name: "Husky"
+          name: "Jackal"
           plugin: Body
           class: BodyItem
           is_checked: true
           data:
-            file: "${SHARE}/model/Husky/Husky.body"
+            file: "${SHARE}/UGV/model/Jackal/Jackal.body"
             format: CHOREONOID-BODY
-            rootPosition: [ 0, 0, 0.13228 ]
+            rootPosition: [ 0, 0, 0.1 ]
             rootAttitude: [
               1, 0, 0,
               0, 1, 0,
               0, 0, 1 ]
             jointDisplacements: [ 0, 0, 0, 0 ]
-            initialRootPosition: [ 0, 0, 0.13228 ]
+            initialRootPosition: [ 0, 0, 0.1 ]
             initialRootAttitude: [
               1, 0, 0,
               0, 1, 0,
@@ -159,7 +159,7 @@ views:
           isCurrent: true
           eye: [ 3, 1.5, 1.2 ]
           direction: [ -0.880451, -0.440225, -0.17609 ]
-          up: [ -0.1575, -0.0787496, 0.984374 ]
+          up: [ -0.1575, -0.0787497, 0.984374 ]
         -
           camera: [ System, Orthographic ]
           orthoHeight: 20
@@ -235,6 +235,11 @@ views:
     mounted: true
   -
     id: 10
+    plugin: JoystickStart
+    class: OnScreenJoystickView
+    mounted: true
+  -
+    id: 11
     plugin: Python
     class: PythonConsoleView
     mounted: true
@@ -264,7 +269,7 @@ toolbars:
 Body:
   "BodySelectionManager":
     current_body_item: 2
-    current_link: "BASE"
+    current_link: "CHASSIS"
   "KinematicFaultChecker":
     checkJointPositions: true
     angleMargin: 0
@@ -326,9 +331,17 @@ viewAreas:
                   type: pane
                   views: [ 5 ]
                 -
-                  type: pane
-                  views: [ 4, 10 ]
-                  current: 4
+                  type: splitter
+                  orientation: horizontal
+                  sizes: [ 516, 515 ]
+                  children:
+                    -
+                      type: pane
+                      views: [ 4, 11 ]
+                      current: 4
+                    -
+                      type: pane
+                      views: [ 10 ]
         -
           type: splitter
           orientation: vertical

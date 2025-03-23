@@ -17,21 +17,19 @@ items:
       children:
         -
           id: 2
-          name: "Gen2"
+          name: "Gen3WV"
           plugin: Body
           class: BodyItem
           is_checked: true
           data:
-            file: "${SHARE}/model/Gen2/Gen2.body"
+            file: "${SHARE}/RoboticArm/model/Gen3/Gen3WV.body"
             format: CHOREONOID-BODY
             rootPosition: [ 0, 0, 0 ]
             rootAttitude: [
               1, 0, 0,
               0, 1, 0,
               0, 0, 1 ]
-            jointDisplacements: [
-              103.1, 197.3, 180, 43.6, 265.2, 257.5, 288.1, 0, 0, 0,
-              0, 0, 0 ]
+            jointDisplacements: [ 360, 15, 180, 230, 360, 55, 90 ]
             initialRootPosition: [ 0, 0, 0 ]
             initialRootAttitude: [
               1, 0, 0,
@@ -43,7 +41,7 @@ items:
             lock_location: false
             scene_sensitive: true
             link_kinematics:
-              "j2s7s300_joint_end_effector":
+              "end_effector":
                 base_frame: 0
                 offset_frame: 0
           children:
@@ -163,7 +161,7 @@ views:
         -
           camera: [ System, Perspective ]
           isCurrent: true
-          eye: [ 1.45374, 0.586865, 0.634788 ]
+          eye: [ 1.26091, 0.617272, 0.608562 ]
           direction: [ -0.880451, -0.440225, -0.17609 ]
           up: [ -0.1575, -0.0787495, 0.984374 ]
         -
@@ -275,7 +273,7 @@ toolbars:
 Body:
   "BodySelectionManager":
     current_body_item: 2
-    current_link: "j2s7s300_joint_base"
+    current_link: "end_effector"
   "KinematicFaultChecker":
     checkJointPositions: true
     angleMargin: 0

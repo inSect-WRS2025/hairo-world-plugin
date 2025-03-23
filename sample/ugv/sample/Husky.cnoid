@@ -17,22 +17,20 @@ items:
       children:
         -
           id: 2
-          name: "Husky-UR5-2F85"
+          name: "Husky"
           plugin: Body
           class: BodyItem
           is_checked: true
           data:
-            file: "${SHARE}/model/Husky/Husky-UR5-2F85.body"
+            file: "${SHARE}/UGV/model/Husky/Husky.body"
             format: CHOREONOID-BODY
-            rootPosition: [ 0, 0, 0.15 ]
+            rootPosition: [ 0, 0, 0.13228 ]
             rootAttitude: [
               1, 0, 0,
               0, 1, 0,
               0, 0, 1 ]
-            jointDisplacements: [
-              0, 0, 0, 0, 0, -150, 120, -60, -90, 0,
-              0, 0, 0, 0, 0, 0 ]
-            initialRootPosition: [ 0, 0, 0.15 ]
+            jointDisplacements: [ 0, 0, 0, 0 ]
+            initialRootPosition: [ 0, 0, 0.13228 ]
             initialRootAttitude: [
               1, 0, 0,
               0, 1, 0,
@@ -51,25 +49,12 @@ items:
               data:
                 isNoDelayMode: false
                 controllerOptions: ""
-                controller: "RAJoystickController"
+                controller: "UGVJoystickController"
                 base_directory: "Controller directory"
                 reloading: false
                 export_symbols: false
-              children:
-                -
-                  id: 4
-                  name: "JoystickController2"
-                  plugin: Body
-                  class: SimpleControllerItem
-                  data:
-                    isNoDelayMode: false
-                    controllerOptions: ""
-                    controller: "UGVJoystickController"
-                    base_directory: "Controller directory"
-                    reloading: false
-                    export_symbols: false
         -
-          id: 5
+          id: 4
           name: "Floor"
           plugin: Body
           class: BodyItem
@@ -93,12 +78,12 @@ items:
             lock_location: false
             scene_sensitive: true
         -
-          id: 6
+          id: 5
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
           data:
-            time_step: 0.005
+            time_step: 0.001
             realtime_sync_mode: compensatory
             recording: full
             time_range_mode: unlimited
@@ -111,7 +96,7 @@ items:
             controller_options: ""
             block_scene_view_edit_mode: false
             dynamicsMode: "Forward dynamics"
-            integrationMode: semi-implicit_euler
+            integrationMode: runge-kutta
             gravity: [ 0, 0, -9.80665 ]
             min_friction_coefficient: 0
             max_friction_coefficient: 100
@@ -140,7 +125,7 @@ views:
     class: ItemTreeView
     mounted: true
     state:
-      expanded: [ 1, 2, 3 ]
+      expanded: [ 1, 2 ]
   -
     id: 3
     plugin: Base
@@ -163,7 +148,7 @@ views:
     class: SceneView
     mounted: true
     state:
-      editMode: true
+      editMode: false
       viewpointOperationMode: thirdPerson
       visible_polygon_elements: [ face ]
       highlighting: false
@@ -302,7 +287,7 @@ Body:
         show_cm_projection: false
         show_zmp: false
       -
-        body_item: 5
+        body_item: 4
         show_cm: false
         show_cm_projection: false
         show_zmp: false
