@@ -27,24 +27,3 @@ if(BUILD_PHITS_PLUGIN)
     endforeach()
   endif()
 endif()
-
-# "model" directory
-install(DIRECTORY model DESTINATION ${CHOREONOID_SHARE_SUBDIR})
-if(make_symlink)
-#  file(MAKE_DIRECTORY ${CHOREONOID_BINARY_SHARE_DIR}/model)
-  if(ENABLE_SAMPLES)
-    set(sample_model_dirs
-      MockupStairs RobotTestPool TestField TrainingStage)
-    foreach(dir ${sample_model_dirs})
-      add_custom_target(
-	symlink_to_model_${dir} ALL
-	COMMAND ${CMAKE_COMMAND} -E create_symlink
-	${CMAKE_CURRENT_SOURCE_DIR}/model/${dir} ${CHOREONOID_BINARY_SHARE_DIR}/model/${dir})
-    endforeach()
-  endif()
-endif()
-
-# "project" directory
-#if(make_symlink)
-#  file(MAKE_DIRECTORY ${CHOREONOID_BINARY_SHARE_DIR}/project)
-#endif()
