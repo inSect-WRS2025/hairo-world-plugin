@@ -79,6 +79,7 @@ class RAJoystickController : public SimpleController
     int prevMap;
     int currentJoint;
     int currentSpeed;
+    bool prevActionState;
     double maxV;
     double maxW;
     double time;
@@ -201,6 +202,7 @@ public:
         currentMap = prevMap = 0;
         currentJoint = 0;
         currentSpeed = 50;
+        prevActionState = false;
         time = 0.0;
         timeStep = io->timeStep();
 
@@ -297,73 +299,7 @@ public:
             }
         }
 
-        const double speedRatio = (double)currentSpeed / 100.0;
-
-        if(currentMap != prevMap) {
-            for(int i = 0; i < ioBody->numJoints(); ++i) {
-                Link* joint = ioBody->joint(i);
-                double q = joint->q();
-                ikBody->joint(i)->q() = q;
-                qold[i] = q;
-            }
-
-            baseToWrist->calcForwardKinematics();
-        }
-        prevMap = currentMap;
-
-        if(currentMap == 2) {
-            double pos = joystick->getPosition(targetMode, Joystick::R_STICK_H_AXIS);
-            if(fabs(pos) < 0.15) {
-                pos = 0.0;
-            }
-
-            Link* joint = ioBody->joint(currentJoint);
-            if((joint->q() < joint->q_lower() && pos < 0.0)
-                || (joint->q() > joint->q_upper() && pos > 0.0)) {
-                pos = 0.0;
-            }
-
-            for(auto& info : arms) {
-                if(ioBody->name() == info.bodyName) {
-                    // selected joint rotation
-                    double w = info.speedLimits[joint->jointId()];
-                    qref[joint->jointId()] += pos * w * timeStep * speedRatio;
-                }
-            }
-        } else {
-            static const int axisID[] = {
-                Joystick::L_STICK_H_AXIS, Joystick::L_STICK_V_AXIS,
-                Joystick::R_STICK_H_AXIS, Joystick::R_STICK_V_AXIS
-            };
-
-            double pos[4];
-            for(int i = 0; i < 4; ++i) {
-                pos[i] = joystick->getPosition(targetMode, axisID[i]);
-                if(fabs(pos[i]) < 0.2) {
-                    pos[i] = 0.0;
-                }
-            }
-
-            VectorXd p(6);
-            if(currentMap == 0) {
-                p.head<3>() = ikWrist->p() + Vector3(-pos[1], -pos[0], -pos[3]) * maxV * timeStep * speedRatio;
-                p.tail<3>() = rpyFromRot(ikWrist->R());
-            } else if(currentMap == 1) {
-                p.head<3>() = ikWrist->p();
-                p.tail<3>() = rpyFromRot(ikWrist->R() * rotFromRpy(Vector3(pos[1], -pos[0], -pos[2]) * maxW * timeStep * speedRatio));
-            }
-
-            Isometry3 T;
-            T.linear() = rotFromRpy(Vector3(p.tail<3>()));
-            T.translation() = p.head<3>();
-            if(baseToWrist->calcInverseKinematics(T)) {
-                for(int i = 0; i < baseToWrist->numJoints(); ++i) {
-                    Link* joint = baseToWrist->joint(i);
-                    qref[joint->jointId()] = joint->q();
-                }
-            }
-        }
-
+        bool is_action_running = false;
         for(int i = 0; i < 2; ++i) {
             bool buttonState = joystick->getButtonState(targetMode,
                 i == 0 ? Joystick::A_BUTTON : Joystick::B_BUTTON);
@@ -379,8 +315,88 @@ public:
                                 double q = joint->q();
                                 double deltaq = (qe - q) * timeStep;
                                 qref[joint->jointId()] += deltaq;
+                                is_action_running = true;
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        bool stateChanged = false;
+        if(!is_action_running && prevActionState) {
+            stateChanged = true;
+        }
+        prevActionState = is_action_running;
+
+        if(currentMap != prevMap) {
+            stateChanged = true;
+        }
+        prevMap = currentMap;
+
+        if(stateChanged) {
+            for(int i = 0; i < ioBody->numJoints(); ++i) {
+                Link* joint = ioBody->joint(i);
+                double q = joint->q();
+                ikBody->joint(i)->q() = q;
+                qold[i] = q;
+            }
+
+            baseToWrist->calcForwardKinematics();
+        }
+
+        if(!is_action_running) {
+            const double speedRatio = (double)currentSpeed / 100.0;
+
+            if(currentMap == 2) {
+                double pos = joystick->getPosition(targetMode, Joystick::R_STICK_H_AXIS);
+                if(fabs(pos) < 0.15) {
+                    pos = 0.0;
+                }
+
+                Link* joint = ioBody->joint(currentJoint);
+                if((joint->q() < joint->q_lower() && pos < 0.0)
+                    || (joint->q() > joint->q_upper() && pos > 0.0)) {
+                    pos = 0.0;
+                }
+
+                for(auto& info : arms) {
+                    if(ioBody->name() == info.bodyName) {
+                        // selected joint rotation
+                        double w = info.speedLimits[joint->jointId()];
+                        qref[joint->jointId()] += pos * w * timeStep * speedRatio;
+                    }
+                }
+            } else {
+                static const int axisID[] = {
+                    Joystick::L_STICK_H_AXIS, Joystick::L_STICK_V_AXIS,
+                    Joystick::R_STICK_H_AXIS, Joystick::R_STICK_V_AXIS
+                };
+
+                double pos[4];
+                for(int i = 0; i < 4; ++i) {
+                    pos[i] = joystick->getPosition(targetMode, axisID[i]);
+                    if(fabs(pos[i]) < 0.2) {
+                        pos[i] = 0.0;
+                    }
+                }
+
+                VectorXd p(6);
+                if(currentMap == 0) {
+                    p.head<3>() = ikWrist->p() + Vector3(-pos[1], -pos[0], -pos[3]) * maxV * timeStep * speedRatio;
+                    p.tail<3>() = rpyFromRot(ikWrist->R());
+                } else if(currentMap == 1) {
+                    p.head<3>() = ikWrist->p();
+                    p.tail<3>() = rpyFromRot(ikWrist->R() * rotFromRpy(Vector3(pos[1], -pos[0], -pos[2]) * maxW * timeStep * speedRatio));
+                }
+
+                Isometry3 T;
+                T.linear() = rotFromRpy(Vector3(p.tail<3>()));
+                T.translation() = p.head<3>();
+                if(baseToWrist->calcInverseKinematics(T)) {
+                    for(int i = 0; i < baseToWrist->numJoints(); ++i) {
+                        Link* joint = baseToWrist->joint(i);
+                        qref[joint->jointId()] = joint->q();
                     }
                 }
             }
@@ -403,7 +419,7 @@ public:
                 } else if(fabs(pos[1]) > 0.0) {
                     dq_hand = -1.0;
                 }
-                if(ioBody->name() == "Gen3lite") {
+                if(ioFinger[i]->name() == "right_finger_bottom_joint") {
                     dq_hand *= -1.0;
                 }
                 if((ioFinger[i]->q() < ioFinger[i]->q_lower() && dq_hand < 0.0)
