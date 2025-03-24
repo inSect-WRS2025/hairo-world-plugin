@@ -13,6 +13,16 @@ using namespace cnoid;
 
 namespace {
 
+const double pgain[] = {
+    150.00, 150.00, 150.00, 150.00, 150.00, 150.00,
+    150.00, 150.00, 150.00, 150.00, 150.00, 150.00
+};
+
+const double dgain[] = {
+    15.00, 15.00, 15.00, 15.00, 15.00, 15.00,
+    15.00, 15.00, 15.00, 15.00, 15.00, 15.00
+};
+
 const double down[] = {
     0.0, 96.2, -143.4, 0.0, 96.2, -143.4,
     0.0, 96.2, -143.4, 0.0, 96.2, -143.4
@@ -27,20 +37,20 @@ const double up[] = {
 
 class SpotLiedownController : public SimpleController
 {
-    SimpleControllerIO* io;
-    int legActuationMode;
-    Link* legJoint[12];
-    double qref[12];
-    double qprev[12];
-    double dt;
+    Body* ioBody;
+    VectorXd qref, qold, qref_old;
+    double timeStep;
+    bool isKinematicsMode;
 
     struct ActionInfo {
+        int actionId;
         int buttonId;
         bool prevButtonState;
         bool stateChanged;
         const double* angleMap;
-        ActionInfo(int buttonId, const double* angleMap)
-            : buttonId(buttonId),
+        ActionInfo(int actionId, int buttonId, const double* angleMap)
+            : actionId(actionId),
+              buttonId(buttonId),
               prevButtonState(false),
               stateChanged(false),
               angleMap(angleMap)
@@ -56,37 +66,33 @@ public:
 
     virtual bool initialize(SimpleControllerIO* io) override
     {
-        this->io = io;
-        ostream& os = io->os();
-        Body* body = io->body();
+        ioBody = io->body();
 
-        legActuationMode = Link::JointEffort;
+        isKinematicsMode = false;
         for(auto opt : io->options()) {
-            if(opt == "position") {
-                legActuationMode = Link::JointDisplacement;
-                os << "The joint-position command mode is used." << endl;
-            } else if(opt == "velocity") {
-                legActuationMode = Link::JointVelocity;
-                os << "The joint-velocity command mode is used." << endl;
+            if(opt == "kinematics") {
+                isKinematicsMode = true;
             }
         }
 
-        for(int i = 0; i < 12; ++i) {
-            Link* joint = legJoint[i] = body->joint(i);
-            if(!joint) {
-                os << "Turret joint " << i << " is not found." << endl;
-                return false;
-            }
-            qref[i] = qprev[i] = joint->q();
-            joint->setActuationMode(legActuationMode);
+        const int nj = ioBody->numJoints();
+        qold.resize(nj);
+        for(int i = 0; i < nj; ++i) {
+            Link* joint = ioBody->joint(i);
+            joint->setActuationMode(isKinematicsMode ? JointDisplacement : JointEffort);
             io->enableIO(joint);
+            double q = joint->q();
+            qold[i] = q;
         }
 
-        dt = io->timeStep();
+        qref = qold;
+        qref_old = qold;
+
+        timeStep = io->timeStep();
 
         actions = {
-            { Joystick::B_BUTTON, down },
-            { Joystick::X_BUTTON,   up }
+            { 0, Joystick::B_BUTTON, down },
+            { 1, Joystick::X_BUTTON,   up }
         };
         is_liedown_enabled = false;
 
@@ -100,8 +106,7 @@ public:
     {
         joystick->updateState(targetMode);
 
-        for(size_t i = 0; i < actions.size(); ++i) {
-            ActionInfo& info = actions[i];
+        for(auto& info : actions) {
             bool stateChanged = false;
             bool buttonState = joystick->getButtonState(targetMode, info.buttonId);
             if(buttonState && !info.prevButtonState) {
@@ -109,33 +114,29 @@ public:
             }
             info.prevButtonState = buttonState;
             if(stateChanged) {
-                is_liedown_enabled = i == 0 ? true: false;
+                is_liedown_enabled = info.actionId == 0 ? true: false;
             }
         }
 
-        static const double P = 150.0;
-        static const double D = 15.0;
-
-        for(int i = 0; i < 12; ++i) {
-            Link* joint = legJoint[i];
-
+        for(int i = 0; i < ioBody->numJoints(); ++i) {
             double qe = radian(actions[is_liedown_enabled ? 0 : 1].angleMap[i]);
-            double q = joint->q();
-            double dq = (q - qprev[i]) / dt;
-            double dqref = 0.0;
-            double deltaq = (qe - q) * dt;
+            double q = ioBody->joint(i)->q();
+            double deltaq = (qe - q) * timeStep;
             qref[i] += deltaq;
-            dqref = deltaq / dt;
-
-            if(legActuationMode == Link::JointDisplacement) {
-                joint->q_target() = joint->q() + deltaq;
-            } else if(legActuationMode == Link::JointVelocity) {
-                joint->dq_target() = dqref;
-            } else if(legActuationMode == Link::JointEffort) {
-                joint->u() = P * (qref[i] - q) + D * (dqref - dq);
-            }
-            qprev[i] = q;
         }
+
+        for(int i = 0; i < ioBody->numJoints(); ++i) {
+            if(isKinematicsMode) {
+                ioBody->joint(i)->q_target() = qref[i];
+            } else {
+                double q = ioBody->joint(i)->q();
+                double dq = (q - qold[i]) / timeStep;
+                double dq_ref = (qref[i] - qref_old[i]) / timeStep;
+                ioBody->joint(i)->u() = (qref[i] - q) * pgain[i] + (dq_ref - dq) * dgain[i];
+                qold[i] = q;
+            }
+        }
+        qref_old = qref;
 
         return true;
     }

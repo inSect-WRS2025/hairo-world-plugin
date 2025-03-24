@@ -17,10 +17,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/body.dae" }
+          - { type: Resource, uri: "resource/body.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/body_collision.stl" }
+          - { type: Resource, uri: "resource/body_collision.stl" }
   -
     name: front_rail_joint
     parent: base_link_joint
@@ -59,10 +59,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/front_left_hip.dae" }
+          - { type: Resource, uri: "resource/front_left_hip.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/front_left_hip_collision.stl" }
+          - { type: Resource, uri: "resource/front_left_hip_collision.stl" }
   -
     name: front_left_hip_y
     parent: front_left_hip_x
@@ -81,10 +81,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/front_left_upper_leg.dae" }
+          - { type: Resource, uri: "resource/front_left_upper_leg.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/front_left_upper_leg_collision.stl" }
+          - { type: Resource, uri: "resource/front_left_upper_leg_collision.stl" }
   -
     name: front_left_knee
     parent: front_left_hip_y
@@ -103,10 +103,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/front_left_lower_leg.dae" }
+          - { type: Resource, uri: "resource/front_left_lower_leg.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/front_left_lower_leg_collision.stl" }
+          - { type: Resource, uri: "resource/front_left_lower_leg_collision.stl" }
   -
     name: front_right_hip_x
     parent: base_link_joint
@@ -125,10 +125,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/front_right_hip.dae" }
+          - { type: Resource, uri: "resource/front_right_hip.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/front_right_hip_collision.stl" }
+          - { type: Resource, uri: "resource/front_right_hip_collision.stl" }
   -
     name: front_right_hip_y
     parent: front_right_hip_x
@@ -147,10 +147,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/front_right_upper_leg.dae" }
+          - { type: Resource, uri: "resource/front_right_upper_leg.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/front_right_upper_leg_collision.stl" }
+          - { type: Resource, uri: "resource/front_right_upper_leg_collision.stl" }
   -
     name: front_right_knee
     parent: front_right_hip_y
@@ -169,10 +169,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/front_right_lower_leg.dae" }
+          - { type: Resource, uri: "resource/front_right_lower_leg.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/front_right_lower_leg_collision.stl" }
+          - { type: Resource, uri: "resource/front_right_lower_leg_collision.stl" }
   -
     name: rear_left_hip_x
     parent: base_link_joint
@@ -191,10 +191,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/rear_left_hip.dae" }
+          - { type: Resource, uri: "resource/rear_left_hip.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/rear_left_hip_collision.stl" }
+          - { type: Resource, uri: "resource/rear_left_hip_collision.stl" }
   -
     name: rear_left_hip_y
     parent: rear_left_hip_x
@@ -213,10 +213,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/rear_left_upper_leg.dae" }
+          - { type: Resource, uri: "resource/rear_left_upper_leg.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/rear_left_upper_leg_collision.stl" }
+          - { type: Resource, uri: "resource/rear_left_upper_leg_collision.stl" }
   -
     name: rear_left_knee
     parent: rear_left_hip_y
@@ -235,10 +235,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/rear_left_lower_leg.dae" }
+          - { type: Resource, uri: "resource/rear_left_lower_leg.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/rear_left_lower_leg_collision.stl" }
+          - { type: Resource, uri: "resource/rear_left_lower_leg_collision.stl" }
   -
     name: rear_right_hip_x
     parent: base_link_joint
@@ -257,10 +257,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/rear_right_hip.dae" }
+          - { type: Resource, uri: "resource/rear_right_hip.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/rear_right_hip_collision.stl" }
+          - { type: Resource, uri: "resource/rear_right_hip_collision.stl" }
   -
     name: rear_right_hip_y
     parent: rear_right_hip_x
@@ -279,10 +279,10 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/rear_right_upper_leg.dae" }
+          - { type: Resource, uri: "resource/rear_right_upper_leg.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/rear_right_upper_leg_collision.stl" }
+          - { type: Resource, uri: "resource/rear_right_upper_leg_collision.stl" }
   -
     name: rear_right_knee
     parent: rear_right_hip_y
@@ -301,7 +301,7 @@ links:
     elements:
       Visual:
         elements:
-          - { type: Resource, uri: "parts/rear_right_lower_leg.dae" }
+          - { type: Resource, uri: "resource/rear_right_lower_leg.dae" }
       Collision:
         elements:
-          - { type: Resource, uri: "parts/rear_right_lower_leg_collision.stl" }
+          - { type: Resource, uri: "resource/rear_right_lower_leg_collision.stl" }
