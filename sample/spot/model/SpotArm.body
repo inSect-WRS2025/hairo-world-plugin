@@ -18,7 +18,7 @@ links:
       -
         type: Shape
         scale: [ 0.001, 0.001, 0.001 ]
-        geometry:  { type: Resource, uri: "parts/arm/base_link.stl" }
+        geometry:  { type: Resource, uri: "resource/arm/base_link.stl" }
         appearance: &silver { material: { diffuseColor: [ 0.7, 0.7, 0.7 ] } }
   -
     name: arm_joint1
@@ -40,7 +40,7 @@ links:
         type: Shape
         translation: [ -0.0, -0.0, -0.065 ]
         scale: [ 0.001, 0.001, 0.001 ]
-        geometry:  { type: Resource, uri: "parts/arm/link1.stl" }
+        geometry:  { type: Resource, uri: "resource/arm/link1.stl" }
         appearance: *silver
   -
     name: arm_joint2
@@ -62,7 +62,7 @@ links:
         type: Shape
         translation: [ -0.015, -0.0, -0.115 ]
         scale: [ 0.001, 0.001, 0.001 ]
-        geometry:  { type: Resource, uri: "parts/arm/link2.stl" }
+        geometry:  { type: Resource, uri: "resource/arm/link2.stl" }
         appearance: *silver
   -
     name: arm_joint3
@@ -84,7 +84,7 @@ links:
         type: Shape
         translation: [ -0.017, -0.3125, -0.115 ]
         scale: [ 0.001, 0.001, 0.001 ]
-        geometry:  { type: Resource, uri: "parts/arm/link3.stl" }
+        geometry:  { type: Resource, uri: "resource/arm/link3.stl" }
         appearance: *silver
   -
     name: arm_joint4
@@ -106,7 +106,7 @@ links:
         type: Shape
         translation: [ 0.001, -0.4505, -0.0475 ]
         scale: [ 0.001, 0.001, 0.001 ]
-        geometry:  { type: Resource, uri: "parts/arm/link4.stl" }
+        geometry:  { type: Resource, uri: "resource/arm/link4.stl" }
         appearance: *silver
   -
     name: arm_joint5
@@ -128,7 +128,7 @@ links:
         type: Shape
         translation: [ 0.0485, -0.69859, -0.0475 ]
         scale: [ 0.001, 0.001, 0.001 ]
-        geometry:  { type: Resource, uri: "parts/arm/wrist.stl" }
+        geometry:  { type: Resource, uri: "resource/arm/wrist.stl" }
         appearance: *silver
   -
     name: arm_joint6
@@ -150,7 +150,7 @@ links:
         type: Shape
         translation: [ 0.0085, -0.77959, -0.0475 ]
         scale: [ 0.001, 0.001, 0.001 ]
-        geometry:  { type: Resource, uri: "parts/arm/gripper.stl" }
+        geometry:  { type: Resource, uri: "resource/arm/gripper.stl" }
         appearance: *silver
   -
     name: arm_gripper
@@ -172,5 +172,5 @@ links:
         type: Shape
         translation: [ 0.87709, -0.823505, -0.0185 ]
         scale: [ 0.001, 0.001, 0.001 ]
-        geometry:  { type: Resource, uri: "parts/arm/finger.stl" }
+        geometry:  { type: Resource, uri: "resource/arm/finger.stl" }
         appearance: *silver

@@ -77,7 +77,7 @@ int NoisyCamera::stateSize() const
 }
 
 
-const double* NoisyCamera::readState(const double* buf)
+const double* NoisyCamera::readState(const double* buf,int size)
 {
     buf = VisionSensor::readState(buf, Camera::stateSize());
     setHsv(Eigen::Map<const Vector3>(buf));
