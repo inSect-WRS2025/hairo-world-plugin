@@ -79,7 +79,7 @@ int NoisyCamera::stateSize() const
 
 const double* NoisyCamera::readState(const double* buf,int size)
 {
-    buf = VisionSensor::readState(buf, size);
+    buf = VisionSensor::readState(buf, Camera::stateSize());
     setHsv(Eigen::Map<const Vector3>(buf));
     setRgb(Eigen::Map<const Vector3>(buf));
     setCoefB(buf[6]);
